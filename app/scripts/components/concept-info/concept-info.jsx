@@ -13,7 +13,7 @@ let ConceptInfo = React.createClass({
 		let comp;
 
 		if (this.state.edit) {
-			comp = (<ConceptForm {...this.props}/>);
+			comp = (<ConceptForm onDone={this.onShow} {...this.props}/>);
 		} else {
 			comp = (<ConceptView onEdit={this.onEdit} {...this.props}/>);
 		}
@@ -25,6 +25,10 @@ let ConceptInfo = React.createClass({
 
 	onEdit() {
 		this.setState({'edit': true});
+	},
+
+	onShow() {
+		this.setState({'edit': false});
 	}
 
 });

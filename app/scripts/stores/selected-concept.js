@@ -1,27 +1,39 @@
 let Reflux = require('reflux');
 
+let _ = require('lodash');
 let qwest = require('qwest');
 
 let ConceptActions = require('../actions/concept-actions');
-let host = require('../configs/api').host;
+
+let {host} = require('../configs/api');
+let endpoint = `${host}/concepts`;
+let ressource = (id) => `${endpoint}/${id}`;
 
 let SelectedConcept = Reflux.createStore({
 
   listenables: ConceptActions,
 
   select(id) {
-    let store = this;
-    qwest.get(`${host}/concepts/${id}`).then((data) => {
-      store.setConcept(JSON.parse(data));
-    });
+    qwest.get(ressource(id)).then(this.handleResponse);
   },
 
+	save(data) {
+		let route = ressource(this.concept.id);
+		qwest.post(route, {'concept': data}, {'dataType': 'json'})
+			.then(this.handleResponse);
+	},
+
+	handleResponse(data) {
+		this.setConcept(JSON.parse(data));
+	},
+
 	unselect() {
-		this.setConcept(undefined);
+		this.setConcept();
 	},
 
   setConcept(concept) {
-    this.trigger(this.concept = concept);
+	  this.concept = (!concept ? undefined : _.merge({}, this.concept, concept));
+    this.trigger(this.concept);
   }
 
 });

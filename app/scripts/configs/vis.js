@@ -9,7 +9,6 @@ export default {
     'enabled': true,
     'initiallyVisible': true
   },
-  'keyboard': true,
   'nodes': {
     'color': {
       'background': '#f1c40f',
