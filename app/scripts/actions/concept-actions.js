@@ -2,7 +2,8 @@ let Reflux = require('reflux');
 
 let ConceptActions = Reflux.createActions([
   'getAll',
-  'find'
+  'select',
+	'unselect'
 ]);
 
 export default ConceptActions;

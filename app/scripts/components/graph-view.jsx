@@ -3,10 +3,10 @@ let Reflux = require('reflux');
 
 let ConceptActions = require('../actions/concept-actions');
 let Concepts = require('../stores/concepts');
-let Concept = require('../stores/concept');
+let SelectedConcept = require('../stores/selected-concept');
 
 let Graph = require('./graph');
-let ConceptInfo = require('./concept-info');
+let ConceptInfo = require('./concept-info/concept-info');
 
 let GraphView = React.createClass({
 
@@ -19,16 +19,16 @@ let GraphView = React.createClass({
   componentWillMount() {
     ConceptActions.getAll();
     this.listenTo(Concepts, (concepts) => this.setState({concepts}));
-    this.listenTo(Concept, (concept) => this.setState({
+    this.listenTo(SelectedConcept, (concept) => this.setState({
       'selectedConcept': concept
     }));
   },
 
   render() {
-    let conceptInfo = '';
+    let concept = '';
     let selectedConcept = this.state.selectedConcept;
     if (selectedConcept) {
-      conceptInfo = <ConceptInfo concept={selectedConcept}/>;
+      concept = <ConceptInfo concept={selectedConcept}/>;
     }
 
     return (
@@ -39,13 +39,14 @@ let GraphView = React.createClass({
                onDelete={alert}
                onDisconnect={alert}/>
         <div className="info-container">
-          {conceptInfo}
+          {concept}
         </div>
       </div>);
   },
 
   onSelect(id) {
-    ConceptActions.find(id);
+	  if (id !== undefined) ConceptActions.select(id);
+	  else ConceptActions.unselect();
   }
 
 });

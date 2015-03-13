@@ -5,16 +5,20 @@ let qwest = require('qwest');
 let ConceptActions = require('../actions/concept-actions');
 let host = require('../configs/api').host;
 
-let Concept = Reflux.createStore({
+let SelectedConcept = Reflux.createStore({
 
   listenables: ConceptActions,
 
-  onFind(id) {
+  select(id) {
     let store = this;
     qwest.get(`${host}/concepts/${id}`).then((data) => {
       store.setConcept(JSON.parse(data));
     });
   },
+
+	unselect() {
+		this.setConcept(undefined);
+	},
 
   setConcept(concept) {
     this.trigger(this.concept = concept);
@@ -22,4 +26,4 @@ let Concept = Reflux.createStore({
 
 });
 
-export default Concept;
+export default SelectedConcept;
