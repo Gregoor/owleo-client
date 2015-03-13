@@ -4,6 +4,7 @@ let ConceptActions = Reflux.createActions([
   'getAll',
   'select',
 	'unselect',
+	'new',
 	'save'
 ]);
 

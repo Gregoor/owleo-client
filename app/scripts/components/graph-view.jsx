@@ -1,6 +1,8 @@
 let React = require('react');
 let Reflux = require('reflux');
 
+let {FloatingActionButton} = require('material-ui');
+
 let ConceptActions = require('../actions/concept-actions');
 let Concepts = require('../stores/concepts');
 let SelectedConcept = require('../stores/selected-concept');
@@ -10,7 +12,10 @@ let ConceptInfo = require('./concept-info/concept-info');
 
 let GraphView = React.createClass({
 
-  mixins: [Reflux.ListenerMixin],
+  mixins: [
+	  Reflux.ListenerMixin,
+	  Reflux.connect(SelectedConcept, 'selectedConcept')
+  ],
 
   getInitialState() {
     return {};
@@ -19,9 +24,6 @@ let GraphView = React.createClass({
   componentWillMount() {
     ConceptActions.getAll();
     this.listenTo(Concepts, (concepts) => this.setState({concepts}));
-    this.listenTo(SelectedConcept, (concept) => this.setState({
-      'selectedConcept': concept
-    }));
   },
 
   render() {
@@ -41,13 +43,19 @@ let GraphView = React.createClass({
         <div className="info-container">
           {concept}
         </div>
+	      <FloatingActionButton className="add-concept" onClick={this.onNew}
+	                            iconClassName="icon icon-plus"/>
       </div>);
   },
 
-  onSelect(id) {
+	onSelect(id) {
 	  if (id !== undefined) ConceptActions.select(id);
 	  else ConceptActions.unselect();
-  }
+  },
+
+	onNew() {
+		ConceptActions.new();
+	}
 
 });
 

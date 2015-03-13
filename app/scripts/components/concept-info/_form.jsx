@@ -16,6 +16,15 @@ let ConceptForm = React.createClass({
 
 	render() {
 		let concept = this.props.concept;
+		let isNew = !concept.id;
+		let abortButton = '';
+		if (!isNew) {
+			abortButton = (
+				<div className="col-xs-3">
+					<FlatButton label="Abort" type="button" onClick={this.onAbort} />
+				</div>
+			);
+		}
 		return (
 			<form onChange={this.updateFormData} onSubmit={this.onSave}>
 				<div className="row">
@@ -31,11 +40,9 @@ let ConceptForm = React.createClass({
 					</div>
 				</div>
 				<div className="row end-xs">
+					{abortButton}
 					<div className="col-xs-3">
-						<FlatButton label="Abort" type="button" onClick={this.onAbort} />
-					</div>
-					<div className="col-xs-3">
-						<FlatButton label="Save" primary={true} />
+						<FlatButton label={isNew ? 'Create' : 'Save'} primary={true} />
 					</div>
 				</div>
 			</form>

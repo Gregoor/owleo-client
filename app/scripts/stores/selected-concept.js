@@ -17,8 +17,12 @@ let SelectedConcept = Reflux.createStore({
     qwest.get(ressource(id)).then(this.handleResponse);
   },
 
+	new() {
+		this.setConcept({});
+	},
+
 	save(data) {
-		let route = ressource(this.concept.id);
+		let route = this.concept.id ? ressource(this.concept.id) : endpoint;
 		qwest.post(route, {'concept': data}, {'dataType': 'json'})
 			.then(this.handleResponse);
 	},
