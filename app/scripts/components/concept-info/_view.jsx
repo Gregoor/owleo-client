@@ -5,6 +5,21 @@ let ConceptView = React.createClass({
 
 	render() {
 		let concept = this.props.concept;
+		let linkRows = [];
+
+		for (let link of concept.links) {
+			linkRows.push(
+				<div className="row middle-xs">
+					<div className="col-xs-8">
+						<a href={link.url}>{link.url}</a>
+					</div>
+					<div className="col-xs-4">
+						{link.paywalled ? '$' : ''}
+					</div>
+				</div>
+			);
+		}
+
 		return (
 			<div>
 				<div className="row">
@@ -22,6 +37,7 @@ let ConceptView = React.createClass({
 				<div className="row">
 					<div className="col-xs-12">{concept.summary}</div>
 				</div>
+				{linkRows}
 			</div>
 		);
 	}
