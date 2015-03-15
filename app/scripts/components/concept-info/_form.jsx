@@ -24,7 +24,8 @@ let ConceptForm = React.createClass({
 		let isNew = !concept.id;
 		let abortButton = '', linkRows = [];
 
-		let linksCount = concept.links.length + this.state.newLinksCount;
+		let linksCount = this.state.newLinksCount;
+		if (!isNew) linksCount += concept.links.length;
 		for (var i = 0; i < linksCount; i++) {
 			let textFieldProps = {}, checkboxProps = {};
 			if (i + 1 == linksCount) {
@@ -32,7 +33,7 @@ let ConceptForm = React.createClass({
 				checkboxProps.onClick= this.onChangeLastLink;
 			}
 
-			let link = concept.links[i] || {};
+			let link = isNew ? {} : concept.links[i] || {};
 			linkRows.push(
 				<div className="row middle-xs">
 					<div className="col-xs-8">
