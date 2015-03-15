@@ -5,16 +5,19 @@ let vis = require('vis');
 let _ = require('lodash');
 
 let VIS_CONFIG = require('../configs/vis');
+let ConceptActions = require('../actions/concept-actions');
 
 let Graph = React.createClass({
+
+	mixins: [Reflux.ListenerMixin],
 
   getInitialState() {
     return {'connectMode': false};
   },
 
   componentDidMount() {
-    var self = this;
-    this.network = new vis.Network(this.getDOMNode(), {}, _.extend(VIS_CONFIG, {
+    let self = this, node = this.getDOMNode();
+    let nw = this.network = new vis.Network(node, {}, _.extend(VIS_CONFIG, {
       'onConnect': (data, callback) => {
         self.setState({'connectMode': false});
         self.props.onConnect(data);
@@ -32,12 +35,26 @@ let Graph = React.createClass({
       }
     }));
 
-    this.network.on('select', (selected) => {
+    nw.on('select', (selected) => {
       var id = selected.nodes[0];
       if (!self.state.connectMode) self.props.onSelect(id);
     });
 
     window.addEventListener('resize', () => { self.network.redraw(); });
+
+	  this.listenTo(ConceptActions.create, (concept) => {
+		  nw.nodesData.add(_.extend(
+			  {'label': concept.name, 'allowedToMoveX': true, 'allowedToMoveY': true},
+			  concept,
+			  nw.getCenterCoordinates()
+		  ));
+		  nw.moving = true;
+		  nw.start();
+	  });
+
+	  this.listenTo(ConceptActions.update, (concept) => {
+		  nw.nodesData.update({'id': concept.id, 'label': concept.name})
+	  });
   },
 
   componentWillUpdate(props) {

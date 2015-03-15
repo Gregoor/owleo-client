@@ -22,9 +22,13 @@ let SelectedConcept = Reflux.createStore({
 	},
 
 	save(data) {
-		let route = this.concept.id ? ressource(this.concept.id) : endpoint;
-		qwest.post(route, {'concept': data}, {'dataType': 'json'})
-			.then(this.handleResponse);
+		let isNew = !this.concept.id;
+		let route = isNew ? endpoint : ressource(this.concept.id);
+		qwest.post(route, {'concept': data}, {'dataType': 'json'}).then((data) => {
+			this.handleResponse(data);
+			if (isNew) ConceptActions.create(this.concept);
+			else ConceptActions.update(this.concept);
+		});
 	},
 
 	handleResponse(data) {
