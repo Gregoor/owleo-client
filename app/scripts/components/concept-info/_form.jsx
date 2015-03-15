@@ -41,7 +41,7 @@ let ConceptForm = React.createClass({
 					</div>
 					<div className="col-xs-4">
 						<Checkbox name={`links[paywalled][${i}]`} label="paywalled"
-						          defaultValue={link.paywalled} {...checkboxProps} />
+						          defaultSwitched={link.paywalled} {...checkboxProps} />
 					</div>
 				</div>
 			);
@@ -95,7 +95,7 @@ let ConceptForm = React.createClass({
 		e.preventDefault();
 
 		let data = _.cloneDeep(this.formData);
-		data.links = data.links.filter((l) => l.url)
+		data.links = data.links.filter((l) => l.url);
 
 		ConceptActions.save(data);
 		this.props.onDone();
