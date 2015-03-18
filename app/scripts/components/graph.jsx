@@ -53,7 +53,7 @@ let Graph = React.createClass({
 	  });
 
 	  this.listenTo(ConceptActions.selected, (id) => {
-		   nw.selectNodes([id]);
+		   nw.selectNodes(id ? [id] : []);
 	  });
 
 	  this.listenTo(ConceptActions.updated, (concept) => {

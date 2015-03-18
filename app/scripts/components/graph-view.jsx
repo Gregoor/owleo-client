@@ -24,8 +24,8 @@ let GraphView = React.createClass({
   },
 
   componentWillMount() {
-	  let name = this.getParams().conceptName;
-	  if (name) ConceptActions.select(name);
+	  this.onRoute();
+	  Router.HashLocation.addChangeListener(this.onRoute);
 	  this.listenTo(SelectedConcept, (concept) => {
 		  this.transitionTo(concept ? '/' + encodeURIComponent(concept.name) : '/');
 		  this.setState({'selectedConcept': concept});
@@ -56,6 +56,12 @@ let GraphView = React.createClass({
 	                            iconClassName="icon icon-plus"/>
       </div>);
   },
+
+	onRoute() {
+		let name = this.getParams().conceptName;
+		if (name) ConceptActions.select(name);
+		else ConceptActions.unselect();
+	},
 
 	onSelect(id) {
 	  if (id !== undefined) ConceptActions.select(id);
