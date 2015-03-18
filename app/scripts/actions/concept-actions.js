@@ -5,9 +5,11 @@ let ConceptActions = Reflux.createActions([
   'select',
 	'unselect',
 	'new',
-	'create',
-	'update',
-	'save'
+	'created',
+	'updated',
+	'save',
+	'delete',
+	'deleted'
 ]);
 
 export default ConceptActions;

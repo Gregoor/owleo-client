@@ -17,6 +17,10 @@ let SelectedConcept = Reflux.createStore({
     qwest.get(ressource(id)).then(this.handleResponse);
   },
 
+	unselect() {
+		this.setConcept();
+	},
+
 	new() {
 		this.setConcept({});
 	},
@@ -24,19 +28,22 @@ let SelectedConcept = Reflux.createStore({
 	save(data) {
 		let isNew = !this.concept.id;
 		let route = isNew ? endpoint : ressource(this.concept.id);
-		qwest.post(route, {'concept': data}, {'dataType': 'json'}).then((data) => {
+		qwest.post(route , {'concept': data}, {'dataType': 'json'}).then((data) => {
 			this.handleResponse(data);
-			if (isNew) ConceptActions.create(this.concept);
-			else ConceptActions.update(this.concept);
+			if (isNew) ConceptActions.created(this.concept);
+			else ConceptActions.updated(this.concept);
+		});
+	},
+
+	delete(id) {
+		qwest.delete(ressource(id)).then(() => {
+			this.handleResponse(null);
+			ConceptActions.deleted(id);
 		});
 	},
 
 	handleResponse(data) {
 		this.setConcept(JSON.parse(data));
-	},
-
-	unselect() {
-		this.setConcept();
 	},
 
   setConcept(concept) {

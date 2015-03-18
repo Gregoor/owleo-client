@@ -1,6 +1,8 @@
 let React = require('react');
 let IconButton = require('material-ui').IconButton;
 
+let ConceptActions = require('../../actions/concept-actions');
+
 let ConceptView = React.createClass({
 
 	render() {
@@ -31,7 +33,8 @@ let ConceptView = React.createClass({
 						            onClick={this.props.onEdit}/>
 					</div>
 					<div className="col-xs-2">
-						<IconButton iconClassName="icon icon-bin" tooltip="Delete"/>
+						<IconButton iconClassName="icon icon-bin" tooltip="Delete"
+						            onClick={this.onDelete}/>
 					</div>
 				</div>
 				<div className="row">
@@ -40,6 +43,12 @@ let ConceptView = React.createClass({
 				{linkRows}
 			</div>
 		);
+	},
+
+	onDelete() {
+		if (!confirm('Ya sure?')) return;
+
+		ConceptActions.delete(this.props.concept.id);
 	}
 
 });

@@ -28,7 +28,7 @@ let Graph = React.createClass({
 
         if (!confirm('Ya sure?')) return;
 
-        if (id) self.props.onDelete(id);
+        if (id) ConceptActions.delete(id);
         else self.props.onDisconnect(network.edges[edgeId]);
 
         callback(data);
@@ -42,7 +42,7 @@ let Graph = React.createClass({
 
     window.addEventListener('resize', () => { self.network.redraw(); });
 
-	  this.listenTo(ConceptActions.create, (concept) => {
+	  this.listenTo(ConceptActions.created, (concept) => {
 		  nw.nodesData.add(_.extend(
 			  {'label': concept.name, 'allowedToMoveX': true, 'allowedToMoveY': true},
 			  concept,
@@ -52,8 +52,13 @@ let Graph = React.createClass({
 		  nw.start();
 	  });
 
-	  this.listenTo(ConceptActions.update, (concept) => {
+	  this.listenTo(ConceptActions.updated, (concept) => {
 		  nw.nodesData.update({'id': concept.id, 'label': concept.name})
+	  });
+	  this.listenTo(ConceptActions.deleted, (id) => {
+		  nw.nodesData.remove(id);
+		  nw.moving = true;
+		  nw.start();
 	  });
   },
 
