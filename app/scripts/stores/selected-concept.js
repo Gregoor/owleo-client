@@ -50,6 +50,7 @@ let SelectedConcept = Reflux.createStore({
 	  this.concept = (!concept || !this.concept || this.concept.id != concept.id ?
 		  concept : _.merge({}, this.concept, concept));
     this.trigger(this.concept);
+	  ConceptActions.selected(this.concept ? this.concept.id : undefined);
   }
 
 });

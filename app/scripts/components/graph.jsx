@@ -52,9 +52,14 @@ let Graph = React.createClass({
 		  nw.start();
 	  });
 
+	  this.listenTo(ConceptActions.selected, (id) => {
+		   nw.selectNodes([id]);
+	  });
+
 	  this.listenTo(ConceptActions.updated, (concept) => {
 		  nw.nodesData.update({'id': concept.id, 'label': concept.name})
 	  });
+
 	  this.listenTo(ConceptActions.deleted, (id) => {
 		  nw.nodesData.remove(id);
 		  nw.moving = true;

@@ -1,4 +1,5 @@
 let React = require('react');
+let Router = require('react-router');
 let Reflux = require('reflux');
 
 let {FloatingActionButton} = require('material-ui');
@@ -14,7 +15,8 @@ let GraphView = React.createClass({
 
   mixins: [
 	  Reflux.ListenerMixin,
-	  Reflux.connect(SelectedConcept, 'selectedConcept')
+	  Router.State,
+	  Router.Navigation
   ],
 
   getInitialState() {
@@ -22,8 +24,15 @@ let GraphView = React.createClass({
   },
 
   componentWillMount() {
-    ConceptActions.getAll();
-    this.listenTo(Concepts, (concepts) => this.setState({concepts}));
+	  let name = this.getParams().conceptName;
+	  if (name) ConceptActions.select(name);
+	  this.listenTo(SelectedConcept, (concept) => {
+		  this.transitionTo(concept ? '/' + encodeURIComponent(concept.name) : '/');
+		  this.setState({'selectedConcept': concept});
+	  });
+
+	  ConceptActions.getAll();
+	  this.listenTo(Concepts, (concepts) => this.setState({concepts}));
   },
 
   render() {

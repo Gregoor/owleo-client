@@ -7,7 +7,8 @@ let Layout = require('./components/layout');
 let GraphView = require('./components/graph-view');
 
 let routes = (
-	<Route name="layout" path="/" handler={Layout}>
+	<Route handler={Layout}>
+		<Route path=":conceptName" handler={GraphView}/>
 		<DefaultRoute handler={GraphView} />
 	</Route>
 );
