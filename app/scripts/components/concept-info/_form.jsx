@@ -115,8 +115,8 @@ let ConceptForm = React.createClass({
 
 		let data = _.cloneDeep(this.formData);
 		data.links = data.links.filter((l) => l.url);
-		data.reqs = this.getDOMNode()
-			.querySelector('[name="reqs"]').value.split(',');
+		data.reqs = _.compact(this.getDOMNode()
+			.querySelector('[name="reqs"]').value.split(','));
 		ConceptActions.save(data);
 		this.props.onDone();
 	},
