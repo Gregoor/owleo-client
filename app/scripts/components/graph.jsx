@@ -42,6 +42,15 @@ let Graph = React.createClass({
 
     window.addEventListener('resize', () => { self.network.redraw(); });
 
+	  let addEdgesFor = (concept) => {
+		  for (let req of concept.reqs) {
+			  let id = `${req}-${concept.id}`;
+			  if (!nw.edgesData.get(id)) {
+				  nw.edgesData.add({id, 'from': req, 'to': concept.id});
+			  }
+		  }
+	  };
+
 	  this.listenTo(ConceptActions.created, (concept) => {
 		  nw.nodesData.add(_.extend(
 			  {'label': concept.name, 'allowedToMoveX': true, 'allowedToMoveY': true},
@@ -50,6 +59,8 @@ let Graph = React.createClass({
 		  ));
 		  nw.moving = true;
 		  nw.start();
+
+		  addEdgesFor(concept);
 	  });
 
 	  this.listenTo(ConceptActions.selected, (id) => {
@@ -58,6 +69,14 @@ let Graph = React.createClass({
 
 	  this.listenTo(ConceptActions.updated, (concept) => {
 		  nw.nodesData.update({'id': concept.id, 'label': concept.name})
+		  for (let edge of nw.edgesData.get()) {
+			  let [from, to] = edge.id.split('-');
+			  if (to == concept.id && !_.includes(concept.reqs, from)) {
+				  nw.edgesData.remove(edge.id);
+			  }
+		  }
+
+		  addEdgesFor(concept);
 	  });
 
 	  this.listenTo(ConceptActions.deleted, (id) => {
@@ -93,7 +112,10 @@ let Graph = React.createClass({
 
       nodes.push(node);
 
-      concept.reqs.forEach((req) => edges.push({'from': req, 'to': concept.id}));
+	    let id = concept.id;
+      concept.reqs.forEach((req) => {
+	      return edges.push({'id': `${req}-${id}`,'from': req, 'to': id});
+      });
     });
 
     this.network.setData({nodes, edges});
