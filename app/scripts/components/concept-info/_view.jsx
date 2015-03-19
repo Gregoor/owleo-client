@@ -7,8 +7,17 @@ let ConceptView = React.createClass({
 
 	render() {
 		let concept = this.props.concept;
-		let linkRows = [];
 
+		let reqLinks = [];
+		for (let req of concept.reqs) {
+			reqLinks.push(
+				<a href={`#/${encodeURIComponent(req.name)}`}>{req.name}</a>
+			);
+			reqLinks.push(', ');
+		}
+		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
+
+		let linkRows = [];
 		for (let link of concept.links) {
 			linkRows.push(
 				<div className="row middle-xs">
@@ -35,6 +44,11 @@ let ConceptView = React.createClass({
 					<div className="col-xs-2">
 						<IconButton iconClassName="icon icon-bin" tooltip="Delete"
 						            onClick={this.onDelete}/>
+					</div>
+				</div>
+				<div className="row">
+					<div className="col-xs-12" style={{'display': 'inline'}}>
+						{reqLinks}
 					</div>
 				</div>
 				<div className="row">
