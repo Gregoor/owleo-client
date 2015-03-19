@@ -69,7 +69,8 @@ let ConceptForm = React.createClass({
 				</div>
 				<div className="row">
 					<div className="col-xs-12">
-						<Select name="reqs" value={concept.reqs ? concept.reqs.map(this.conceptToOption) : undefined}
+						<Select name="reqs" placeholder="Requirements"
+						        value={concept.reqs ? concept.reqs.map(this.conceptToOption) : undefined}
 						        multi={true} autoload={false}
 						        asyncOptions={this.onGetSelectOptions}/>
 					</div>
@@ -93,10 +94,8 @@ let ConceptForm = React.createClass({
 
 	onGetSelectOptions(q, cb) {
 		qwest.get(`${host}/concepts/search`, {q}).then((data) => {
-			cb(null, {
-				'options': JSON.parse(data).map(this.conceptToOption),
-				'complete': false
-			});
+			let options = JSON.parse(data).map(this.conceptToOption);
+			cb(null, {options, 'complete': options.length < 10});
 		});
 	},
 
