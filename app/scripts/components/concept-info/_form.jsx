@@ -2,9 +2,12 @@ let React = require('react');
 
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
+let Select = require('react-select');
 let FormData = require('../../mixins/FormData');//require('react-form-data');
+let qwest = require('qwest');
 
 let ConceptActions = require('../../actions/concept-actions');
+let {host} = require('../../configs/api');
 
 let ConceptForm = React.createClass({
 
@@ -66,6 +69,13 @@ let ConceptForm = React.createClass({
 				</div>
 				<div className="row">
 					<div className="col-xs-12">
+						<Select name="reqs" value={concept.reqs ? concept.reqs.map(this.conceptToOption) : undefined}
+						        multi={true} autoload={false}
+						        asyncOptions={this.onGetSelectOptions}/>
+					</div>
+				</div>
+				<div className="row">
+					<div className="col-xs-12">
 						<TextField floatingLabelText="Summary" multiLine={true}
 						           name="summary" defaultValue={concept.summary} />
 					</div>
@@ -79,6 +89,15 @@ let ConceptForm = React.createClass({
 				</div>
 			</form>
 		);
+	},
+
+	onGetSelectOptions(q, cb) {
+		qwest.get(`${host}/concepts/search`, {q}).then((data) => {
+			cb(null, {
+				'options': JSON.parse(data).map(this.conceptToOption),
+				'complete': false
+			});
+		});
 	},
 
 	onChangeLastLink() {
@@ -97,9 +116,14 @@ let ConceptForm = React.createClass({
 
 		let data = _.cloneDeep(this.formData);
 		data.links = data.links.filter((l) => l.url);
-
+		data.reqs = this.getDOMNode()
+			.querySelector('[name="reqs"]').value.split(',');
 		ConceptActions.save(data);
 		this.props.onDone();
+	},
+
+	conceptToOption(concept) {
+		return {'label': concept.name, 'value': concept.id};
 	}
 
 });
