@@ -9,6 +9,13 @@ let ConceptInfo = React.createClass({
 		return {'edit': false};
 	},
 
+	componentWillReceiveProps(props) {
+		let oldConcept = this.props.concept;
+		if (oldConcept && oldConcept.id != props.concept.id) {
+			this.setState({'edit': false});
+		}
+	},
+
 	render() {
 		let comp;
 
