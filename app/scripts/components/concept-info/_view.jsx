@@ -37,13 +37,21 @@ let ConceptView = React.createClass({
 					<div className="col-xs-8">
 						<h1 title={concept.name}>{concept.name}</h1>
 					</div>
-					<div className="col-xs-2">
-						<IconButton iconClassName="icon icon-cog" tooltip="Edit"
-						            onClick={this.props.onEdit}/>
-					</div>
-					<div className="col-xs-2">
-						<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-						            onClick={this.onDelete}/>
+					<div className="col-xs-4">
+						<div className="row">
+							<div className="col-xs-4">
+								<IconButton iconClassName="icon icon-eye" tooltip="Show in map"
+								            onClick={this.props.onEdit}/>
+							</div>
+							<div className="col-xs-4">
+								<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
+								            onClick={this.props.onEdit}/>
+							</div>
+							<div className="col-xs-4">
+								<IconButton iconClassName="icon icon-bin" tooltip="Delete"
+								            onClick={this.onDelete}/>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div className="row">
