@@ -27,7 +27,12 @@ let GraphView = React.createClass({
 	  this.onRoute();
 	  Router.HashLocation.addChangeListener(this.onRoute);
 	  this.listenTo(SelectedConcept, (concept) => {
-		  this.transitionTo(concept ? '/' + encodeURIComponent(concept.name) : '/');
+		  let path = '/';
+		  if (concept) {
+			  if (concept.id) path += encodeURIComponent(concept.name);
+			  else path += 'new';
+		  }
+		  this.transitionTo(path);
 		  this.setState({'selectedConcept': concept});
 	  });
 
@@ -59,8 +64,10 @@ let GraphView = React.createClass({
 
 	onRoute() {
 		let name = this.getParams().conceptName;
-		if (name) ConceptActions.select(name);
-		else ConceptActions.unselect();
+		if (name) {
+			if (name == 'new') ConceptActions.new();
+			else ConceptActions.select(name);
+		} else ConceptActions.unselect();
 	},
 
 	onSelect(id) {
