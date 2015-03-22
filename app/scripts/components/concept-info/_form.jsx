@@ -93,7 +93,8 @@ let ConceptForm = React.createClass({
 	},
 
 	onGetSelectOptions(q, cb) {
-		qwest.get(`${host}/concepts/search`, {q}).then((data) => {
+		let params = {'json': JSON.stringify({q, 'for': ['Concept']})};
+		qwest.get(`${host}/search`, params).then((data) => {
 			let options = JSON.parse(data).map(this.conceptToOption);
 			cb(null, {options, 'complete': options.length < 10});
 		});
