@@ -13,7 +13,7 @@
     "react": "~0.12.2",
     "react-form-data": "^0.2.2",
     "react-router": "~0.12.0",
-    "react-select": "^0.4.0",
+    "react-select": "git://github.com/Gregoor/react-select.git#lib",
     "react-tap-event-plugin": "^0.1.4",
     "reflux": "~0.2.5",
     "vis": "^3.11.0"

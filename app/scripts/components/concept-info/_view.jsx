@@ -8,6 +8,8 @@ let ConceptView = React.createClass({
 	render() {
 		let concept = this.props.concept;
 
+		let tags = concept.tags.map((tag) => (<span className="tag">{tag}</span>));
+
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
@@ -16,10 +18,10 @@ let ConceptView = React.createClass({
 			reqLinks.push(', ');
 		}
 		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
+		if (reqLinks.length == 0) reqLinks.push(<em>None</em>)
 
-		let linkRows = [];
-		for (let link of concept.links) {
-			linkRows.push(
+		let linkRows = concept.links.map((link) => {
+			return (
 				<div className="row middle-xs">
 					<div className="col-xs-8">
 						<a href={link.url}>{link.url}</a>
@@ -29,7 +31,7 @@ let ConceptView = React.createClass({
 					</div>
 				</div>
 			);
-		}
+		});
 
 		return (
 			<div>
@@ -56,9 +58,16 @@ let ConceptView = React.createClass({
 				</div>
 				<div className="row">
 					<div className="col-xs-12" style={{'display': 'inline'}}>
+						{tags}
+					</div>
+				</div>
+				<div className="row">
+					<div className="col-xs-12" style={{'display': 'inline'}}>
+						<h2>Requirements:</h2>
 						{reqLinks}
 					</div>
 				</div>
+				<br/>
 				<div className="row">
 					<div className="col-xs-12">{concept.summary}</div>
 				</div>

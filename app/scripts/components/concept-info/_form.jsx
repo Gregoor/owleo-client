@@ -2,12 +2,11 @@ let React = require('react');
 
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
-let Select = require('react-select');
+let Select = require('./select');
 let FormData = require('../../mixins/FormData');//require('react-form-data');
-let qwest = require('qwest');
 
 let ConceptActions = require('../../actions/concept-actions');
-let {host} = require('../../configs/api');
+let search = require('../../requests/search');
 
 let ConceptForm = React.createClass({
 
@@ -69,10 +68,22 @@ let ConceptForm = React.createClass({
 				</div>
 				<div className="row">
 					<div className="col-xs-12">
-						<Select name="reqs" placeholder="Requirements"
-						        value={concept.reqs ? concept.reqs.map(this.conceptToOption) : undefined}
+						<h2>Tags</h2>
+						<Select name="tags" placeholder="Tags"
+						        value={concept.tags}
 						        multi={true} autoload={false}
-						        asyncOptions={this.onGetSelectOptions}/>
+						        asyncOptions={this.onGetOptionsOf('Tag')}
+						        createable={true}/>
+					</div>
+				</div>
+				<div className="row">
+					<div className="col-xs-12">
+						<h2>Requirements</h2>
+						<Select name="reqs" placeholder="Requirements"
+						        value={concept.reqs ? concept.reqs.map(this.conceptToOpton) : undefined}
+						        multi={true} autoload={false}
+						        asyncOptions={this.onGetOptionsOf('Concept')}
+										exclude={[concept.name]}/>
 					</div>
 				</div>
 				<div className="row">
@@ -92,10 +103,12 @@ let ConceptForm = React.createClass({
 		);
 	},
 
-	onGetSelectOptions(q, cb) {
-		let params = {'json': JSON.stringify({q, 'for': ['Concept']})};
-		qwest.get(`${host}/search`, params).then((data) => {
-			let options = JSON.parse(data).map(this.conceptToOption);
+
+	onGetOptionsOf(type) {
+		return (q, cb) => search({q, 'for': [type]}).then((result) => {
+			let options = result.map(type == 'Concept' ? this.conceptToOpton :
+				(tag) => ({'label': tag.name, 'value': tag.name})
+			);
 			cb(null, {options, 'complete': options.length < 10});
 		});
 	},
@@ -112,18 +125,20 @@ let ConceptForm = React.createClass({
 	},
 
 	onSave(e) {
+		let splitValueOfName = (name) => _.compact(this.getDOMNode()
+			.querySelector(`[name="${name}"]`).value.split(','));
 		e.preventDefault();
 
 		let data = _.cloneDeep(this.formData);
 		data.links = data.links.filter((l) => l.url);
-		data.reqs = _.compact(this.getDOMNode()
-			.querySelector('[name="reqs"]').value.split(','));
+		data.reqs = splitValueOfName('reqs');
+		data.tags = splitValueOfName('tags');
 		ConceptActions.save(data);
 		this.props.onDone();
 	},
 
-	conceptToOption(concept) {
-		return {'label': concept.name, 'value': concept.id};
+	conceptToOpton(obj) {
+		return {'label': obj.name, 'value': obj.id};
 	}
 
 });
