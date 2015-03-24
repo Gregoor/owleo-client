@@ -44,9 +44,9 @@ let Graph = React.createClass({
 
 	  let addEdgesFor = (concept) => {
 		  for (let req of concept.reqs) {
-			  let id = `${req}-${concept.id}`;
+			  let id = `${req.id}-${concept.id}`;
 			  if (!nw.edgesData.get(id)) {
-				  nw.edgesData.add({id, 'from': req, 'to': concept.id});
+				  nw.edgesData.add({id, 'from': req.id, 'to': concept.id});
 			  }
 		  }
 	  };
