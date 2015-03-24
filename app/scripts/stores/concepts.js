@@ -3,7 +3,7 @@ let Reflux = require('reflux');
 let qwest = require('qwest');
 
 let ConceptActions = require('../actions/concept-actions');
-let host = require('../configs/api').host;
+let host = require('../configs/api.custom').host;
 
 let Concepts = Reflux.createStore({
 

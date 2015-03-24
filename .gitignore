@@ -5,3 +5,5 @@ test/temp
 app/vendor
 .tmp
 test/scripts/
+
+*.custom.js

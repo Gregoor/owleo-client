@@ -1,6 +1,6 @@
 let qwest = require('qwest');
 
-let {host} = require('../configs/api');
+let {host} = require('../configs/api.custom');
 
 export default (params) => {
 	params = {'json': JSON.stringify(params)};

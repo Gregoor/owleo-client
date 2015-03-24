@@ -5,7 +5,7 @@ let qwest = require('qwest');
 
 let ConceptActions = require('../actions/concept-actions');
 
-let {host} = require('../configs/api');
+let {host} = require('../configs/api.custom');
 let endpoint = `${host}/concepts`;
 let ressource = (id) => `${endpoint}/${id}`;
 
