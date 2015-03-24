@@ -21,10 +21,14 @@ let ConceptView = React.createClass({
 		if (reqLinks.length == 0) reqLinks.push(<em>None</em>)
 
 		let linkRows = concept.links.map((link) => {
+			let parser = document.createElement('a');
+			parser.href = link.url;
+			let paths = parser.pathname.split('/');
+			let partial = `${parser.hostname}/../${paths[paths.length - 1]}`;
 			return (
 				<div className="row middle-xs">
 					<div className="col-xs-8">
-						<a href={link.url}>{link.url}</a>
+						<a className="link" href={link.url}>{partial}</a>
 					</div>
 					<div className="col-xs-4">
 						{link.paywalled ? '$' : ''}
