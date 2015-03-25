@@ -36,7 +36,7 @@ let ConceptForm = React.createClass({
 
 			let link = concept.isNew ? {} : concept.links[i] || {};
 			linkRows.push(
-				<div className="row middle-xs">
+				<div key={`link-${i}`} className="row middle-xs">
 					<div className="col-xs-8">
 						<TextField name={`links[url][${i}]`} floatingLabelText="URL"
 							defaultValue={link.url} {...textFieldProps}/>
@@ -70,7 +70,7 @@ let ConceptForm = React.createClass({
 						<div className="col-xs-12">
 							<h2>Tags</h2>
 							<Select name="tags" placeholder="Tags"
-							        value={concept.tags}
+							        defaultValue={concept.tags}
 							        multi={true} autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Tag')}
 							        createable={true}/>
@@ -80,7 +80,7 @@ let ConceptForm = React.createClass({
 						<div className="col-xs-12">
 							<h2>Requirements</h2>
 							<Select name="reqs" placeholder="Requirements"
-							        value={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
+							        defaultValue={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
 							        multi={true} autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Concept')}
 											exclude={[concept.name]}/>

@@ -7,14 +7,29 @@ export default React.createClass({
 
 	getDefaultProps() {
 		return {
-			'exclude': []
+			'exclude': [],
+			'defaultValue': null,
+			'onChange': _.noop
+		};
+	},
+
+	getInitialState() {
+		return {
+			'value': null
 		};
 	},
 
 	render() {
 		return (
-			<Select {...this.props} asyncOptions={this.onGetOptions}/>
+			<Select {...this.props} value={this.state.value || this.props.defaultValue}
+			                        onChange={this.onChange}
+			                        asyncOptions={this.onGetOptions}/>
 		);
+	},
+
+	onChange(value) {
+		this.setState({value});
+		this.props.onChange.apply(this, arguments);
 	},
 
 	onGetOptions(filter, cb) {
