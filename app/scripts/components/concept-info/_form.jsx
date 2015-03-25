@@ -23,11 +23,10 @@ let ConceptForm = React.createClass({
 
 	render() {
 		let concept = this.props.concept;
-		let isNew = !concept.id;
 		let abortButton = '', linkRows = [];
 
 		let linksCount = this.state.newLinksCount;
-		if (!isNew) linksCount += concept.links.length;
+		if (!concept.isNew) linksCount += concept.links.length;
 		for (var i = 0; i < linksCount; i++) {
 			let textFieldProps = {}, checkboxProps = {};
 			if (i + 1 == linksCount) {
@@ -35,7 +34,7 @@ let ConceptForm = React.createClass({
 				checkboxProps.onClick= this.onChangeLastLink;
 			}
 
-			let link = isNew ? {} : concept.links[i] || {};
+			let link = concept.isNew ? {} : concept.links[i] || {};
 			linkRows.push(
 				<div className="row middle-xs">
 					<div className="col-xs-8">
@@ -50,7 +49,7 @@ let ConceptForm = React.createClass({
 			);
 		}
 
-		if (!isNew) {
+		if (!concept.isNew) {
 			abortButton = (
 				<div className="col-xs-3">
 					<FlatButton label="Abort" type="button" onClick={this.onAbort} />
@@ -80,7 +79,7 @@ let ConceptForm = React.createClass({
 					<div className="col-xs-12">
 						<h2>Requirements</h2>
 						<Select name="reqs" placeholder="Requirements"
-						        value={concept.reqs ? concept.reqs.map(this.conceptToOpton) : undefined}
+						        value={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
 						        multi={true} autoload={false}
 						        asyncOptions={this.onGetOptionsOf('Concept')}
 										exclude={[concept.name]}/>
@@ -96,7 +95,8 @@ let ConceptForm = React.createClass({
 				<div className="row end-xs">
 					{abortButton}
 					<div className="col-xs-3">
-						<FlatButton label={isNew ? 'Create' : 'Save'} primary={true} />
+						<FlatButton label={concept.isNew ? 'Create' : 'Save'}
+						            primary={true} />
 					</div>
 				</div>
 			</form>
@@ -106,9 +106,7 @@ let ConceptForm = React.createClass({
 
 	onGetOptionsOf(type) {
 		return (q, cb) => search({q, 'for': [type]}).then((result) => {
-			let options = result.map(type == 'Concept' ? this.conceptToOpton :
-				(tag) => ({'label': tag.name, 'value': tag.name})
-			);
+			let options = result.map(this.nameObjToOption);
 			cb(null, {options, 'complete': options.length < 10});
 		});
 	},
@@ -137,8 +135,9 @@ let ConceptForm = React.createClass({
 		this.props.onDone();
 	},
 
-	conceptToOpton(obj) {
-		return {'label': obj.name, 'value': obj.id};
+	nameObjToOption(name) {
+		if (name.name) name = name.name;
+		return {'label': name, 'value': name};
 	}
 
 });

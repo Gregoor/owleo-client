@@ -29,8 +29,8 @@ let GraphView = React.createClass({
 	  this.listenTo(SelectedConcept, (concept) => {
 		  let path = '/';
 		  if (concept) {
-			  if (concept.id) path += encodeURIComponent(concept.name);
-			  else path += 'new';
+			  if (concept.isNew) path += 'new';
+			  else path += encodeURIComponent(concept.name);
 		  }
 		  this.transitionTo(path);
 		  this.setState({'selectedConcept': concept});
@@ -41,21 +41,17 @@ let GraphView = React.createClass({
   },
 
   render() {
-    let concept = '';
+    let conceptInfo = '';
     let selectedConcept = this.state.selectedConcept;
     if (selectedConcept) {
-      concept = <ConceptInfo concept={selectedConcept}/>;
+      conceptInfo = <ConceptInfo concept={selectedConcept}/>;
     }
 
     return (
       <div>
-        <Graph concepts={this.state.concepts}
-               onSelect={this.onSelect}
-               onConnect={alert}
-               onDelete={alert}
-               onDisconnect={alert}/>
+        <Graph concepts={this.state.concepts} onSelect={this.onSelect}/>
         <div className="info-container">
-          {concept}
+          {conceptInfo}
         </div>
 	      <FloatingActionButton className="add-concept" onClick={this.onNew}
 	                            iconClassName="icon icon-plus"/>
@@ -70,8 +66,8 @@ let GraphView = React.createClass({
 		} else ConceptActions.unselect();
 	},
 
-	onSelect(id) {
-	  if (id !== undefined) ConceptActions.select(id);
+	onSelect(name) {
+	  if (name !== undefined) ConceptActions.select(name);
 	  else ConceptActions.unselect();
   },
 

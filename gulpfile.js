@@ -17,7 +17,8 @@ var bundler = {
       entries: ['./app/scripts/app.js'],
       insertGlobals: true,
       cache: {},
-      packageCache: {}
+      packageCache: {},
+	    debug: true
     }));
   },
   bundle: function() {

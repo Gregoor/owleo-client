@@ -13,7 +13,7 @@ let ConceptView = React.createClass({
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
-				<a href={`#/${encodeURIComponent(req.name)}`}>{req.name}</a>
+				<a href={`#/${encodeURIComponent(req)}`}>{req}</a>
 			);
 			reqLinks.push(', ');
 		}
@@ -83,7 +83,7 @@ let ConceptView = React.createClass({
 	onDelete() {
 		if (!confirm('Ya sure?')) return;
 
-		ConceptActions.delete(this.props.concept.id);
+		ConceptActions.delete(this.props.concept.name);
 	}
 
 });

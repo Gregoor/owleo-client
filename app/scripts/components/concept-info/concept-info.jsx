@@ -19,7 +19,7 @@ let ConceptInfo = React.createClass({
 	render() {
 		let comp;
 
-		if (this.state.edit || !this.props.concept.id) {
+		if (this.state.edit || this.props.concept.isNew) {
 			comp = (<ConceptForm onDone={this.onShow} {...this.props}/>);
 		} else {
 			comp = (<ConceptView onEdit={this.onEdit} {...this.props}/>);

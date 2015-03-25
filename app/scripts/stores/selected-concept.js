@@ -7,14 +7,14 @@ let ConceptActions = require('../actions/concept-actions');
 
 let {host} = require('../configs/api.custom');
 let endpoint = `${host}/concepts`;
-let ressource = (id) => `${endpoint}/${id}`;
+let ressource = (name) => `${endpoint}/${name}`;
 
 let SelectedConcept = Reflux.createStore({
 
   listenables: ConceptActions,
 
-  select(id) {
-    qwest.get(ressource(id)).then(this.handleResponse);
+  select(name) {
+    qwest.get(ressource(name)).then(this.handleResponse);
   },
 
 	unselect() {
@@ -22,23 +22,24 @@ let SelectedConcept = Reflux.createStore({
 	},
 
 	new() {
-		this.setConcept({});
+		this.setConcept({'isNew': true});
 	},
 
 	save(data) {
-		let isNew = !this.concept.id;
-		let route = isNew ? endpoint : ressource(this.concept.id);
-		qwest.post(route , {'concept': data}, {'dataType': 'json'}).then((data) => {
-			this.handleResponse(data);
-			if (isNew) ConceptActions.created(this.concept);
+		let route = this.concept.isNew ? endpoint : ressource(this.concept.name);
+		let concept = _.pick(data, 'name', 'summary', 'reqs', 'tags', 'links');
+		let wasNew = this.concept.isNew;
+		qwest.post(route , {concept}, {'dataType': 'json'}).then((serverData) => {
+			this.handleResponse(serverData);
+			if (wasNew) ConceptActions.created(this.concept);
 			else ConceptActions.updated(this.concept);
 		});
 	},
 
-	delete(id) {
-		qwest.delete(ressource(id)).then(() => {
+	delete(name) {
+		qwest.delete(ressource(name)).then(() => {
 			this.handleResponse(null);
-			ConceptActions.deleted(id);
+			ConceptActions.deleted(name);
 		});
 	},
 
@@ -49,7 +50,7 @@ let SelectedConcept = Reflux.createStore({
   setConcept(concept) {
 	  this.concept = concept;
 	  this.trigger(this.concept);
-	  ConceptActions.selected(this.concept ? this.concept.id : undefined);
+	  ConceptActions.selected(this.concept ? this.concept.name : undefined);
   }
 
 });
