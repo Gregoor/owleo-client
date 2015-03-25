@@ -65,33 +65,35 @@ let ConceptForm = React.createClass({
 						           defaultValue={concept.name} />
 					</div>
 				</div>
-				<div className="row">
-					<div className="col-xs-12">
-						<h2>Tags</h2>
-						<Select name="tags" placeholder="Tags"
-						        value={concept.tags}
-						        multi={true} autoload={false}
-						        asyncOptions={this.onGetOptionsOf('Tag')}
-						        createable={true}/>
+				<div className="scroll">
+					<div className="row">
+						<div className="col-xs-12">
+							<h2>Tags</h2>
+							<Select name="tags" placeholder="Tags"
+							        value={concept.tags}
+							        multi={true} autoload={false}
+							        asyncOptions={this.onGetOptionsOf('Tag')}
+							        createable={true}/>
+						</div>
 					</div>
-				</div>
-				<div className="row">
-					<div className="col-xs-12">
-						<h2>Requirements</h2>
-						<Select name="reqs" placeholder="Requirements"
-						        value={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
-						        multi={true} autoload={false}
-						        asyncOptions={this.onGetOptionsOf('Concept')}
-										exclude={[concept.name]}/>
+					<div className="row">
+						<div className="col-xs-12">
+							<h2>Requirements</h2>
+							<Select name="reqs" placeholder="Requirements"
+							        value={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
+							        multi={true} autoload={false}
+							        asyncOptions={this.onGetOptionsOf('Concept')}
+											exclude={[concept.name]}/>
+						</div>
 					</div>
-				</div>
-				<div className="row">
-					<div className="col-xs-12">
-						<TextField floatingLabelText="Summary" multiLine={true}
-						           name="summary" defaultValue={concept.summary} />
+					<div className="row">
+						<div className="col-xs-12">
+							<TextField floatingLabelText="Summary" multiLine={true}
+							           name="summary" defaultValue={concept.summary} />
+						</div>
 					</div>
+					{linkRows}
 				</div>
-				{linkRows}
 				<div className="row end-xs">
 					{abortButton}
 					<div className="col-xs-3">

@@ -60,22 +60,24 @@ let ConceptView = React.createClass({
 						</div>
 					</div>
 				</div>
-				<div className="row">
-					<div className="col-xs-12" style={{'display': 'inline'}}>
-						{tags}
+				<div className="scroll">
+					<div className="row">
+						<div className="col-xs-12" style={{'display': 'inline'}}>
+							{tags}
+						</div>
 					</div>
-				</div>
-				<div className="row">
-					<div className="col-xs-12" style={{'display': 'inline'}}>
-						<h2>Requirements:</h2>
-						{reqLinks}
+					<div className="row">
+						<div className="col-xs-12" style={{'display': 'inline'}}>
+							<h2>Requirements:</h2>
+							{reqLinks}
+						</div>
 					</div>
+					<br/>
+					<div className="row">
+						<div className="col-xs-12">{concept.summary}</div>
+					</div>
+					{linkRows}
 				</div>
-				<br/>
-				<div className="row">
-					<div className="col-xs-12">{concept.summary}</div>
-				</div>
-				{linkRows}
 			</div>
 		);
 	},
