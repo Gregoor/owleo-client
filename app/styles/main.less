@@ -29,7 +29,14 @@ body, input, button, textarea, select {
   right: 0;
   height: 100%;
 	width: 100%;
+
+	svg& {
+		&.grabbed {
+			cursor: move;
+		}
+	}
 }
+
 .map-actions {
 	position: fixed;
 	bottom: 25px;

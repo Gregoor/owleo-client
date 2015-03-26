@@ -3,8 +3,6 @@ let d3 = require('d3');
 let Hammer = require('hammerjs');
 let _ = require('lodash');
 
-const PAN_SPEED = .5;
-
 let Map = React.createClass({
 
 	getInitialState() {
@@ -14,7 +12,7 @@ let Map = React.createClass({
 			'panDelta': {x, y},
 			'zoom': 1
 		};
-		return null;
+		return {'panning': false};
 	},
 
 	componentDidMount() {
@@ -24,6 +22,7 @@ let Map = React.createClass({
 		let hammer = new Hammer.Manager(this.getDOMNode());
 		hammer.add(new Hammer.Pan({'threshold': 0}));
 		hammer.add(new Hammer.Pinch());
+		hammer.on('panstart', this.onPanStart);
 		hammer.on('panmove', this.onPan);
 		hammer.on('panend', this.onPanEnd);
 		hammer.on('pinch', this.onPinch);
@@ -42,8 +41,13 @@ let Map = React.createClass({
 
 	render() {
 		return (
-			<svg className="map" onWheel={this.onScroll}/>
+			<svg className={`map ${this.state.panning ? 'grabbed' : ''}`}
+			     onWheel={this.onScroll} onClick={() => this.props.onSelect()}/>
 		);
+	},
+
+	onPanStart() {
+		this.setState({'panning': true});
 	},
 
 	onPan(event) {
@@ -62,6 +66,7 @@ let Map = React.createClass({
 
 	onPanEnd() {
 		this.setStateD3({'panDelta': {'x': 0, 'y': 0}});
+		this.setState({'panning': false});
 	},
 
 	onPinch(event) {
