@@ -162,7 +162,7 @@ let Graph = React.createClass({
 	},
 
   render() {
-    return (<div className="vis-map"></div>);
+    return (<div className="map"></div>);
   }
 });
 

@@ -8,14 +8,17 @@ let ConceptActions = require('../actions/concept-actions');
 let MapActions = require('../actions/map-actions');
 let Concepts = require('../stores/concepts');
 let SelectedConcept = require('../stores/selected-concept');
+let userStore = require('../stores/user-store');
 
-let Graph = require('./graph');
+let VisMap = require('./vis-map');
+let Map = require('./map');
 let ConceptInfo = require('./concept-info/concept-info');
 
 let GraphView = React.createClass({
 
   mixins: [
 	  Reflux.ListenerMixin,
+	  Reflux.connect(userStore, 'user'),
 	  Router.State,
 	  Router.Navigation
   ],
@@ -48,9 +51,11 @@ let GraphView = React.createClass({
       conceptInfo = <ConceptInfo concept={selectedConcept}/>;
     }
 
+	  let AMap = 23 == 42 ? VisMap : Map;
+
     return (
       <div>
-        <Graph concepts={this.state.concepts} onSelect={this.onSelect}/>
+	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}/>
         <div className="info-container">
           {conceptInfo}
         </div>
