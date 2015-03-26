@@ -5,6 +5,7 @@ let Reflux = require('reflux');
 let {FloatingActionButton} = require('material-ui');
 
 let ConceptActions = require('../actions/concept-actions');
+let MapActions = require('../actions/map-actions');
 let Concepts = require('../stores/concepts');
 let SelectedConcept = require('../stores/selected-concept');
 
@@ -53,8 +54,22 @@ let GraphView = React.createClass({
         <div className="info-container">
           {conceptInfo}
         </div>
-	      <FloatingActionButton className="add-concept" onClick={this.onNew}
-	                            iconClassName="icon icon-plus"/>
+	      <div className="map-actions">
+		      <div className="center-xs">
+			      <FloatingActionButton onClick={this.onUnlockPositions}
+			                            secondary={true} mini={true}
+			                            iconClassName="icon icon-unlocked"/>
+		      </div>
+		      <div className="center-xs">
+			      <FloatingActionButton onClick={this.onSavePositions}
+			                            secondary={true} mini={true}
+			                            iconClassName="icon icon-floppy-disk"/>
+		      </div>
+		      <div className="center-xs">
+			      <FloatingActionButton className="add-concept" onClick={this.onNew}
+			                            iconClassName="icon icon-plus"/>
+		      </div>
+	      </div>
       </div>);
   },
 
@@ -70,6 +85,18 @@ let GraphView = React.createClass({
 	  if (name !== undefined) ConceptActions.select(name);
 	  else ConceptActions.unselect();
   },
+
+	onUnlockPositions() {
+		MapActions.unlock();
+	},
+
+	onSavePositions() {
+		MapActions.getPositions();
+		this.listenTo(MapActions.gotPositions, (concepts) => {
+			this.stopListeningTo(MapActions.gotPositions);
+			ConceptActions.reposition(concepts);
+		});
+	},
 
 	onNew() {
 		ConceptActions.new();

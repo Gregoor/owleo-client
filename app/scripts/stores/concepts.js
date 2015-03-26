@@ -9,12 +9,16 @@ let Concepts = Reflux.createStore({
 
   listenables: ConceptActions,
 
-  onGetAll() {
+  getAll() {
     let store = this;
     qwest.get(`${host}/concepts`).then((data) => {
       store.setConcepts(JSON.parse(data));
     });
   },
+
+	reposition(concepts) {
+		qwest.post(`${host}/concepts/position`, {concepts}, {'dataType': 'json'});
+	},
 
   setConcepts(concepts) {
     this.trigger(this.concepts = concepts);

@@ -10,7 +10,8 @@ let ConceptActions = Reflux.createActions([
 	'updated',
 	'save',
 	'delete',
-	'deleted'
+	'deleted',
+	'reposition'
 ]);
 
 export default ConceptActions;

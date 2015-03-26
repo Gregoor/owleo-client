@@ -6,6 +6,7 @@ let _ = require('lodash');
 
 let VIS_CONFIG = require('../configs/vis');
 let ConceptActions = require('../actions/concept-actions');
+let MapActions = require('../actions/map-actions');
 
 let Graph = React.createClass({
 
@@ -91,6 +92,25 @@ let Graph = React.createClass({
 		  nw.moving = true;
 		  nw.start();
 	  });
+
+	  this.listenTo(MapActions.getPositions, () => {
+		  let concepts = _.map(nw.getPositions(), (pos, name) => ({name, pos}));
+		  nw.nodesData.update(concepts.map((concept) => {
+			  return _.extend(concept.pos, {
+				  'id': concept.name,
+				  'allowedToMoveX': false,
+				  'allowedToMoveY': false
+			  });
+		  }));
+		  MapActions.gotPositions(concepts);
+	  });
+
+	  this.listenTo(MapActions.unlock, () => {
+		  nw.nodesData.update(nw.nodesData.map(function(node) {
+			  node.allowedToMoveX = node.allowedToMoveY = true;
+			  return node;
+		  }));
+	  });
   },
 
   componentWillUpdate(props) {
@@ -112,7 +132,10 @@ let Graph = React.createClass({
           ) +
           word;
       }, '');
-      let node = {'id': name, label};
+      let node = _.extend({'id': name, label}, {
+	      'x': concept.x || undefined,
+	      'y': concept.y || undefined
+      });
 
       if (concept.edges !== undefined) _.extend(node, {
         'radius': 10 + .1 * concept.edges,
