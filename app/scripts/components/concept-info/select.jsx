@@ -21,10 +21,16 @@ export default React.createClass({
 
 	render() {
 		return (
-			<Select {...this.props} value={this.state.value || this.props.defaultValue}
+			<Select {...this.props} value={this.getValue()}
 			                        onChange={this.onChange}
 			                        asyncOptions={this.onGetOptions}/>
 		);
+	},
+
+	getValue() {
+		let value = this.state.value;
+		if (value !== null && value.length == 0) value = []
+		return value || this.props.defaultValue;
 	},
 
 	onChange(value) {
