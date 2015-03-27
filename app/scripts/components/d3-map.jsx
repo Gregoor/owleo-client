@@ -42,7 +42,7 @@ let D3Map = React.createClass({
 	},
 
 	renderD3() {
-		let zoom = this.stateD3.zoom, pos = this.stateD3.position;
+		let zoom = this.navState.zoom, pos = this.navState.position;
 		this.group.attr('transform', `translate(${pos.x}, ${pos.y}) scale(${zoom})`);
 	},
 

@@ -1,3 +1,4 @@
+let _ = require('lodash');
 let Hammer = require('hammerjs');
 
 export default {
