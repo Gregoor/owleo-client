@@ -14,6 +14,7 @@ let SelectedConcept = Reflux.createStore({
   listenables: ConceptActions,
 
   select(name) {
+	  if (this.concept && name == this.concept.name) return;
     qwest.get(ressource(name)).then(this.handleResponse);
   },
 

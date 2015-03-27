@@ -45,10 +45,11 @@ let GraphView = React.createClass({
   },
 
   render() {
-    let conceptInfo = '';
+    let conceptInfo, conceptName;
     let selectedConcept = this.state.selectedConcept;
     if (selectedConcept) {
       conceptInfo = <ConceptInfo concept={selectedConcept}/>;
+	    conceptName = selectedConcept.name;
     }
 
 	  let AMap = 23 == 42 ? VisMap : D3Map;

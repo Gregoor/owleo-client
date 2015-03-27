@@ -1,5 +1,5 @@
 let React = require('react');
-let Reflux = require('reflux');
+let Router = require('react-router');
 
 let d3 = require('d3');
 let _ = require('lodash');
@@ -11,7 +11,7 @@ const RADIUS = 10;
 
 let D3Map = React.createClass({
 
-	mixins: [Reflux.ListenerMixin, NavigateMapMixin],
+	mixins: [NavigateMapMixin, Router.State],
 
 	componentDidMount() {
 		let svg = d3.select(this.getDOMNode());
@@ -23,22 +23,44 @@ let D3Map = React.createClass({
 				'orient': 'auto'
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
+
+		Router.HashLocation.addChangeListener(this.onRoute);
 	},
 
 	componentWillReceiveProps(props) {
 		let {concepts} = props;
+
 		if (!_.isEmpty(concepts) && !this.props.concepts) {
-			this.renderEdges(concepts);
+			let indexedConcepts = new Map();
+			for (let concept of concepts) indexedConcepts.set(concept.name, concept);
+			this.renderEdges(indexedConcepts);
 			this.renderNodes(concepts);
 			this.renderD3();
+		}
+	},
+
+	//TODO: This should be replaced with listening to props change which
+	// sadly I couldn't get to work (4h+ going mad) :(
+	onRoute() {
+		let name = this.getParams().conceptName;
+		if (name && name != 'new') {
+			let node = this.conceptNodesMap.get(name);
+			if (node) node.classList.add('selected');
+		} else {
+			let node = this.group.select('.node.selected').node();
+			if (node) node.classList.remove('selected');
 		}
 	},
 
 	render() {
 		return (
 			<svg className={`map ${this.state.panning ? 'grabbed' : ''}`}
-			     onWheel={this.onScroll} onClick={() => this.props.onSelect()}/>
+			     onWheel={this.onScroll} onClick={this.onSelect}/>
 		);
+	},
+
+	onSelect() {
+		this.props.onSelect();
 	},
 
 	renderD3() {
@@ -46,12 +68,9 @@ let D3Map = React.createClass({
 		this.group.attr('transform', `translate(${pos.x}, ${pos.y}) scale(${zoom})`);
 	},
 
-	renderEdges(concepts) {
-		let indexedConcepts = new Map();
-		for (let concept of concepts) indexedConcepts.set(concept.name, concept);
-
+	renderEdges(indexedConcepts) {
 		let edgeData = [];
-		for (let concept of concepts) for (let req of concept.reqs) {
+		for (let [name, concept] of indexedConcepts) for (let req of concept.reqs) {
 			let reqV = Victor.fromObject(indexedConcepts.get(req));
 			let conceptV = Victor.fromObject(concept);
 
@@ -59,7 +78,7 @@ let D3Map = React.createClass({
 				.multiply(new Victor(RADIUS, RADIUS));
 
 			reqV.subtract(radV);
-			conceptV.add(radV.clone().multiply(new Victor(2, 2)));
+			conceptV.add(radV.clone().multiply(new Victor(1.9, 1.9)));
 
 			edgeData.push({
 				'from': {'x': reqV.x, 'y': reqV.y},
@@ -76,12 +95,15 @@ let D3Map = React.createClass({
 	},
 
 	renderNodes(concepts) {
+		let conceptNodesMap = this.conceptNodesMap = new Map();
 		let conceptNodes = this.group.selectAll('.node').data(concepts)
 			.enter();
 		conceptNodes.append('circle')
 			.attr('class', 'node').attr('r', RADIUS)
 			.attr({'cx': (n) => n.x, 'cy': (n) => n.y})
-			.on('click', (c) => this.props.onSelect(c.name));
+			.on('click', (c) => this.props.onSelect(c.name)).each(function(c) {
+				conceptNodesMap.set(c.name, this);
+			});
 
 		conceptNodes.append('text')
 			.text((c) => c.name)
