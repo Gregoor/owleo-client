@@ -16,6 +16,7 @@
     "react-select": "git://github.com/Gregoor/react-select.git#lib",
     "react-tap-event-plugin": "^0.1.4",
     "reflux": "~0.2.5",
+    "victor": "^0.2.6",
     "vis": "^3.11.0"
   },
   "devDependencies": {
@@ -67,9 +68,9 @@
       "cjsx"
     ]
   },
-	"browserify": {
-		"transform": [
-			"babelify"
-		]
-	}
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  }
 }

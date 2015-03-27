@@ -2,8 +2,11 @@ let React = require('react');
 let d3 = require('d3');
 let Hammer = require('hammerjs');
 let _ = require('lodash');
+let Victor = require('victor');
 
-let Map = React.createClass({
+const RADIUS = 10;
+
+let D3Map = React.createClass({
 
 	getInitialState() {
 		let x = 0, y = 0;
@@ -17,6 +20,13 @@ let Map = React.createClass({
 
 	componentDidMount() {
 		let svg = d3.select(this.getDOMNode());
+		svg.append('defs').append('marker').attr({
+				'id': 'triangle',
+				'viewBox': '0 -5 10 10',
+				'markerWidth': '4',
+				'markerHeight': '4',
+				'orient': 'auto'
+			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
 
 		let hammer = new Hammer.Manager(this.getDOMNode());
@@ -29,12 +39,51 @@ let Map = React.createClass({
 	},
 
 	componentWillReceiveProps(props) {
-		if (_.isEmpty(props.concepts)) return;
-		this.group.selectAll('.node')
-			.data(props.concepts).enter().append('circle')
-			.attr('class', 'node').attr('r', 10).style('fill', 'orange')
+		let concepts = props.concepts;
+		if (_.isEmpty(concepts) || this.props.concepts) return;
+
+		let indexedConcepts = new Map();
+		for (let concept of concepts) indexedConcepts.set(concept.name, concept);
+
+		let edgeData = [];
+		for (let concept of concepts) for (let req of concept.reqs) {
+			let reqV = Victor.fromObject(indexedConcepts.get(req));
+			let conceptV = Victor.fromObject(concept);
+
+			let radV = reqV.clone().subtract(conceptV).norm()
+				.multiply(new Victor(RADIUS, RADIUS));
+
+			reqV.subtract(radV);
+			conceptV.add(radV.clone().multiply(new Victor(2, 2)));
+
+			edgeData.push({
+				'from': {'x': reqV.x, 'y': reqV.y},
+				'to': {'x': conceptV.x, 'y': conceptV.y}
+			});
+		}
+
+		let edges = this.group.selectAll('.edge').data(edgeData).enter();
+		edges.append('line').attr({
+			'class': 'edge',
+			'x1': (e) => e.from.x,  'y1': (e) => e.from.y,
+			'x2': (e) => e.to.x,   'y2': (e) => e.to.y,
+			'marker-end': 'url(#triangle)'
+		});
+
+		let conceptNodes = this.group.selectAll('.node').data(props.concepts)
+			.enter();
+		conceptNodes.append('circle')
+			.attr('class', 'node').attr('r', RADIUS)
 			.attr({'cx': (n) => n.x, 'cy': (n) => n.y})
 			.on('click', (c) => this.props.onSelect(c.name));
+
+		conceptNodes.append('text')
+			.text((c) => c.name)
+			.attr({
+				'class': 'label',
+				'x': function(c) { return c.x - this.getComputedTextLength() / 2 },
+				'y': (c) => c.y + 23
+			});
 
 		this.renderD3();
 	},
@@ -90,4 +139,4 @@ let Map = React.createClass({
 
 });
 
-export default Map;
+export default D3Map;

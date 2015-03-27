@@ -11,7 +11,7 @@ let SelectedConcept = require('../stores/selected-concept');
 let userStore = require('../stores/user-store');
 
 let VisMap = require('./vis-map');
-let Map = require('./map');
+let D3Map = require('./d3-map');
 let ConceptInfo = require('./concept-info/concept-info');
 
 let GraphView = React.createClass({
@@ -51,7 +51,7 @@ let GraphView = React.createClass({
       conceptInfo = <ConceptInfo concept={selectedConcept}/>;
     }
 
-	  let AMap = 23 == 42 ? VisMap : Map;
+	  let AMap = 23 == 42 ? VisMap : D3Map;
 
     return (
       <div>

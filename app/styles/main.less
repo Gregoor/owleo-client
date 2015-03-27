@@ -34,6 +34,28 @@ body, input, button, textarea, select {
 		&.grabbed {
 			cursor: move;
 		}
+
+		circle.node {
+			fill: #f1c40f;
+			stroke: #be9100;
+		}
+
+		text.label {
+			fill: white;
+			stroke: black;
+			font-weight: 800;
+			stroke-width: .8;
+		}
+
+		@edge-color: #7f8c8d;
+		line.edge {
+			stroke-width: 2;
+			stroke: @edge-color;
+		}
+
+		#triangle path {
+			fill: @edge-color;
+		}
 	}
 }
 
