@@ -113,8 +113,9 @@ let D3Map = React.createClass({
 				'class': 'label',
 				'x': function(c) { return c.x - this.getComputedTextLength() / 2 },
 				'y': (c) => c.y + 23
-			});
-	},
+			})
+			.on('click', (c) => this.props.onSelect(c.name));
+	}
 
 });
 
