@@ -41,6 +41,10 @@ let MapLayout = React.createClass({
 	  });
 
 	  ConceptActions.getAll();
+
+	  window.addEventListener('keydown', (e) => {
+		  if (e.keyCode == 27/*ESC*/) ConceptActions.unselect();
+	  });
   },
 
   render() {
