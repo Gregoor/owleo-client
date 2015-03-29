@@ -115,7 +115,6 @@ let Graph = React.createClass({
 		));
 
 		this.addEdgesFor(concept);
-		console.log('nuandready');
 	},
 
 	onUpdated(concept) {
