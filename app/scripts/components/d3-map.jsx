@@ -5,13 +5,13 @@ let d3 = require('d3');
 let _ = require('lodash');
 let Victor = require('victor');
 
-let NavigateMapMixin = require('./mixins/NavigateMapMixin');
+let MapNavigationMixin = require('./mixins/MapNavigationMixin');
 
 const RADIUS = 10;
 
 let D3Map = React.createClass({
 
-	mixins: [NavigateMapMixin, Router.State],
+	mixins: [MapNavigationMixin, Router.State],
 
 	componentDidMount() {
 		let svg = d3.select(this.getDOMNode());
@@ -62,7 +62,8 @@ let D3Map = React.createClass({
 	},
 
 	onSelect() {
-		this.props.onSelect();
+		if (this.state.wasPanning) this.setState({'wasPanning': false});
+		else this.props.onSelect();
 	},
 
 	renderD3() {

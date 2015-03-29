@@ -15,7 +15,7 @@ export default {
 
 	componentDidMount() {
 		let hammer = new Hammer.Manager(this.getDOMNode());
-		hammer.add(new Hammer.Pan({'threshold': 0}));
+		hammer.add(new Hammer.Pan({'threshold': 5}));
 		hammer.add(new Hammer.Pinch());
 		hammer.on('panstart', this.onPanStart);
 		hammer.on('panmove', this.onPan);
@@ -24,7 +24,7 @@ export default {
 	},
 
 	onPanStart() {
-		this.setState({'panning': true});
+		this.setState({'panning': true, 'wasPanning': true});
 	},
 
 	onPan(event) {
