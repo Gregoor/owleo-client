@@ -56,6 +56,13 @@ let GraphView = React.createClass({
 		  actions = [
 			  (
 				  <div className="center-xs">
+					  <FloatingActionButton onClick={this.onSwitchEdit}
+					                        secondary={true} mini={true}
+					                        iconClassName="icon icon-eye"/>
+				  </div>
+			  ),
+			  (
+				  <div className="center-xs">
 					  <FloatingActionButton onClick={this.onUnlockPositions}
 					                        secondary={true} mini={true}
 					                        iconClassName="icon icon-unlocked"/>
@@ -78,7 +85,7 @@ let GraphView = React.createClass({
 	  } else {
 		  actions = (
 			  <div className="center-xs">
-				  <FloatingActionButton onClick={this.onSwitchToEdit}
+				  <FloatingActionButton onClick={this.onSwitchEdit}
 				                        iconClassName="icon icon-pencil"/>
 			  </div>
 		  );
@@ -107,8 +114,8 @@ let GraphView = React.createClass({
 		} else ConceptActions.unselect();
 	},
 
-	onSwitchToEdit() {
-		this.setState({'editMode': true});
+	onSwitchEdit() {
+		this.setState({'editMode': !this.state.editMode});
 	},
 
 	onSelect(name) {

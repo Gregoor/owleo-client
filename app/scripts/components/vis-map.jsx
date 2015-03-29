@@ -104,48 +104,16 @@ let Graph = React.createClass({
 			  return node;
 		  }));
 	  });
+
+	  let concepts = this.props.concepts;
+	  if (concepts) this.fillNetwork(concepts);
   },
 
   componentWillReceiveProps(props) {
 	  let {concepts, selectedConcept} = props;
-	  let self = this;
+
 	  if (!this.props.concepts && this.network && concepts) {
-		  let nodes = [], edges = [];
-
-		  concepts.forEach((concept) => {
-			  if (!concept.name) return;
-			  let name = concept.name;
-			  let label = _.reduce(name.split(' '), function(str, word) {
-				  let parts = str.split('\n'), lastPart = parts[parts.length - 1];
-
-				  return str +
-					  (lastPart.length > 0 && lastPart.length + word.length > 20 ?
-						  '\n' :
-						  ' '
-					  ) +
-					  word;
-			  }, '');
-			  let node = _.extend({'id': name, label}, {
-				  'x': concept.x || undefined,
-				  'y': concept.y || undefined
-			  });
-
-			  if (concept.edges !== undefined) _.extend(node, {
-				  'radius': 10 + .1 * concept.edges,
-				  'mass': 1 + .1 * concept.edges
-			  });
-
-			  nodes.push(node);
-			  concept.reqs.forEach((req) => {
-				  return edges.push({
-					  'id': self.edgeIDFor(name, req),
-					  'from': req,
-					  'to': name
-				  });
-			  });
-		  });
-
-		  this.network.setData({nodes, edges});
+		  this.fillNetwork(concepts);
 	  }
 
 		if (selectedConcept && this.network.nodesData.length) {
@@ -155,6 +123,45 @@ let Graph = React.createClass({
 			}, 500);
 		}
   },
+
+	fillNetwork(concepts) {
+		let nodes = [], edges = [];
+
+		concepts.forEach((concept) => {
+			if (!concept.name) return;
+			let name = concept.name;
+			let label = _.reduce(name.split(' '), function(str, word) {
+				let parts = str.split('\n'), lastPart = parts[parts.length - 1];
+
+				return str +
+					(lastPart.length > 0 && lastPart.length + word.length > 20 ?
+						'\n' :
+						' '
+					) +
+					word;
+			}, '');
+			let node = _.extend({'id': name, label}, {
+				'x': concept.x || undefined,
+				'y': concept.y || undefined
+			});
+
+			if (concept.edges !== undefined) _.extend(node, {
+				'radius': 10 + .1 * concept.edges,
+				'mass': 1 + .1 * concept.edges
+			});
+
+			nodes.push(node);
+			concept.reqs.forEach((req) => {
+				return edges.push({
+					'id': this.edgeIDFor(name, req),
+					'from': req,
+					'to': name
+				});
+			});
+		});
+
+		this.network.setData({nodes, edges});
+	},
 
 	edgeIDFor(name, reqName) {
 		let encName = encodeURIComponent(name);

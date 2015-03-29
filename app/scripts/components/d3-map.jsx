@@ -23,22 +23,30 @@ let D3Map = React.createClass({
 				'orient': 'auto'
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
+
+		this.update(this.props);
 	},
 
 	componentWillReceiveProps(props) {
+		this.update(props);
+	},
+
+	update(props) {
 		let {concepts, selectedConcept} = props;
 
-		if (!_.isEmpty(concepts) && !this.props.concepts) {
+		if (!_.isEmpty(concepts) && !this.mapFilled) {
 			let indexedConcepts = new Map();
 			for (let concept of concepts) indexedConcepts.set(concept.name, concept);
 			this.renderEdges(indexedConcepts);
 			this.renderNodes(concepts);
 			this.renderD3();
+			this.mapFilled = true;
 		}
 
+		let conceptNodesMap = this.conceptNodesMap;
 		let name = selectedConcept ? selectedConcept.name : null;
-		if (name && name != 'new') {
-			let node = this.conceptNodesMap.get(name);
+		if (conceptNodesMap && name && name != 'new') {
+			let node = conceptNodesMap.get(name);
 			if (node) node.classList.add('selected');
 		} else {
 			let node = this.group.select('.node.selected').node();
