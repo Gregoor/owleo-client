@@ -23,7 +23,7 @@ let GraphView = React.createClass({
   ],
 
   getInitialState() {
-    return {editMode: true};
+    return {editMode: !true};
   },
 
   componentWillMount() {
@@ -89,7 +89,7 @@ let GraphView = React.createClass({
     return (
       <div>
 	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}
-	            focusedConcept={selectedConcept}/>
+	            selectedConcept={selectedConcept}/>
         <div className="info-container">
           {conceptInfo}
         </div>

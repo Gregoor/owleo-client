@@ -23,12 +23,10 @@ let D3Map = React.createClass({
 				'orient': 'auto'
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
-
-		Router.HashLocation.addChangeListener(this.onRoute);
 	},
 
 	componentWillReceiveProps(props) {
-		let {concepts} = props;
+		let {concepts, selectedConcept} = props;
 
 		if (!_.isEmpty(concepts) && !this.props.concepts) {
 			let indexedConcepts = new Map();
@@ -37,12 +35,8 @@ let D3Map = React.createClass({
 			this.renderNodes(concepts);
 			this.renderD3();
 		}
-	},
 
-	//TODO: This should be replaced with listening to props change which
-	// sadly I couldn't get to work (4h+ going mad) :(
-	onRoute() {
-		let name = this.getParams().conceptName;
+		let name = selectedConcept ? selectedConcept.name : null;
 		if (name && name != 'new') {
 			let node = this.conceptNodesMap.get(name);
 			if (node) node.classList.add('selected');

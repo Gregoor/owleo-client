@@ -107,11 +107,12 @@ let Graph = React.createClass({
   },
 
   componentWillReceiveProps(props) {
+	  let {concepts, selectedConcept} = props;
 	  let self = this;
-	  if (!this.props.concepts && this.network && props.concepts) {
+	  if (!this.props.concepts && this.network && concepts) {
 		  let nodes = [], edges = [];
 
-		  props.concepts.forEach((concept) => {
+		  concepts.forEach((concept) => {
 			  if (!concept.name) return;
 			  let name = concept.name;
 			  let label = _.reduce(name.split(' '), function(str, word) {
@@ -147,9 +148,9 @@ let Graph = React.createClass({
 		  this.network.setData({nodes, edges});
 	  }
 
-		if (props.focusedConcept && this.network.nodesData.length) {
+		if (selectedConcept && this.network.nodesData.length) {
 			setTimeout(() => {
-				let name = props.focusedConcept.name;
+				let name = selectedConcept.name;
 				this.network.selectNodes(name ? [name] : []);
 			}, 500);
 		}
