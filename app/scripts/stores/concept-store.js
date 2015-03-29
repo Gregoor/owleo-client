@@ -10,14 +10,11 @@ let conceptStore = Reflux.createStore({
   listenables: ConceptActions,
 
 	getAll() {
-		conceptAPI.all().then((data) => {
-			this.all = data;
-			this.triggerAll();
-		});
+		conceptAPI.all().then(this.setAll);
 	},
 
 	reposition(concepts) {
-		conceptAPI.reposition(concepts);
+		conceptAPI.reposition(concepts).then(this.setAll);
 	},
 
   select(name) {
@@ -59,6 +56,11 @@ let conceptStore = Reflux.createStore({
 			ConceptActions.deleted(name);
 			this.setSelected();
 		});
+	},
+
+	setAll(concepts) {
+		this.all = concepts;
+		this.triggerAll();
 	},
 
   setSelected(concept) {
