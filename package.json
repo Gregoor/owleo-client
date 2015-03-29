@@ -5,6 +5,7 @@
   "author": "Jane Doe",
   "license": "MIT",
   "dependencies": {
+    "d3": "^3.5.5",
     "flexboxgrid": "^6.1.1",
     "gulp-plumber": "^1.0.0",
     "hammerjs": "^2.0.4",
