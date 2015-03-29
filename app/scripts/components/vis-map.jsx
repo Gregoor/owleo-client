@@ -67,14 +67,7 @@ let Graph = React.createClass({
 		  addEdgesFor(concept);
 	  });
 
-	  this.listenTo(ConceptActions.selected, (name) => {
-		   nw.selectNodes(name ? [name] : []);
-	  });
-
 	  this.listenTo(ConceptActions.updated, (concept) => {
-		  let id, label;
-		  id = label = concept.name;
-		  nw.nodesData.update({id, label})
 		  for (let edge of nw.edgesData.get()) {
 			  let [from, to] = edge.id.split('>');
 			  if (decodeURIComponent(to) == concept.name && !_.find(concept.reqs, (req) => {
@@ -113,46 +106,53 @@ let Graph = React.createClass({
 	  });
   },
 
-  componentWillUpdate(props) {
-    if (this.props.concepts || !this.network || !props.concepts) return;
+  componentWillReceiveProps(props) {
 	  let self = this;
+	  if (!this.props.concepts && this.network && props.concepts) {
+		  let nodes = [], edges = [];
 
-    let nodes = [], edges = [];
+		  props.concepts.forEach((concept) => {
+			  if (!concept.name) return;
+			  let name = concept.name;
+			  let label = _.reduce(name.split(' '), function(str, word) {
+				  let parts = str.split('\n'), lastPart = parts[parts.length - 1];
 
-    props.concepts.forEach((concept) => {
-      if (!concept.name) return;
-	    let name = concept.name;
-      let label = _.reduce(name.split(' '), function(str, word) {
-        let parts = str.split('\n'), lastPart = parts[parts.length - 1];
+				  return str +
+					  (lastPart.length > 0 && lastPart.length + word.length > 20 ?
+						  '\n' :
+						  ' '
+					  ) +
+					  word;
+			  }, '');
+			  let node = _.extend({'id': name, label}, {
+				  'x': concept.x || undefined,
+				  'y': concept.y || undefined
+			  });
 
-        return str +
-          (lastPart.length > 0 && lastPart.length + word.length > 20 ?
-            '\n' :
-            ' '
-          ) +
-          word;
-      }, '');
-      let node = _.extend({'id': name, label}, {
-	      'x': concept.x || undefined,
-	      'y': concept.y || undefined
-      });
+			  if (concept.edges !== undefined) _.extend(node, {
+				  'radius': 10 + .1 * concept.edges,
+				  'mass': 1 + .1 * concept.edges
+			  });
 
-      if (concept.edges !== undefined) _.extend(node, {
-        'radius': 10 + .1 * concept.edges,
-        'mass': 1 + .1 * concept.edges
-      });
+			  nodes.push(node);
+			  concept.reqs.forEach((req) => {
+				  return edges.push({
+					  'id': self.edgeIDFor(name, req),
+					  'from': req,
+					  'to': name
+				  });
+			  });
+		  });
 
-      nodes.push(node);
-      concept.reqs.forEach((req) => {
-	      return edges.push({
-		      'id': self.edgeIDFor(name, req),
-		      'from': req,
-		      'to': name
-	      });
-      });
-    });
+		  this.network.setData({nodes, edges});
+	  }
 
-    this.network.setData({nodes, edges});
+		if (props.focusedConcept && this.network.nodesData.length) {
+			setTimeout(() => {
+				let name = props.focusedConcept.name;
+				this.network.selectNodes(name ? [name] : []);
+			}, 500);
+		}
   },
 
 	edgeIDFor(name, reqName) {

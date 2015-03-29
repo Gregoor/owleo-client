@@ -8,6 +8,24 @@ let ConceptView = React.createClass({
 	render() {
 		let concept = this.props.concept;
 
+		let editActions;
+		if (this.props.editMode) {
+			editActions = [
+				(
+					<div className="col-xs-4">
+						<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
+						            onClick={this.props.onEdit}/>
+					</div>
+				),
+				(
+					<div className="col-xs-4">
+					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
+					            onClick={this.onDelete}/>
+					</div>
+				)
+			];
+		}
+
 		let tags = concept.tags.map((tag) => (<span className="tag">{tag}</span>));
 
 		let reqLinks = [];
@@ -44,19 +62,12 @@ let ConceptView = React.createClass({
 						<h1 title={concept.name}>{concept.name}</h1>
 					</div>
 					<div className="col-xs-4">
-						<div className="row">
+						<div className="row end-xs">
 							<div className="col-xs-4">
-								<IconButton iconClassName="icon icon-eye" tooltip="Show in map"
-								            onClick={this.props.onEdit}/>
+								<IconButton iconClassName="icon icon-eye"
+								            tooltip="Show in map"/>
 							</div>
-							<div className="col-xs-4">
-								<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
-								            onClick={this.props.onEdit}/>
-							</div>
-							<div className="col-xs-4">
-								<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-								            onClick={this.onDelete}/>
-							</div>
+							{editActions}
 						</div>
 					</div>
 				</div>

@@ -6,7 +6,7 @@ let Select = require('./select');
 let FormData = require('../../mixins/FormData');//require('react-form-data');
 
 let ConceptActions = require('../../actions/concept-actions');
-let search = require('../../requests/search');
+let searchAPI = require('../../api/search-api');
 
 let ConceptForm = React.createClass({
 
@@ -107,7 +107,7 @@ let ConceptForm = React.createClass({
 
 
 	onGetOptionsOf(type) {
-		return (q, cb) => search({q, 'for': [type]}).then((result) => {
+		return (q, cb) => searchAPI({q, 'for': [type]}).then((result) => {
 			let options = result.map(this.nameObjToOption);
 			cb(null, {options, 'complete': options.length < 10});
 		});

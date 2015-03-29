@@ -7,7 +7,6 @@ var watchify   = require('watchify');
 var source     = require('vinyl-source-stream');
 var path       = require('path');
 
-require('harmonize')();
 
 var bundler = {
   w: null,
@@ -16,10 +15,9 @@ var bundler = {
 	    extensions: ['.jsx'],
       entries: ['./app/scripts/app.js'],
       insertGlobals: true,
-      cache: {},
-      packageCache: {},
 	    debug: true
     }));
+	  this.w.on('log', $.util.log.bind($.util));
   },
   bundle: function() {
     return this.w && this.w.bundle()

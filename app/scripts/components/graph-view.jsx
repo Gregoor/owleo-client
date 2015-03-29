@@ -6,8 +6,7 @@ let {FloatingActionButton} = require('material-ui');
 
 let ConceptActions = require('../actions/concept-actions');
 let MapActions = require('../actions/map-actions');
-let Concepts = require('../stores/concepts');
-let SelectedConcept = require('../stores/selected-concept');
+let conceptStore = require('../stores/concept-store');
 let userStore = require('../stores/user-store');
 
 let VisMap = require('./vis-map');
@@ -24,57 +23,78 @@ let GraphView = React.createClass({
   ],
 
   getInitialState() {
-    return {};
+    return {editMode: true};
   },
 
   componentWillMount() {
 	  this.onRoute();
 	  Router.HashLocation.addChangeListener(this.onRoute);
-	  this.listenTo(SelectedConcept, (concept) => {
+	  this.listenTo(conceptStore, (concepts) => {
 		  let path = '/';
-		  if (concept) {
-			  if (concept.isNew) path += 'new';
-			  else path += encodeURIComponent(concept.name);
+		  let selectedConcept = concepts.selected;
+		  if (selectedConcept) {
+			  if (selectedConcept.isNew) path += 'new';
+			  else path += encodeURIComponent(selectedConcept.name);
 		  }
 		  this.transitionTo(path);
-		  this.setState({'selectedConcept': concept});
+		  this.setState({selectedConcept, 'concepts': concepts.all});
 	  });
 
 	  ConceptActions.getAll();
-	  this.listenTo(Concepts, (concepts) => this.setState({concepts}));
   },
 
   render() {
     let conceptInfo, conceptName;
     let selectedConcept = this.state.selectedConcept;
     if (selectedConcept) {
-      conceptInfo = <ConceptInfo concept={selectedConcept}/>;
-	    conceptName = selectedConcept.name;
+      conceptInfo = <ConceptInfo concept={selectedConcept}
+                                 editMode={this.state.editMode}/>;
     }
 
-	  let AMap = 23 == 42 ? VisMap : D3Map;
+	  let actions;
+	  if (this.state.editMode) {
+		  actions = [
+			  (
+				  <div className="center-xs">
+					  <FloatingActionButton onClick={this.onUnlockPositions}
+					                        secondary={true} mini={true}
+					                        iconClassName="icon icon-unlocked"/>
+			    </div>
+			  ),
+			  (
+				  <div className="center-xs">
+				  <FloatingActionButton onClick={this.onSavePositions}
+				                        secondary={true} mini={true}
+				                        iconClassName="icon icon-floppy-disk"/>
+				  </div>
+			  ),
+			  (
+				  <div className="center-xs">
+					  <FloatingActionButton className="add-concept" onClick={this.onNew}
+					                        iconClassName="icon icon-plus"/>
+				  </div>
+			  )
+		  ];
+	  } else {
+		  actions = (
+			  <div className="center-xs">
+				  <FloatingActionButton onClick={this.onSwitchToEdit}
+				                        iconClassName="icon icon-pencil"/>
+			  </div>
+		  );
+	  }
+
+	  let AMap = this.state.editMode ? VisMap : D3Map;
 
     return (
       <div>
-	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}/>
+	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}
+	            focusedConcept={selectedConcept}/>
         <div className="info-container">
           {conceptInfo}
         </div>
 	      <div className="map-actions">
-		      <div className="center-xs">
-			      <FloatingActionButton onClick={this.onUnlockPositions}
-			                            secondary={true} mini={true}
-			                            iconClassName="icon icon-unlocked"/>
-		      </div>
-		      <div className="center-xs">
-			      <FloatingActionButton onClick={this.onSavePositions}
-			                            secondary={true} mini={true}
-			                            iconClassName="icon icon-floppy-disk"/>
-		      </div>
-		      <div className="center-xs">
-			      <FloatingActionButton className="add-concept" onClick={this.onNew}
-			                            iconClassName="icon icon-plus"/>
-		      </div>
+		      {actions}
 	      </div>
       </div>);
   },
@@ -85,6 +105,10 @@ let GraphView = React.createClass({
 			if (name == 'new') ConceptActions.new();
 			else ConceptActions.select(name);
 		} else ConceptActions.unselect();
+	},
+
+	onSwitchToEdit() {
+		this.setState({'editMode': true});
 	},
 
 	onSelect(name) {
