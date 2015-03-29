@@ -46,7 +46,7 @@ let ConceptView = React.createClass({
 			return (
 				<div className="row middle-xs">
 					<div className="col-xs-8">
-						<a className="link" href={link.url}>{partial}</a>
+						<a className="link" target="_blank" href={link.url}>{partial}</a>
 					</div>
 					<div className="col-xs-4">
 						{link.paywalled ? '$' : ''}
