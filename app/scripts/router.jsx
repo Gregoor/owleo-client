@@ -4,12 +4,12 @@ let Route = Router.Route;
 let DefaultRoute = Router.DefaultRoute;
 
 let Layout = require('./components/layout');
-let GraphView = require('./components/graph-view');
+let MapLayout = require('./components/map-layout');
 
 let routes = (
 	<Route handler={Layout}>
-		<Route path=":conceptName" handler={GraphView}/>
-		<DefaultRoute handler={GraphView} />
+		<Route path=":conceptName" handler={MapLayout}/>
+		<DefaultRoute handler={MapLayout} />
 	</Route>
 );
 

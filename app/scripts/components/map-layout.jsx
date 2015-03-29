@@ -13,7 +13,7 @@ let VisMap = require('./vis-map');
 let D3Map = require('./d3-map');
 let ConceptInfo = require('./concept-info/concept-info');
 
-let GraphView = React.createClass({
+let MapLayout = React.createClass({
 
   mixins: [
 	  Reflux.ListenerMixin,
@@ -23,7 +23,7 @@ let GraphView = React.createClass({
   ],
 
   getInitialState() {
-    return {editMode: !true};
+    return {editMode: false};
   },
 
   componentWillMount() {
@@ -141,4 +141,4 @@ let GraphView = React.createClass({
 
 });
 
-export default GraphView;
+export default MapLayout;
