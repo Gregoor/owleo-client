@@ -25,14 +25,7 @@ let Graph = React.createClass({
         callback(data);
       },
       'onDelete': (data, callback) => {
-        var id = data.nodes[0], edgeId = data.edges[0];
-
-        if (!confirm('Ya sure?')) return;
-
-        if (id) ConceptActions.delete(id);
-        else return;
-
-        callback(data);
+        return;
       }
     }));
 
