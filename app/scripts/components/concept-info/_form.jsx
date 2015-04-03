@@ -7,43 +7,56 @@ let FormData = require('../../mixins/FormData');//require('react-form-data');
 
 let ConceptActions = require('../../actions/concept-actions');
 let searchAPI = require('../../api/search-api');
+let IconButton = require('material-ui').IconButton;
 
 let ConceptForm = React.createClass({
 
 	mixins: [FormData],
 
 	getInitialState() {
-		return {'newLinksCount': 1};
+		return {'newLinksCount': 1, 'deletedLinks': []}
 	},
 
 	getInitialFormData() {
-		return _.merge({'links': [{'url': '', 'paywalled': false}]},
-			_.pick(this.props.concept, 'name', 'summary','summarySource', 'links'));
+		return _.merge(
+			{'links': [{'url': '', 'paywalled': false}]},
+			_.pick(this.props.concept, 'name', 'summary','summarySource', 'links')
+		);
 	},
 
 	render() {
 		let concept = this.props.concept;
-		let abortButton = '', linkRows = [];
+		let abortButton = '',
+				linkRows = [],
+				deletedLinks = this.state.deletedLinks;
 
 		let linksCount = this.state.newLinksCount;
 		if (!concept.isNew) linksCount += concept.links.length;
 		for (var i = 0; i < linksCount; i++) {
-			let textFieldProps = {}, checkboxProps = {};
+			let textFieldProps = {},
+					checkboxProps = {};
+			if (_.includes(deletedLinks, i)) {
+				continue;
+			}
 			if (i + 1 == linksCount) {
 				textFieldProps.onChange = this.onChangeLastLink;
-				checkboxProps.onClick= this.onChangeLastLink;
+				checkboxProps.onClick = this.onChangeLastLink;
 			}
 
 			let link = concept.isNew ? {} : concept.links[i] || {};
 			linkRows.push(
 				<div key={`link-${i}`} className="row middle-xs">
-					<div className="col-xs-8">
+					<div className="col-xs-7">
 						<TextField name={`links[url][${i}]`} floatingLabelText="URL"
 							defaultValue={link.url} {...textFieldProps}/>
 					</div>
-					<div className="col-xs-4">
+					<div className="col-xs-3">
 						<Checkbox name={`links[paywalled][${i}]`} label="paywalled"
 						          defaultSwitched={link.paywalled} {...checkboxProps} />
+					</div>
+					<div className="col-xs-2">
+						<IconButton type="button" iconClassName="icon icon-bin" tooltip="Delete"
+							onClick={this.onDeleteLink.bind(this, i)}/>
 					</div>
 				</div>
 			);
@@ -146,6 +159,13 @@ let ConceptForm = React.createClass({
 	nameObjToOption(name) {
 		if (name.name) name = name.name;
 		return {'label': name, 'value': name};
+	},
+
+	onDeleteLink(i) {
+		let deletedLinks = _.clone(this.state.deletedLinks);
+		deletedLinks.push(i);
+		this.setState({deletedLinks});
+		this.formData.links.splice(i, 1);
 	}
 
 });
