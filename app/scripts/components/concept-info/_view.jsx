@@ -85,8 +85,17 @@ let ConceptView = React.createClass({
 					</div>
 					<br/>
 					<div className="row">
-						<div className="col-xs-12">{concept.summary}</div>
+						<div className="col-xs-12" style={{'display': 'inline'}}>
+							<h2>Summary:</h2>
+							{concept.summary}
+						</div>
 					</div>
+					<div className="row">
+						<div className="col-xs-12" style={{'display': 'inline'}}>
+							<h2>Source of summary:</h2>
+							<a className="link" target="_blank" href={concept.summarySource}>{concept.summarySource}</a>
+					</div>
+						</div>
 					{linkRows}
 				</div>
 			</div>

@@ -7,3 +7,4 @@ app/vendor
 test/scripts/
 
 *.custom.js
+.python-version

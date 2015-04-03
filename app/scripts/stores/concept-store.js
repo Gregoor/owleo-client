@@ -31,7 +31,7 @@ let conceptStore = Reflux.createStore({
 	},
 
 	save(data) {
-		data = _.pick(data, 'name', 'summary', 'reqs', 'tags', 'links');
+		data = _.pick(data, 'name', 'summary','summarySource', 'reqs', 'tags', 'links');
 
 		(this.selected.isNew ? this.create : this.update)(data);
 	},

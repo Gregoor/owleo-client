@@ -18,7 +18,7 @@ let ConceptForm = React.createClass({
 
 	getInitialFormData() {
 		return _.merge({'links': [{'url': '', 'paywalled': false}]},
-			_.pick(this.props.concept, 'name', 'summary', 'links'));
+			_.pick(this.props.concept, 'name', 'summary','summarySource', 'links'));
 	},
 
 	render() {
@@ -90,6 +90,12 @@ let ConceptForm = React.createClass({
 						<div className="col-xs-12">
 							<TextField floatingLabelText="Summary" multiLine={true}
 							           name="summary" defaultValue={concept.summary} />
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-xs-12">
+							<TextField floatingLabelText="Source of summary" multiline={false}
+								         name="summarySource" defaultValue={concept.summarySource} />
 						</div>
 					</div>
 					{linkRows}
