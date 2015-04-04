@@ -156,9 +156,9 @@ let ConceptForm = React.createClass({
 		this.props.onDone();
 	},
 
-	nameObjToOption(name) {
-		if (name.name) name = name.name;
-		return {'label': name, 'value': name};
+	nameObjToOption(obj) {
+		let value = obj.id || obj.name;
+		return {value, 'label': obj.name};
 	},
 
 	onDeleteLink(i) {

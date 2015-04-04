@@ -3,7 +3,7 @@ let request = require('superagent');
 let host = require('../configs/api.custom').host;
 
 let endpoint = `${host}/concepts`;
-let resource = (name) => `${endpoint}/${encodeURIComponent(name)}`;
+let resource = (id) => `${endpoint}/${id}`;
 
 let promiseWrap = (req) => new Promise((resolve) => {
 	req.end((err, res) => resolve(res.body));
@@ -15,20 +15,20 @@ export default {
 		return promiseWrap(request.get(endpoint));
 	},
 
-	find(name) {
-		return promiseWrap(request.get(resource(name)));
+	find(id) {
+		return promiseWrap(request.get(resource(id)));
 	},
 
 	create(concept) {
 		return promiseWrap(request.post(endpoint, {concept}));
 	},
 
-	update(name, concept) {
-		return promiseWrap(request.post(resource(name), {concept}));
+	update(id, concept) {
+		return promiseWrap(request.post(resource(id), {concept}));
 	},
 
-	delete(name) {
-		return promiseWrap(request.del(resource(name)));
+	delete(id) {
+		return promiseWrap(request.del(resource(id)));
 	},
 
 	reposition(concepts) {

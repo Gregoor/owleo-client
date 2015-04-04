@@ -8,7 +8,7 @@ let MapLayout = require('./components/map-layout');
 
 let routes = (
 	<Route handler={Layout}>
-		<Route path=":conceptName" handler={MapLayout}/>
+		<Route path=":conceptId" handler={MapLayout}/>
 		<DefaultRoute handler={MapLayout} />
 	</Route>
 );

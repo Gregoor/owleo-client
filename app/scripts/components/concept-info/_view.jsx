@@ -31,7 +31,7 @@ let ConceptView = React.createClass({
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
-				<a href={`#/${encodeURIComponent(req)}`}>{req}</a>
+				<a href={`#/${req.id}`}>{req.name}</a>
 			);
 			reqLinks.push(', ');
 		}

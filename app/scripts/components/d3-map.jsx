@@ -36,7 +36,7 @@ let D3Map = React.createClass({
 
 		if (!_.isEmpty(concepts) && !this.mapFilled) {
 			let indexedConcepts = new Map();
-			for (let concept of concepts) indexedConcepts.set(concept.name, concept);
+			for (let concept of concepts) indexedConcepts.set(concept.id, concept);
 			this.renderEdges(indexedConcepts);
 			this.renderNodes(concepts);
 			this.renderD3();
@@ -44,9 +44,9 @@ let D3Map = React.createClass({
 		}
 
 		let conceptNodesMap = this.conceptNodesMap;
-		let name = selectedConcept ? selectedConcept.name : null;
-		if (conceptNodesMap && name && name != 'new') {
-			let node = conceptNodesMap.get(name);
+		let id = selectedConcept ? selectedConcept.id : null;
+		if (conceptNodesMap && id && id != 'new') {
+			let node = conceptNodesMap.get(id);
 			if (node) node.classList.add('selected');
 		} else {
 			let node = this.group.select('.node.selected').node();
@@ -73,7 +73,7 @@ let D3Map = React.createClass({
 
 	renderEdges(indexedConcepts) {
 		let edgeData = [];
-		for (let [name, concept] of indexedConcepts) for (let req of concept.reqs) {
+		for (let [id, concept] of indexedConcepts) for (let req of concept.reqs) {
 			let reqV = Victor.fromObject(indexedConcepts.get(req));
 			let conceptV = Victor.fromObject(concept);
 
@@ -104,8 +104,8 @@ let D3Map = React.createClass({
 		conceptNodes.append('circle')
 			.attr('class', 'node').attr('r', RADIUS)
 			.attr({'cx': (n) => n.x, 'cy': (n) => n.y})
-			.on('click', (c) => this.props.onSelect(c.name)).each(function(c) {
-				conceptNodesMap.set(c.name, this);
+			.on('click', (c) => this.props.onSelect(c.id)).each(function(c) {
+				conceptNodesMap.set(c.id, this);
 			});
 
 		conceptNodes.append('text')
@@ -115,7 +115,7 @@ let D3Map = React.createClass({
 				'x': function(c) { return c.x - this.getComputedTextLength() / 2 },
 				'y': (c) => c.y + 23
 			})
-			.on('click', (c) => this.props.onSelect(c.name));
+			.on('click', (c) => this.props.onSelect(c.id));
 	}
 
 });

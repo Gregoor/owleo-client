@@ -24,9 +24,7 @@ let Graph = React.createClass({
         self.props.onConnect(data);
         callback(data);
       },
-      'onDelete': (data, callback) => {
-        return;
-      }
+      'onDelete': _.noop
     }));
 
 	  this.network.on('select', (selected) => {
@@ -52,8 +50,8 @@ let Graph = React.createClass({
 
 		if (selectedConcept && this.network.nodesData.length) {
 			setTimeout(() => {
-				let name = selectedConcept.name;
-				this.network.selectNodes(name ? [name] : []);
+				let id = selectedConcept.id;
+				this.network.selectNodes(id ? [id] : []);
 			}, 500);
 		}
   },
@@ -62,8 +60,8 @@ let Graph = React.createClass({
 		let nodes = [], edges = [];
 
 		concepts.forEach((concept) => {
-			if (!concept.name) return;
-			let name = concept.name;
+			let {id, name} = concept;
+			if (!name) return;
 			let label = _.reduce(name.split(' '), function(str, word) {
 				let parts = str.split('\n'), lastPart = parts[parts.length - 1];
 
@@ -74,7 +72,7 @@ let Graph = React.createClass({
 					) +
 					word;
 			}, '');
-			let node = _.extend({'id': name, label}, {
+			let node = _.extend({id, label}, {
 				'x': concept.x || undefined,
 				'y': concept.y || undefined
 			});
@@ -85,11 +83,11 @@ let Graph = React.createClass({
 			});
 
 			nodes.push(node);
-			concept.reqs.forEach((req) => {
+			concept.reqs.forEach((reqId) => {
 				return edges.push({
-					'id': this.edgeIDFor(name, req),
-					'from': req,
-					'to': name
+					'id': this.edgeIDFor(concept, reqId),
+					'from': reqId,
+					'to': id
 				});
 			});
 		});
@@ -99,7 +97,6 @@ let Graph = React.createClass({
 
 	onCreated(concept) {
 		this.network.nodesData.add(_.extend({
-				'id': concept.name,
 				'label': concept.name,
 				'allowedToMoveX': true,
 				'allowedToMoveY': true},
@@ -113,8 +110,8 @@ let Graph = React.createClass({
 	onUpdated(concept) {
 		for (let edge of this.network.edgesData.get()) {
 			let [from, to] = edge.id.split('>');
-			if (decodeURIComponent(to) == concept.name && !_.find(concept.reqs, (req) => {
-					return req == decodeURIComponent(from);
+			if (to == concept.id && !_.find(concept.reqs, (req) => {
+					return req.id == from;
 				})) {
 				this.network.edgesData.remove(edge.id);
 			}
@@ -123,19 +120,17 @@ let Graph = React.createClass({
 		this.addEdgesFor(concept);
 	},
 
-	onDeleted(name) {
-		this.network.nodesData.remove(name);
+	onDeleted(id) {
+		this.network.nodesData.remove(id);
 	},
 
 	onGetPositions() {
-		let nodes = _.map(this.network.getPositions(), (pos, name) => {
-			return _.extend(pos, {
-				'id': name,
-				'allowedToMoveX': false,
-				'allowedToMoveY': false
-			});
-		});
-		this.network.nodesData.update(nodes);
+		let nodes = _.map(this.network.getPositions(), (pos, id) => ({id, pos}));
+
+		this.network.nodesData.update(nodes.map((n) => _.extend({
+			'allowedToMoveX': false,
+			'allowedToMoveY': false
+		}, n)));
 		MapActions.gotPositions(nodes);
 	},
 
@@ -148,17 +143,15 @@ let Graph = React.createClass({
 
 	addEdgesFor(concept) {
 		for (let req of concept.reqs) {
-			let id = this.edgeIDFor(concept.name, req);
+			let id = this.edgeIDFor(concept, req.id);
 			if (!this.network.edgesData.get(id)) {
-				this.network.edgesData.add({id, 'from': req, 'to': concept.name});
+				this.network.edgesData.add({id, 'from': req.id, 'to': concept.id});
 			}
 		}
 	},
 
-	edgeIDFor(name, reqName) {
-		let encName = encodeURIComponent(name);
-		let encReq = encodeURIComponent(reqName);
-		return `${encReq}>${encName}`;
+	edgeIDFor(concept, req) {
+		return `${req}>${concept.id}`;
 	},
 
   render() {

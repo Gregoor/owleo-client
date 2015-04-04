@@ -17,9 +17,9 @@ let conceptStore = Reflux.createStore({
 		conceptAPI.reposition(concepts).then(this.setAll);
 	},
 
-  select(name) {
-	  if (this.selected && name == this.selected.name) return;
-    conceptAPI.find(name).then(this.setSelected);
+  select(id) {
+	  if (this.selected && id == this.selected.id) return;
+    conceptAPI.find(id).then(this.setSelected);
   },
 
 	unselect() {
@@ -44,16 +44,15 @@ let conceptStore = Reflux.createStore({
 	},
 
 	update(data) {
-		let oldName = this.selected.name;
-		conceptAPI.update(oldName, data).then((serverData) => {
+		conceptAPI.update(this.selected.id, data).then((serverData) => {
 			ConceptActions.updated(serverData);
 			this.setSelected(serverData);
 		});
 	},
 
-	delete(name) {
-		conceptAPI.delete(name).then(() => {
-			ConceptActions.deleted(name);
+	delete(id) {
+		conceptAPI.delete(id).then(() => {
+			ConceptActions.deleted(id);
 			this.setSelected();
 		});
 	},

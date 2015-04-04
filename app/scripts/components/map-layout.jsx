@@ -33,7 +33,7 @@ let MapLayout = React.createClass({
 		  let selectedConcept = concepts.selected;
 		  if (selectedConcept) {
 			  if (selectedConcept.isNew) path += 'new';
-			  else path += encodeURIComponent(selectedConcept.name);
+			  else path += selectedConcept.id;
 		  }
 		  this.transitionTo(path);
 		  this.setState({selectedConcept, 'concepts': concepts.all});
@@ -86,10 +86,10 @@ let MapLayout = React.createClass({
   },
 
 	onRoute() {
-		let name = this.getParams().conceptName;
-		if (name) {
-			if (name == 'new') ConceptActions.new();
-			else ConceptActions.select(name);
+		let id = this.getParams().conceptId;
+		if (id) {
+			if (id == 'new') ConceptActions.new();
+			else ConceptActions.select(id);
 		} else ConceptActions.unselect();
 	},
 
