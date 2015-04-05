@@ -1,7 +1,7 @@
 let React = require('react');
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
-let Select = require('./select');
+let Select = require('../select');
 let FormData = require('../mixins/FormData');//require('react-form-data');
 
 let ConceptActions = require('../../actions/concept-actions');

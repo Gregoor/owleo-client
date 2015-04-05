@@ -9,6 +9,7 @@ let userStore = require('../stores/user-store');
 
 let VisMap = require('./vis-map');
 let D3Map = require('./d3-map');
+let Search = require('./search');
 let ConceptInfo = require('./concept-info/concept-info');
 let MapFab = require('./map-fab');
 
@@ -77,6 +78,7 @@ let MapLayout = React.createClass({
 	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}
 	            selectedConcept={selectedConcept}/>
         <div className="info-container">
+	        <Search onSelect={this.onSelect}/>
           {conceptInfo}
         </div>
 	      <div className="map-actions">
@@ -97,8 +99,8 @@ let MapLayout = React.createClass({
 		this.setState({'editMode': !this.state.editMode});
 	},
 
-	onSelect(name) {
-	  if (name !== undefined) ConceptActions.select(name);
+	onSelect(id) {
+	  if (id !== undefined) ConceptActions.select(id);
 	  else ConceptActions.unselect();
   },
 
