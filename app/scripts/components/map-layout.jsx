@@ -59,16 +59,21 @@ let MapLayout = React.createClass({
 	  if (this.state.editMode) {
 		  let {isLocked} = this.state;
 		  actions = [
-			  (<MapFab onClick={this.onSwitchEdit} secondary={true} icon="eye"/>),
 			  (
-				  <MapFab onClick={isLocked ? this.onUnlock : this.onLock}
-				          secondary={true}
-				          icon={isLocked ? 'unlocked' : 'lock'}/>
+				  <MapFab title="Leave edit mode" secondary={true} icon="eye"
+				          onClick={this.onSwitchEdit}/>
 			  ),
-			  (<MapFab onClick={this.onNew} icon="plus"/>)
+			  (
+				  <MapFab title={isLocked ? 'Unlock' : 'Lock'}
+				          secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
+				          onClick={isLocked ? this.onUnlock : this.onLock}/>
+			  ),
+			  (<MapFab title="Add Concept" icon="plus" onClick={this.onNew}/>)
 		  ];
 	  } else {
-		  actions = (<MapFab onClick={this.onSwitchEdit} icon="pencil"/>)
+		  actions = (
+			  <MapFab title="Edit mode" icon="pencil" onClick={this.onSwitchEdit}/>
+		  );
 	  }
 
 	  let AMap = this.state.editMode ? VisMap : D3Map;

@@ -1,5 +1,6 @@
 let React = require('react');
 
+let _ = require('lodash');
 let {FloatingActionButton} = require('material-ui');
 
 let MapFab = React.createClass({
@@ -9,13 +10,14 @@ let MapFab = React.createClass({
 	},
 
 	render() {
-		let {secondary, icon, onClick} = this.props;
+		let {secondary, icon} = this.props;
+		let fabProps = _.pick(this.props, 'onClick', 'title');
 
 		let secondaryProps = secondary ? {'secondary': true, 'mini': true} : {};
 
 		return (
 			<div className="center-xs">
-				<FloatingActionButton onClick={onClick} {...secondaryProps}
+				<FloatingActionButton {...fabProps} {...secondaryProps}
 				                      iconClassName={`icon icon-${icon}`}/>
 			</div>
 		);
