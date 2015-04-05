@@ -20,7 +20,8 @@ let D3Map = React.createClass({
 				'viewBox': '0 -5 10 10',
 				'markerWidth': '4',
 				'markerHeight': '4',
-				'orient': 'auto'
+				'orient': 'auto',
+				'fill': 'context-fill'
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
 
@@ -73,28 +74,42 @@ let D3Map = React.createClass({
 
 	renderEdges(indexedConcepts) {
 		let edgeData = [];
-		for (let [id, concept] of indexedConcepts) for (let req of concept.reqs) {
-			let reqV = Victor.fromObject(indexedConcepts.get(req));
-			let conceptV = Victor.fromObject(concept);
+		for (let [id, concept] of indexedConcepts) {
+			let {container, reqs} = concept;
 
-			let radV = reqV.clone().subtract(conceptV).norm()
-				.multiply(new Victor(RADIUS, RADIUS));
+			for (let reqId of reqs) {
+				edgeData.push(this.calcEdgeAnchors(indexedConcepts.get(reqId), concept));
+			}
 
-			reqV.subtract(radV);
-			conceptV.add(radV.clone().multiply(new Victor(1.9, 1.9)));
-
-			edgeData.push({
-				'from': {'x': reqV.x, 'y': reqV.y},
-				'to': {'x': conceptV.x, 'y': conceptV.y}
-			});
+			if (container) edgeData.push(_.extend(
+				this.calcEdgeAnchors(indexedConcepts.get(container), concept),
+				{'stroke': '#f1c40f'}
+			));
 		}
 
 		this.group.selectAll('.edge').data(edgeData).enter().append('line').attr({
 			'class': 'edge',
-			'x1': (e) => e.from.x,  'y1': (e) => e.from.y,
-			'x2': (e) => e.to.x,   'y2': (e) => e.to.y,
-			'marker-end': 'url(#triangle)'
+			'x1': e => e.from.x,  'y1': e => e.from.y,
+			'x2': e => e.to.x,    'y2': e => e.to.y,
+			'marker-end': 'url(#triangle)',
+			'stroke': e => e.stroke || '#bdc3c7'
 		});
+	},
+
+	calcEdgeAnchors(from, to) {
+		let fromV = Victor.fromObject(from);
+		let toV = Victor.fromObject(to);
+
+		let radV = fromV.clone().subtract(toV).norm()
+			.multiply(new Victor(RADIUS, RADIUS));
+
+		fromV.subtract(radV);
+		toV.add(radV.clone().multiply(new Victor(1.9, 1.9)));
+
+		return {
+			'from': {'x': fromV.x, 'y': fromV.y},
+			'to': {'x': toV.x, 'y': toV.y}
+		};
 	},
 
 	renderNodes(concepts) {
