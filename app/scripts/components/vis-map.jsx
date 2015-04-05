@@ -24,7 +24,7 @@ let Graph = React.createClass({
         self.props.onConnect(data);
         callback(data);
       },
-      'onDelete': _.noop
+      'onDelete': (a, b) => {}
     }));
 
 	  this.network.on('select', (selected) => {

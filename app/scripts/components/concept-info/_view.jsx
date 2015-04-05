@@ -105,7 +105,7 @@ let ConceptView = React.createClass({
 	onDelete() {
 		if (!confirm('Ya sure?')) return;
 
-		ConceptActions.delete(this.props.concept.name);
+		ConceptActions.delete(this.props.concept.id);
 	}
 
 });
