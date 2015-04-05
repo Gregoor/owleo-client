@@ -15,7 +15,7 @@ export default React.createClass({
 
 	getInitialState() {
 		return {
-			'value': null
+			'selected': undefined
 		};
 	},
 
@@ -28,13 +28,13 @@ export default React.createClass({
 	},
 
 	getValue() {
-		let value = this.state.value;
-		if (value !== null && value.length == 0) value = []
-		return value || this.props.defaultValue;
+		let {selected} = this.state;
+		if (selected !== undefined && selected.length == 0) selected = [];
+		return selected || this.props.defaultValue;
 	},
 
-	onChange(value) {
-		this.setState({value});
+	onChange(newValue, selected) {
+		this.setState({selected});
 		this.props.onChange.apply(this, arguments);
 	},
 
