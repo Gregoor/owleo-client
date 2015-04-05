@@ -51,6 +51,20 @@ let ConceptView = React.createClass({
 		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
 		if (reqLinks.length == 0) reqLinks.push(<em>None</em>);
 
+		let summarySourceRow;
+		if (concept.summarySource) {
+			summarySourceRow = (
+				<div className="row">
+					<div className="col-xs-12" style={{'display': 'inline'}}>
+						<h2>Source of summary:</h2>
+						<a className="link" target="_blank" href={concept.summarySource}>
+							{concept.summarySource}
+						</a>
+					</div>
+				</div>
+			);
+		}
+
 		let linkRows = concept.links.map((link) => {
 			let parser = document.createElement('a');
 			parser.href = link.url;
@@ -97,19 +111,13 @@ let ConceptView = React.createClass({
 							{reqLinks}
 						</div>
 					</div>
-					<br/>
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
 							<h2>Summary:</h2>
 							{concept.summary}
 						</div>
 					</div>
-					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Source of summary:</h2>
-							<a className="link" target="_blank" href={concept.summarySource}>{concept.summarySource}</a>
-					</div>
-						</div>
+					{summarySourceRow}
 					{linkRows}
 				</div>
 			</div>
