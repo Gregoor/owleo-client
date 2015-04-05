@@ -85,7 +85,7 @@ let Graph = React.createClass({
 			nodes.push(node);
 			concept.reqs.forEach((reqId) => {
 				return edges.push({
-					'id': this.edgeIDFor(concept, reqId),
+					'id': this.reqEdgeIDFor(concept, reqId),
 					'from': reqId,
 					'to': id
 				});
@@ -118,10 +118,15 @@ let Graph = React.createClass({
 		let inReqs = findId => _.find(reqs, req => req.id == findId);
 
 		for (let edge of this.network.edgesData.get()) {
-			let [from, to] = edge.id.split('>');
-			if (to == id && !(inReqs(from) || (container && container.id == from))) {
-				this.network.edgesData.remove(edge.id);
+			let shouldDelete = false;
+			if (edge.id.indexOf('>') !== -1) {
+				let [from, to] = edge.id.split('>');
+				shouldDelete = to == id && !inReqs(from);
+			} else {
+				let [from, to] = edge.id.split(':');
+				shouldDelete = to == id && (container && container.id == from);
 			}
+			if (shouldDelete) this.network.edgesData.remove(edge.id);
 		}
 
 		this.addEdgesFor(concept);
@@ -156,7 +161,7 @@ let Graph = React.createClass({
 		);
 
 		for (let req of reqs) {
-			let edgeId = this.edgeIDFor(concept, req.id);
+			let edgeId = this.reqEdgeIDFor(concept, req.id);
 			if (!this.network.edgesData.get(edgeId)) this.network.edgesData.add(
 				{'id': edgeId, 'from': req.id, 'to': id}
 			);
@@ -165,7 +170,7 @@ let Graph = React.createClass({
 
 	containerEdgeFor(id, containerId) {
 		return {
-			'id': this.edgeIDFor(id, containerId),
+			'id': this.containEdgeIDFor(id, containerId),
 			'from': containerId,
 			'to': id,
 			'color': '#f1c40f',
@@ -174,8 +179,12 @@ let Graph = React.createClass({
 		}
 	},
 
-	edgeIDFor(concept, req) {
-		return `${req}>${concept.id || concept}`;
+	reqEdgeIDFor(concept, reqId) {
+		return `${reqId}>${concept.id || concept}`;
+	},
+
+	containEdgeIDFor(concept, containerId) {
+		return `${containerId}:${concept.id || concept}`;
 	},
 
   render() {
