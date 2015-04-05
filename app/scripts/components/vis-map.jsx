@@ -97,7 +97,8 @@ let Graph = React.createClass({
 				'from': containerId,
 				'to': id,
 				'color': '#f1c40f',
-				'width': 1.5
+				'width': 1.5,
+				'length': 50
 			})
 		});
 

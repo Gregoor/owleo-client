@@ -5,6 +5,7 @@ export default {
       'centralGravity': .8
     }
   },
+	'smoothCurves': false,
   'dataManipulation': {
     'enabled': true,
     'initiallyVisible': true
