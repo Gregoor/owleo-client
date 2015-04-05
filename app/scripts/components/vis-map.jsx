@@ -92,14 +92,7 @@ let Graph = React.createClass({
 			});
 
 			let containerId = concept.container;
-			if (containerId) edges.push({
-				'id': this.edgeIDFor(concept, containerId),
-				'from': containerId,
-				'to': id,
-				'color': '#f1c40f',
-				'width': 1.5,
-				'length': 50
-			})
+			if (containerId) edges.push(this.containerEdgeFor(id, containerId));
 		});
 
 		this.network.setData({nodes, edges});
@@ -118,12 +111,15 @@ let Graph = React.createClass({
 	},
 
 	onUpdated(concept) {
-		this.network.nodesData.update({'id': concept.id, 'label': concept.name});
+		let {id, reqs, container} = concept;
+
+		this.network.nodesData.update({id, 'label': concept.name});
+
+		let inReqs = findId => _.find(reqs, req => req.id == findId);
+
 		for (let edge of this.network.edgesData.get()) {
 			let [from, to] = edge.id.split('>');
-			if (to == concept.id && !_.find(concept.reqs, (req) => {
-					return req.id == from;
-				})) {
+			if (to == id && !(inReqs(from) || (container && container.id == from))) {
 				this.network.edgesData.remove(edge.id);
 			}
 		}
@@ -153,16 +149,33 @@ let Graph = React.createClass({
 	},
 
 	addEdgesFor(concept) {
-		for (let req of concept.reqs) {
-			let id = this.edgeIDFor(concept, req.id);
-			if (!this.network.edgesData.get(id)) {
-				this.network.edgesData.add({id, 'from': req.id, 'to': concept.id});
-			}
+		let {id, container, reqs} = concept;
+
+		if (container && container.id) this.network.edgesData.add(
+			this.containerEdgeFor(id, container.id)
+		);
+
+		for (let req of reqs) {
+			let edgeId = this.edgeIDFor(concept, req.id);
+			if (!this.network.edgesData.get(edgeId)) this.network.edgesData.add(
+				{'id': edgeId, 'from': req.id, 'to': id}
+			);
+		}
+	},
+
+	containerEdgeFor(id, containerId) {
+		return {
+			'id': this.edgeIDFor(id, containerId),
+			'from': containerId,
+			'to': id,
+			'color': '#f1c40f',
+			'width': 1.5,
+			'length': 50
 		}
 	},
 
 	edgeIDFor(concept, req) {
-		return `${req}>${concept.id}`;
+		return `${req}>${concept.id || concept}`;
 	},
 
   render() {

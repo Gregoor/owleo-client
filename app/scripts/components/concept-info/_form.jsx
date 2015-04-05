@@ -102,8 +102,7 @@ let ConceptForm = React.createClass({
 											placeholder="Container"
 											defaultValue={concept.container ? this.nameObjToOption(concept.container) : undefined}
 											autoload={false}
-											asyncOptions={this.onGetOptionsOf('Concept')}
-											createable={true}/>
+											asyncOptions={this.onGetOptionsOf('Concept')}/>
 						</div>
 					</div>
 					<div className="row">
