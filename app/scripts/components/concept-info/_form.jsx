@@ -1,5 +1,4 @@
 let React = require('react');
-
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
 let Select = require('./select');
@@ -47,16 +46,20 @@ let ConceptForm = React.createClass({
 			linkRows.push(
 				<div key={`link-${i}`} className="row middle-xs">
 					<div className="col-xs-7">
-						<TextField name={`links[url][${i}]`} floatingLabelText="URL"
-							defaultValue={link.url} {...textFieldProps}/>
+						<TextField name={`links[url][${i}]`}
+											 floatingLabelText="URL"
+											 defaultValue={link.url} {...textFieldProps}/>
 					</div>
 					<div className="col-xs-3">
-						<Checkbox name={`links[paywalled][${i}]`} label="paywalled"
+						<Checkbox name={`links[paywalled][${i}]`}
+											label="paywalled"
 						          defaultSwitched={link.paywalled} {...checkboxProps} />
 					</div>
 					<div className="col-xs-2">
-						<IconButton type="button" iconClassName="icon icon-bin" tooltip="Delete"
-							onClick={this.onDeleteLink.bind(this, i)}/>
+						<IconButton type="button"
+												iconClassName="icon icon-bin"
+												tooltip="Delete"
+												onClick={this.onDeleteLink.bind(this, i)}/>
 					</div>
 				</div>
 			);
@@ -74,7 +77,8 @@ let ConceptForm = React.createClass({
 			<form onChange={this.updateFormData} onSubmit={this.onSave}>
 				<div className="row">
 					<div className="col-xs-12">
-						<TextField floatingLabelText="Name" name="name"
+						<TextField floatingLabelText="Name"
+											 name="name"
 						           defaultValue={concept.name} />
 					</div>
 				</div>
@@ -82,32 +86,51 @@ let ConceptForm = React.createClass({
 					<div className="row">
 						<div className="col-xs-12">
 							<h2>Tags</h2>
-							<Select name="tags" placeholder="Tags"
+							<Select name="tags"
+											placeholder="Tags"
 							        defaultValue={concept.tags}
-							        multi={true} autoload={false}
+							        multi={true}
+											autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Tag')}
 							        createable={true}/>
 						</div>
 					</div>
 					<div className="row">
 						<div className="col-xs-12">
+							<h2>Contained by</h2>
+							<Select name="container"
+											placeholder="Container"
+											defaultValue={concept.container ? this.nameObjToOption(concept.container) : undefined}
+											autoload={false}
+											asyncOptions={this.onGetOptionsOf('Concept')}
+											createable={true}/>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-xs-12">
 							<h2>Requirements</h2>
-							<Select name="reqs" placeholder="Requirements"
+							<Select name="reqs"
+											placeholder="Requirements"
 							        defaultValue={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
-							        multi={true} autoload={false}
+							        multi={true}
+										  autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Concept')}/>
 						</div>
 					</div>
 					<div className="row">
 						<div className="col-xs-12">
-							<TextField floatingLabelText="Summary" multiLine={true}
-							           name="summary" defaultValue={concept.summary} />
+							<TextField floatingLabelText="Summary"
+												 multiLine={true}
+							           name="summary"
+												 defaultValue={concept.summary} />
 						</div>
 					</div>
 					<div className="row">
 						<div className="col-xs-12">
-							<TextField floatingLabelText="Source of summary" multiline={false}
-								         name="summarySource" defaultValue={concept.summarySource} />
+							<TextField floatingLabelText="Source of summary"
+												 multiline={false}
+								         name="summarySource"
+												 defaultValue={concept.summarySource} />
 						</div>
 					</div>
 					{linkRows}
@@ -138,18 +161,18 @@ let ConceptForm = React.createClass({
 
 	onAbort() {
 		if (!confirm('Do you really want to discard your changes?')) return;
-
 		this.props.onDone();
 	},
 
 	onSave(e) {
-		let splitValueOfName = (name) => _.compact(this.getDOMNode()
-			.querySelector(`[name="${name}"]`).value.split(','));
+		let getValueOfName = (name) => this.getDOMNode().querySelector(`[name="${name}"]`).value;
+		let splitValueOfName = (name) => _.compact(getValueOfName(name).split(','));
 		e.preventDefault();
 
 		let data = _.cloneDeep(this.formData);
 		data.links = data.links.filter((l) => l.url);
 		data.reqs = splitValueOfName('reqs');
+		data.container = getValueOfName('container');
 		data.tags = splitValueOfName('tags');
 		ConceptActions.save(data);
 		this.props.onDone();
