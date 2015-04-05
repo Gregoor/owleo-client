@@ -108,6 +108,7 @@ let Graph = React.createClass({
 	},
 
 	onUpdated(concept) {
+		this.network.nodesData.update({'id': concept.id, 'label': concept.name});
 		for (let edge of this.network.edgesData.get()) {
 			let [from, to] = edge.id.split('>');
 			if (to == concept.id && !_.find(concept.reqs, (req) => {
