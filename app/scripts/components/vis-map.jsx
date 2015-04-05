@@ -90,6 +90,15 @@ let Graph = React.createClass({
 					'to': id
 				});
 			});
+
+			let containerId = concept.container;
+			if (containerId) edges.push({
+				'id': this.edgeIDFor(concept, containerId),
+				'from': containerId,
+				'to': id,
+				'color': '#f1c40f',
+				'width': 1.5
+			})
 		});
 
 		this.network.setData({nodes, edges});
