@@ -74,6 +74,12 @@ let ConceptView = React.createClass({
 				<div className="scroll">
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
+							<h2>Container</h2>
+							{concept.container.name}
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-xs-12" style={{'display': 'inline'}}>
 							{tags}
 						</div>
 					</div>
