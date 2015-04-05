@@ -15,7 +15,12 @@ let Search = React.createClass({
 
 	onLoadOptions(q, cb) {
 		searchAPI({q, 'for': ['Concept']}).then(result => {
-			let options = result.map(c => ({'value': c.id, 'label': c.name}));
+			let options = result.map(c => {
+				let label = c.name;
+				let containerName = c.container.name;
+				if (containerName) label += ` in ${containerName}`;
+				return {'value': c.id, label};
+			});
 			cb(null, {options, 'complete': options.length < 10});
 		});
 	},
