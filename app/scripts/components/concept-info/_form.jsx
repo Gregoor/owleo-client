@@ -95,8 +95,7 @@ let ConceptForm = React.createClass({
 							<Select name="reqs" placeholder="Requirements"
 							        defaultValue={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
 							        multi={true} autoload={false}
-							        asyncOptions={this.onGetOptionsOf('Concept')}
-											exclude={[concept.name]}/>
+							        asyncOptions={this.onGetOptionsOf('Concept')}/>
 						</div>
 					</div>
 					<div className="row">
