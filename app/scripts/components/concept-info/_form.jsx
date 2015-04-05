@@ -7,6 +7,7 @@ let FormData = require('../mixins/FormData');//require('react-form-data');
 let ConceptActions = require('../../actions/concept-actions');
 let searchAPI = require('../../api/search-api');
 let IconButton = require('material-ui').IconButton;
+let nameAndContainer = require('../helpers/nameAndContainer');
 
 let ConceptForm = React.createClass({
 
@@ -179,7 +180,8 @@ let ConceptForm = React.createClass({
 
 	nameObjToOption(obj) {
 		let value = obj.id || obj.name;
-		return {value, 'label': obj.name};
+		let label = obj.container ? nameAndContainer(obj) : obj.name;
+		return {value, label};
 	},
 
 	onDeleteLink(i) {

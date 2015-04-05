@@ -2,6 +2,7 @@ let React = require('react');
 let IconButton = require('material-ui').IconButton;
 
 let ConceptActions = require('../../actions/concept-actions');
+let nameAndContainer = require('../helpers/nameAndContainer');
 
 let ConceptView = React.createClass({
 
@@ -19,11 +20,23 @@ let ConceptView = React.createClass({
 				),
 				(
 					<div className="col-xs-4">
-					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-					            onClick={this.onDelete}/>
+						<IconButton iconClassName="icon icon-bin" tooltip="Delete"
+						            onClick={this.onDelete}/>
 					</div>
 				)
 			];
+		}
+
+		let containerRow;
+		if (concept.container && concept.container.id) {
+			containerRow = (
+				<div className="row">
+					<div className="col-xs-12" style={{'display': 'inline'}}>
+						<h2>Container</h2>
+						{nameAndContainer(concept.container)}
+					</div>
+				</div>
+			);
 		}
 
 		let tags = concept.tags.map((tag) => (<span className="tag">{tag}</span>));
@@ -31,12 +44,12 @@ let ConceptView = React.createClass({
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
-				<a href={`#/${req.id}`}>{req.name}</a>
+				<a href={`#/${req.id}`}>{nameAndContainer(req)}</a>
 			);
 			reqLinks.push(', ');
 		}
 		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
-		if (reqLinks.length == 0) reqLinks.push(<em>None</em>)
+		if (reqLinks.length == 0) reqLinks.push(<em>None</em>);
 
 		let linkRows = concept.links.map((link) => {
 			let parser = document.createElement('a');
@@ -72,12 +85,7 @@ let ConceptView = React.createClass({
 					</div>
 				</div>
 				<div className="scroll">
-					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Container</h2>
-							{concept.container.name}
-						</div>
-					</div>
+					{containerRow}
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
 							{tags}

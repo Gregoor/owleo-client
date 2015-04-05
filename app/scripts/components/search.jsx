@@ -3,6 +3,8 @@ let React = require('react');
 let searchAPI = require('../api/search-api');
 let Select = require('./select');
 
+let nameAndContainer = require('./helpers/nameAndContainer');
+
 let Search = React.createClass({
 
 	render() {
@@ -13,15 +15,12 @@ let Search = React.createClass({
 		);
 	},
 
-	onLoadOptions(q, cb) {
-		searchAPI({q, 'for': ['Concept']}).then(result => {
-			let options = result.map(c => {
-				let label = c.name;
-				let containerName = c.container.name;
-				if (containerName) label += ` in ${containerName}`;
-				return {'value': c.id, label};
+	onLoadOptions(query, callback) {
+		searchAPI({'q': query, 'for': ['Concept']}).then(result => {
+			let options = result.map(concept => {
+				return {'value': concept.id, 'label': nameAndContainer(concept)};
 			});
-			cb(null, {options, 'complete': options.length < 10});
+			callback(null, {options, 'complete': options.length < 10});
 		});
 	},
 
