@@ -3,11 +3,12 @@ let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
 let Select = require('../select');
 let FormData = require('../mixins/FormData');//require('react-form-data');
-
+let ColorPicker = require('react-color-picker');
 let ConceptActions = require('../../actions/concept-actions');
 let searchAPI = require('../../api/search-api');
 let IconButton = require('material-ui').IconButton;
 let nameAndContainer = require('../helpers/nameAndContainer');
+
 
 let ConceptForm = React.createClass({
 
@@ -18,19 +19,18 @@ let ConceptForm = React.createClass({
 	},
 
 	getInitialFormData() {
-		return _.merge(
-			{'links': [{'url': '', 'paywalled': false}]},
-			_.pick(this.props.concept, 'name', 'summary','summarySource', 'links')
+		return _.merge({'links': [{'url': '', 'paywalled': false}]},
+			_.pick(this.props.concept, 'name','color', 'summary','summarySource', 'links')
 		);
 	},
 
 	render() {
-		let concept = this.props.concept;
-		let abortButton = '',
+		let concept = this.props.concept,
+				abortButton = '',
 				linkRows = [],
-				deletedLinks = this.state.deletedLinks;
+				deletedLinks = this.state.deletedLinks,
+				linksCount = this.state.newLinksCount;
 
-		let linksCount = this.state.newLinksCount;
 		if (!concept.isNew) linksCount += concept.links.length;
 		for (var i = 0; i < linksCount; i++) {
 			let textFieldProps = {},
@@ -84,6 +84,7 @@ let ConceptForm = React.createClass({
 					</div>
 				</div>
 				<div className="scroll">
+					{/*
 					<div className="row">
 						<div className="col-xs-12">
 							<h2>Tags</h2>
@@ -96,7 +97,18 @@ let ConceptForm = React.createClass({
 							        createable={true}/>
 						</div>
 					</div>
+						*/}
 					<div className="row">
+						<div className="col-xs-8">
+							<ColorPicker floatingLabelText="Concept color"
+										 defaultValue={concept.color}
+										 onChange={this.onChangeColor}
+										 saturationHeight={50}
+										 saturationWidth={100}/>
+							</div>
+						<div className="col-xs-4">
+							<div className="colorbox" style={{'background-color': concept.color}}></div>
+						</div>
 						<div className="col-xs-12">
 							<h2>Contained by</h2>
 							<Select name="container"
@@ -146,7 +158,6 @@ let ConceptForm = React.createClass({
 		);
 	},
 
-
 	onGetOptionsOf(type) {
 		return (q, cb) => searchAPI({q, 'for': [type]}).then((result) => {
 			let options = result.map(this.nameObjToOption);
@@ -173,7 +184,7 @@ let ConceptForm = React.createClass({
 		data.links = data.links.filter((l) => l.url);
 		data.reqs = splitValueOfName('reqs');
 		data.container = getValueOfName('container');
-		data.tags = splitValueOfName('tags');
+		// data.tags = splitValueOfName('tags');
 		ConceptActions.save(data);
 		this.props.onDone();
 	},
@@ -189,6 +200,10 @@ let ConceptForm = React.createClass({
 		deletedLinks.push(i);
 		this.setState({deletedLinks});
 		this.formData.links.splice(i, 1);
+	},
+
+	onChangeColor(color) {
+		this.formData.color = color;
 	}
 
 });

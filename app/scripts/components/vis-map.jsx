@@ -17,7 +17,8 @@ let Graph = React.createClass({
   },
 
   componentDidMount() {
-    let self = this, node = this.getDOMNode();
+    let self = this,
+	      node = this.getDOMNode();
     this.network = new vis.Network(node, {}, _.extend(VIS_CONFIG, {
       'onConnect': (data, callback) => {
         self.setState({'connectMode': false});
@@ -57,13 +58,15 @@ let Graph = React.createClass({
   },
 
 	fillNetwork(concepts) {
-		let nodes = [], edges = [];
+		let nodes = [],
+				edges = [];
 
 		concepts.forEach((concept) => {
 			let {id, name} = concept;
 			if (!name) return;
 			let label = _.reduce(name.split(' '), function(str, word) {
-				let parts = str.split('\n'), lastPart = parts[parts.length - 1];
+				let parts = str.split('\n'),
+					  lastPart = parts[parts.length - 1];
 
 				return str +
 					(lastPart.length > 0 && lastPart.length + word.length > 20 ?
@@ -74,7 +77,10 @@ let Graph = React.createClass({
 			}, '');
 			let node = _.extend({id, label}, {
 				'x': concept.x || undefined,
-				'y': concept.y || undefined
+				'y': concept.y || undefined,
+				'color': {
+					'background': concept.color
+				}
 			});
 
 			if (concept.edges !== undefined) _.extend(node, {
