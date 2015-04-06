@@ -51,6 +51,7 @@ export default {
 	},
 
 	onScroll(event) {
+		event.preventDefault();
 		this.setNavState({'zoom': this.navState.zoom + (event.deltaY / 3000)});
 	},
 
