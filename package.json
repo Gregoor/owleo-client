@@ -12,6 +12,7 @@
     "lodash": "^3.6.0",
     "material-ui": "^0.7.1",
     "react": "~0.12.2",
+    "react-color-picker": "^2.1.5",
     "react-form-data": "^0.2.2",
     "react-router": "~0.12.0",
     "react-select": "git://github.com/Gregoor/react-select.git#lib",
