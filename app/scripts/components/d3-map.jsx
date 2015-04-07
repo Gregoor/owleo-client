@@ -82,14 +82,13 @@ let D3Map = React.createClass({
 		for (let [id, concept] of indexedConcepts) {
 			let {container, reqs} = concept;
 
-			for (let reqId of reqs) {
-				edgeData.push(this.calcEdgeAnchors(indexedConcepts.get(reqId), concept));
-			}
+			for (let reqId of reqs) edgeData.push(
+				this.calcEdgeAnchors(indexedConcepts.get(reqId), concept)
+			);
 
-			if (container) edgeData.push(_.extend(
-				this.calcEdgeAnchors(indexedConcepts.get(container), concept),
-				{'stroke': '#f1c40f'}
-			));
+			if (container) edgeData.push(
+				this.calcEdgeAnchors(indexedConcepts.get(container), concept)
+			);
 		}
 
 		this.group.selectAll('.edge').data(edgeData).enter().append('line').attr({
@@ -113,17 +112,21 @@ let D3Map = React.createClass({
 
 		return {
 			'from': {'x': fromV.x, 'y': fromV.y},
-			'to': {'x': toV.x, 'y': toV.y}
+			'to': {'x': toV.x, 'y': toV.y},
+			'stroke': from.color
 		};
 	},
 
 	renderNodes(concepts) {
 		let conceptNodesMap = this.conceptNodesMap = new Map();
-		let conceptNodes = this.group.selectAll('.node').data(concepts)
-			.enter();
+		let conceptNodes = this.group.selectAll('.node').data(concepts).enter();
+
 		conceptNodes.append('circle')
-			.attr('class', 'node').attr('r', RADIUS)
-			.attr({'cx': (n) => n.x, 'cy': (n) => n.y})
+			.attr('class', 'node')
+			.attr({
+				'r': RADIUS, 'fill': n => n.color || 'lightgrey',
+				'cx': n => n.x, 'cy': n => n.y
+			})
 			.on('click', (c) => this.props.onSelect(c.id)).each(function(c) {
 				conceptNodesMap.set(c.id, this);
 			});
