@@ -75,7 +75,7 @@ let ConceptForm = React.createClass({
 		}
 
 		return (
-			<form onChange={this.updateFormData} onSubmit={this.onSave}>
+			<form onChange={this.onChange} onSubmit={this.onSave}>
 				<div className="row">
 					<div className="col-xs-12">
 						<TextField floatingLabelText="Name"
@@ -173,6 +173,11 @@ let ConceptForm = React.createClass({
 	onAbort() {
 		if (!confirm('Do you really want to discard your changes?')) return;
 		this.props.onDone();
+	},
+
+	onChange(e) {
+		this.updateFormData(e);
+		this.props.onChange();
 	},
 
 	onSave(e) {
