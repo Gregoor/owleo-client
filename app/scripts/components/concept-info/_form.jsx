@@ -24,6 +24,10 @@ let ConceptForm = React.createClass({
 		);
 	},
 
+	componentDidMount() {
+		this.refs.nameTextField.focus();
+	},
+
 	render() {
 		let concept = this.props.concept,
 				abortButton = '',
@@ -80,6 +84,7 @@ let ConceptForm = React.createClass({
 					<div className="col-xs-12">
 						<TextField floatingLabelText="Name"
 											 name="name"
+											 ref="nameTextField"
 						           defaultValue={concept.name} />
 					</div>
 				</div>
