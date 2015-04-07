@@ -68,8 +68,13 @@ let D3Map = React.createClass({
 	},
 
 	renderD3() {
-		let zoom = this.navState.zoom, pos = this.navState.position;
-		this.group.attr('transform', `translate(${pos.x}, ${pos.y}) scale(${zoom})`);
+		let zoom = this.navState.zoom;
+		let pos = this.navState.position;
+		let scale = this.navState.scale;
+
+		this.group.attr('transform',
+			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
+		);
 	},
 
 	renderEdges(indexedConcepts) {

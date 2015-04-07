@@ -8,7 +8,7 @@ export default {
 		this.navState = {
 			'position': {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			'panDelta': {x, y},
-			'zoom': 1
+			'scale': 1
 		};
 		return {'panning': false};
 	},
@@ -52,7 +52,27 @@ export default {
 
 	onScroll(event) {
 		event.preventDefault();
-		this.setNavState({'zoom': this.navState.zoom + (event.deltaY / 3000)});
+
+		let steps = 1500; // use this to adjust zoom behavior
+		let oldScale = this.navState.scale;
+		let scale = oldScale - (oldScale * event.deltaY/steps);
+		if (scale === oldScale) { return; }
+
+		let pos = this.navState.position;
+		let eventX = event.pageX;
+		let eventY = event.pageY;
+
+		let scaleD = scale / oldScale;
+		let x = scaleD * (pos.x - eventX) + eventX;
+		let y = scaleD * (pos.y - eventY) + eventY;
+
+		this.setNavState({
+			'scale': scale,
+			'position': {
+				'x': x,
+				'y': y
+			}
+		});
 	},
 
 	setNavState(obj) {
