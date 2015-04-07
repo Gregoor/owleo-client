@@ -8,7 +8,8 @@ export default {
 		this.navState = {
 			'position': {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			'panDelta': {x, y},
-			'scale': 1
+			'scale': 1,
+			'focusedPosition': {x, y}
 		};
 		return {'panning': false};
 	},

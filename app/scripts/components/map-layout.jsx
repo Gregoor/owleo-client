@@ -76,10 +76,12 @@ let MapLayout = React.createClass({
 
     return (
       <div>
-	      <AMap concepts={this.state.concepts} onSelect={this.onSelect}
-	            selectedConcept={selectedConcept}/>
+	      <AMap concepts={this.state.concepts}
+	            selectedConcept={selectedConcept}
+							focusedConceptId={this.state.focusedConceptId}
+							onSelect={this.onSelect}/>
         <div className="info-container">
-	        <Search onSelect={this.onSelect}/>
+	        <Search onSelect={this.onSearchSelect}/>
           {conceptInfo}
         </div>
 	      <div className="map-actions">
@@ -104,6 +106,11 @@ let MapLayout = React.createClass({
 	  if (id !== undefined) ConceptActions.select(id);
 	  else ConceptActions.unselect();
   },
+
+	onSearchSelect(id) {
+		this.onSelect(id);
+		this.setState({'focusedConceptId': id});
+	},
 
 	onUnlock() {
 		this.setState({'isLocked': false});

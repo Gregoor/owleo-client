@@ -33,15 +33,22 @@ let D3Map = React.createClass({
 	},
 
 	update(props) {
-		let {concepts, selectedConcept} = props;
+		let {concepts, selectedConcept, focusedConceptId} = props;
 
 		if (!_.isEmpty(concepts) && !this.mapFilled) {
-			let indexedConcepts = new Map();
-			for (let concept of concepts) indexedConcepts.set(concept.id, concept);
-			this.renderEdges(indexedConcepts);
+			this.indexedConcepts = new Map();
+			for (let concept of concepts) this.indexedConcepts.set(concept.id, concept);
+			this.renderEdges(this.indexedConcepts);
 			this.renderNodes(concepts);
-			this.renderD3();
+			this.isDirty = true;
 			this.mapFilled = true;
+		}
+
+		this.updateFocusedPosition(focusedConceptId);
+
+		if (this.isDirty) {
+			this.renderD3();
+			this.isDirty = false;
 		}
 
 		let conceptNodesMap = this.conceptNodesMap;
@@ -53,6 +60,23 @@ let D3Map = React.createClass({
 			let node = this.group.select('.node.selected').node();
 			if (node) node.classList.remove('selected');
 		}
+	},
+
+	updateFocusedPosition(id) {
+		if (!id) return;
+
+		let focusedConcept = this.indexedConcepts.get(id);
+		let focusedPosition = {
+			x: focusedConcept.x,
+			y: focusedConcept.y
+		};
+
+		if (focusedPosition === this.navState.focusedPosition) return;
+
+		this.isDirty = true;
+		this.navState.position =
+			this.navState.focusedPosition = focusedPosition;
+		console.log(focusedPosition);
 	},
 
 	render() {
@@ -68,7 +92,6 @@ let D3Map = React.createClass({
 	},
 
 	renderD3() {
-		let zoom = this.navState.zoom;
 		let pos = this.navState.position;
 		let scale = this.navState.scale;
 
