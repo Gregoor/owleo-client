@@ -54,14 +54,12 @@ let ConceptInfo = React.createClass({
 	},
 
 	onChange() {
-		this.setState({'isDirty': true});
+		this.isDirty = true;
 	},
 
 	onKeydown(e) {
 		if (e.keyCode == 27/*ESC*/) {
-			// abort and esc have duplicate confirm msgs,
-			// but are different scenarios imo.
-			if (this.state.isDirty &&
+			if (this.isDirty &&
 				!confirm('Do you really want to discard your changes?')) return;
 			ConceptActions.unselect();
 		}
