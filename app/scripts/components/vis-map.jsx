@@ -79,7 +79,7 @@ let Graph = React.createClass({
 				'x': concept.x || undefined,
 				'y': concept.y || undefined,
 				'color': {
-					'background': concept.color
+					'background': concept.color || 'lightgrey'
 				}
 			});
 

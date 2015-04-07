@@ -12,11 +12,9 @@ export default {
   },
   'nodes': {
     'color': {
-      'background': '#f1c40f',
       'highlight': {
         'border': '#bdc3c7'
-      },
-      'border': '#BE9100'
+      }
     },
     'fontColor': 'white',
     'fontStrokeWidth': '2',
