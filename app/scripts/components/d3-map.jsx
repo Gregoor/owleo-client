@@ -25,6 +25,7 @@ let D3Map = React.createClass({
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
 
+		this.animated = false;
 		this.debugAxis = false;
 
 		this.update(this.props);
@@ -113,6 +114,7 @@ let D3Map = React.createClass({
 		if (focusedPosition === this.navState.focusedPosition) return;
 
 		this.isDirty = true;
+		this.animated = true;
 		this.navState.position =
 			this.navState.focusedPosition = focusedPosition;
 	},
@@ -133,9 +135,19 @@ let D3Map = React.createClass({
 		let pos = this.navState.position;
 		let scale = this.navState.scale;
 
-		this.group.attr('transform',
+		this.getGroup().attr('transform',
 			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
 		);
+
+	},
+
+	getGroup() {
+		if (this.animated) {
+			this.animated = false;
+			return this.group.transition();
+		} else {
+			return this.group;
+		}
 	},
 
 	renderEdges(indexedConcepts) {
