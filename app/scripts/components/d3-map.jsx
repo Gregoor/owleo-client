@@ -25,6 +25,8 @@ let D3Map = React.createClass({
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
 
+		this.debugAxis = false;
+
 		this.update(this.props);
 	},
 
@@ -40,6 +42,7 @@ let D3Map = React.createClass({
 			for (let concept of concepts) this.indexedConcepts.set(concept.id, concept);
 			this.renderEdges(this.indexedConcepts);
 			this.renderNodes(concepts);
+			if (this.debugAxis) this.renderAxis();
 			this.isDirty = true;
 			this.mapFilled = true;
 		}
@@ -62,6 +65,41 @@ let D3Map = React.createClass({
 		}
 	},
 
+	renderAxis() {
+		let svg = d3.select(this.getDOMNode());
+		let {width, height} = this.group[0][0].getBoundingClientRect();
+		let w = width/2, h = height/2;
+
+		let xScale = d3.scale.linear()
+			.domain([-w, w])
+			.range([-w,w]);
+
+		let yScale = d3.scale.linear()
+			.domain([-h, h])
+			.range([-h,h]);
+
+		let xAxis = d3.svg.axis()
+			.scale(xScale)
+			.orient('bottom')
+			.ticks(w * 2 / 50 + 1)
+			.tickSize(3);
+
+		let yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient('left')
+			.ticks(h * 2 / 50 + 1)
+			.tickSize(3);
+
+		this.group.append("svg:g")
+			.attr("class", "xaxis")
+			.call(xAxis);
+
+		this.group.append("svg:g")
+			.attr("class", "yaxis")
+			.call(yAxis);
+
+	},
+
 	updateFocusedPosition(id) {
 		if (!id) return;
 
@@ -76,7 +114,6 @@ let D3Map = React.createClass({
 		this.isDirty = true;
 		this.navState.position =
 			this.navState.focusedPosition = focusedPosition;
-		console.log(focusedPosition);
 	},
 
 	render() {
