@@ -25,6 +25,9 @@ let D3Map = React.createClass({
 			}).append('path').attr('d', 'M0,-5L10,0L0,5');
 		this.group = svg.append('g');
 
+		this.animated = false;
+		this.debugAxis = false;
+
 		this.update(this.props);
 	},
 
@@ -33,15 +36,23 @@ let D3Map = React.createClass({
 	},
 
 	update(props) {
-		let {concepts, selectedConcept} = props;
+		let {concepts, selectedConcept, focusedConceptId} = props;
 
 		if (!_.isEmpty(concepts) && !this.mapFilled) {
-			let indexedConcepts = new Map();
-			for (let concept of concepts) indexedConcepts.set(concept.id, concept);
-			this.renderEdges(indexedConcepts);
+			this.indexedConcepts = new Map();
+			for (let concept of concepts) this.indexedConcepts.set(concept.id, concept);
+			this.renderEdges(this.indexedConcepts);
 			this.renderNodes(concepts);
-			this.renderD3();
+			if (this.debugAxis) this.renderAxis();
+			this.isDirty = true;
 			this.mapFilled = true;
+		}
+
+		this.updateFocusedPosition(focusedConceptId);
+
+		if (this.isDirty) {
+			this.renderD3();
+			this.isDirty = false;
 		}
 
 		let conceptNodesMap = this.conceptNodesMap;
@@ -53,6 +64,59 @@ let D3Map = React.createClass({
 			let node = this.group.select('.node.selected').node();
 			if (node) node.classList.remove('selected');
 		}
+	},
+
+	renderAxis() {
+		let {width, height} = this.group[0][0].getBoundingClientRect();
+		let w = width/2, h = height/2;
+
+		let xScale = d3.scale.linear()
+			.domain([-w, w])
+			.range([-w,w]);
+
+		let yScale = d3.scale.linear()
+			.domain([-h, h])
+			.range([-h,h]);
+
+		let xAxis = d3.svg.axis()
+			.scale(xScale)
+			.orient('bottom')
+			.ticks(w * 2 / 50 + 1)
+			.tickSize(3);
+
+		let yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient('left')
+			.ticks(h * 2 / 50 + 1)
+			.tickSize(3);
+
+		this.group.append("svg:g")
+			.attr("class", "xaxis")
+			.call(xAxis);
+
+		this.group.append("svg:g")
+			.attr("class", "yaxis")
+			.call(yAxis);
+
+	},
+
+	updateFocusedPosition(id) {
+		if (!id) return;
+
+		let boundingRect = this.getDOMNode().getBoundingClientRect();
+
+		let focusedConcept = this.indexedConcepts.get(id);
+		let focusedPosition = {
+			x: boundingRect.width / 2 - focusedConcept.x,
+			y: boundingRect.height / 2 - focusedConcept.y
+		};
+
+		if (focusedPosition === this.navState.focusedPosition) return;
+
+		this.isDirty = true;
+		this.animated = true;
+		this.navState.position =
+			this.navState.focusedPosition = focusedPosition;
 	},
 
 	render() {
@@ -68,13 +132,22 @@ let D3Map = React.createClass({
 	},
 
 	renderD3() {
-		let zoom = this.navState.zoom;
 		let pos = this.navState.position;
 		let scale = this.navState.scale;
 
-		this.group.attr('transform',
+		this.getGroup().attr('transform',
 			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
 		);
+
+	},
+
+	getGroup() {
+		if (this.animated) {
+			this.animated = false;
+			return this.group.transition();
+		} else {
+			return this.group;
+		}
 	},
 
 	renderEdges(indexedConcepts) {
