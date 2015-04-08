@@ -66,7 +66,6 @@ let D3Map = React.createClass({
 	},
 
 	renderAxis() {
-		let svg = d3.select(this.getDOMNode());
 		let {width, height} = this.group[0][0].getBoundingClientRect();
 		let w = width/2, h = height/2;
 
@@ -103,10 +102,12 @@ let D3Map = React.createClass({
 	updateFocusedPosition(id) {
 		if (!id) return;
 
+		let boundingRect = this.getDOMNode().getBoundingClientRect();
+
 		let focusedConcept = this.indexedConcepts.get(id);
 		let focusedPosition = {
-			x: focusedConcept.x,
-			y: focusedConcept.y
+			x: boundingRect.width / 2 - focusedConcept.x,
+			y: boundingRect.height / 2 - focusedConcept.y
 		};
 
 		if (focusedPosition === this.navState.focusedPosition) return;
