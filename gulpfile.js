@@ -12,6 +12,7 @@ var bundler = {
   w: null,
   init: function() {
     this.w = watchify(browserify({
+			cache: {}, packageCache: {},
 	    extensions: ['.jsx'],
       entries: ['./app/scripts/app.js'],
       insertGlobals: true,
