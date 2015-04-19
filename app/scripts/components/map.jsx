@@ -1,6 +1,6 @@
 import React from 'react';
 import 'd3';
-import 'lodash';
+import _ from 'lodash';
 import 'victor';
 
 let MapNavigationMixin = require('./mixins/MapNavigationMixin');
@@ -67,24 +67,52 @@ let D3Map = React.createClass({
 	addToForceLayout(parentEl, concepts) {
 		let force = d3.layout.force().size([WIDTH, HEIGHT]);
 
-		for (let concept of concepts) concept.force = force;
+		let links = [];
+		for (let i = 0; i < concepts.length; i++) {
+			let concept = concepts[i];
+			concept.force = force;
+			for (let j = 0; j < concepts.length; j++) {
+				if (_.includes(concept.reqs, concepts[j].id)) {
+					links.push({'source': j, 'target': i});
+				}
+			}
+		}
 
-		force.nodes(concepts).start();
+		force.nodes(concepts).links(links).start();
 
 		let el = parentEl.selectAll('.node').data(concepts).enter()
 			.append('g').attr('class', 'node');
 
 		let circle = el.append('circle')
-			.style({'stroke': d => d.color || 'white', 'fill': 'transparent'})
-			.call(force.drag);
+			.style({'stroke': d => d.color || 'white', 'fill': 'transparent'});
+			//.call(force.drag);
 
 		circle.append('title').text(d => d.name);
+
+		let link = parentEl.selectAll('.link')
+			.data(links)
+			.enter().append('line')
+			.attr('class', 'link');
+
+		let label = el.append('text')
+			.text(d => d.name)
+			.attr({
+				'class': 'label',
+				'x': function(d) { return -this.getComputedTextLength() / 2 }
+			});
 
 		force.on('tick', () => {
 			el.attr('transform', d => `translate(
             ${d.x - HF_WIDTH},
             ${d.y - HF_HEIGHT})
         `);
+
+			link.attr({
+				'x1': d => d.source.x - HF_WIDTH,
+				'y1': d => d.source.y - HF_HEIGHT,
+				'x2': d => d.target.x - HF_WIDTH,
+				'y2': d => d.target.y - HF_HEIGHT
+			});
 
 			circle.attr('r', d => d.r = BASE_RAD +
 				(!this.containers.has(d.id) ? 0 :
@@ -98,6 +126,8 @@ let D3Map = React.createClass({
 					}, 0)
 				)
 			);
+
+			label.attr('y', d => d.r + 18);
 
 			force
 				.charge(d => -200 + sqr(d.r) * -.18)
@@ -140,7 +170,7 @@ let D3Map = React.createClass({
 		} else {
 			return this.group;
 		}
-	},
+	}
 
 });
 
