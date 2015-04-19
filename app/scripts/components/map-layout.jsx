@@ -7,8 +7,7 @@ let MapActions = require('../actions/map-actions');
 let conceptStore = require('../stores/concept-store');
 let userStore = require('../stores/user-store');
 
-let VisMap = require('./vis-map');
-let D3Map = require('./d3-map');
+let Map = require('./map');
 let Search = require('./search');
 let ConceptInfo = require('./concept-info/concept-info');
 let MapFab = require('./map-fab');
@@ -72,14 +71,12 @@ let MapLayout = React.createClass({
 		  );
 	  }
 
-	  let AMap = this.state.editMode ? VisMap : D3Map;
-
     return (
       <div>
-	      <AMap concepts={this.state.concepts}
-	            selectedConcept={selectedConcept}
-							focusedConceptId={this.state.focusedConceptId}
-							onSelect={this.onSelect}/>
+	      <Map concepts={this.state.concepts}
+						 selectedConcept={selectedConcept}
+						 focusedConceptId={this.state.focusedConceptId}
+						 onSelect={this.onSelect}/>
         <div className="info-container">
 	        <Search onSelect={this.onSearchSelect}/>
           {conceptInfo}

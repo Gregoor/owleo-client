@@ -9,10 +9,9 @@
 @import 'icons';
 @import 'info-container';
 @import 'spinner';
+@import 'map';
 
 @import 'roboto-font';
-
-
 
 body {
   background: #2c3e50;
@@ -20,57 +19,6 @@ body {
 
 body, input, button, textarea, select {
   font-family: 'Roboto', sans-serif;
-}
-
-.map {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  height: 100%;
-	width: 100%;
-
-	svg& {
-		&.grabbed {
-			cursor: move;
-		}
-
-		circle.node {
-			stroke: black;
-			cursor: pointer;
-
-			&.selected {
-				stroke: #bdc3c7;
-				stroke-width: 2px;
-			}
-		}
-
-		.xaxis, .yaxis {
-			fill: darkorange;
-			color: darkorange;
-		}
-
-		text.label {
-			fill: white;
-			stroke: black;
-			font-weight: 800;
-			stroke-width: .8;
-			cursor: pointer;
-			@media(-webkit-min-device-pixel-ratio:2) {
-				font-weight: 400;
-				stroke-width: .4;
-			}
-		}
-
-		line.edge {
-			stroke-width: 2;
-		}
-
-		#triangle path {
-			fill: lightgrey;
-		}
-	}
 }
 
 .map-actions {
