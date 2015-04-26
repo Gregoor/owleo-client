@@ -36,14 +36,6 @@ let D3Map = React.createClass({
 		if (!concepts || this.mapBuilt) return;
 		this.mapBuilt = true;
 
-		this.concepts = concepts;
-		let containers = this.containers = new Map();
-		for (let [id, concept] of concepts) {
-			let {container} = concept;
-			if (!containers.has(container)) containers.set(container, [concept]);
-			else containers.get(container).push(concept);
-		}
-
 		let svg = d3.select(this.getDOMNode())
 			.attr({'width': WIDTH, 'height': HEIGHT});
 
@@ -52,7 +44,25 @@ let D3Map = React.createClass({
 
 		this.animated = false;
 
+		this.concepts = concepts;
+		let containers = this.containers = new Map();
+		for (let [id, concept] of concepts) {
+			let {container} = concept;
+			if (!containers.has(container)) containers.set(container, [concept]);
+			else containers.get(container).push(concept);
+		}
+
 		this.stuff(this.group, containers.get(null));
+
+		let links = [];
+		for (let [id, c] of concepts) for (let req of c.reqs) links.push({
+			'from': concepts.get(req), 'to': c
+		});
+
+		this.links = this.group.selectAll('.link')
+			.data(links)
+			.enter().append('line')
+			.attr('class', 'link');
 	},
 
 	stuff(parentEl, concepts) {
@@ -66,6 +76,10 @@ let D3Map = React.createClass({
 
 	addToForceLayout(parentEl, concepts) {
 		let force = d3.layout.force().size([WIDTH, HEIGHT]);
+
+		let container = this.concepts.get(concepts[0].container) ||
+			{'absX': 0, 'absY': 0};
+
 
 		let links = [];
 		for (let i = 0; i < concepts.length; i++) {
@@ -84,15 +98,10 @@ let D3Map = React.createClass({
 			.append('g').attr('class', 'node');
 
 		let circle = el.append('circle')
-			.style({'stroke': d => d.color || 'white', 'fill': 'transparent'});
+			.style({'stroke': d => d.color || 'white', 'fill': '#1f1f1f'});
 			//.call(force.drag);
 
 		circle.append('title').text(d => d.name);
-
-		let link = parentEl.selectAll('.link')
-			.data(links)
-			.enter().append('line')
-			.attr('class', 'link');
 
 		let label = el.append('text')
 			.text(d => d.name)
@@ -105,14 +114,25 @@ let D3Map = React.createClass({
 			el.attr('transform', d => `translate(
             ${d.x - HF_WIDTH},
             ${d.y - HF_HEIGHT})
-        `);
+        `)
+				.each((d) => _.assign(d, {
+					'absX': container.absX - HF_WIDTH + d.x,
+					'absY': container.absY - HF_HEIGHT + d.y
+				}));
 
-			link.attr({
-				'x1': d => d.source.x - HF_WIDTH,
-				'y1': d => d.source.y - HF_HEIGHT,
-				'x2': d => d.target.x - HF_WIDTH,
-				'y2': d => d.target.y - HF_HEIGHT
+			this.links.attr({
+					'x1': d => d.from.absX,
+					'y1': d => d.from.absY,
+					'x2': d => d.to.absX,
+					'y2': d => d.to.absY
 			});
+
+			//link.attr({
+			//	'x1': d => d.source.x - HF_WIDTH,
+			//	'y1': d => d.source.y - HF_HEIGHT,
+			//	'x2': d => d.target.x - HF_WIDTH,
+			//	'y2': d => d.target.y - HF_HEIGHT
+			//});
 
 			circle.attr('r', d => d.r = BASE_RAD +
 				(!this.containers.has(d.id) ? 0 :
@@ -134,7 +154,6 @@ let D3Map = React.createClass({
 				.linkDistance(d => d.source.r + d.target.r + 2 * BASE_RAD)
 				.start();
 
-			let container = this.concepts.get(concepts[0].container);
 			if (container && container.force) container.force.resume();
 		});
 
