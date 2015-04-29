@@ -56,10 +56,9 @@ let D3Map = React.createClass({
 		this.stuff(this.group, containers.get(null));
 
 		let links = [];
-		for (let [id, c] of concepts) for (let reqData of c.reqs) {
-			let req = concepts.get(reqData.id);
-			links.push({'from': req, 'to': c});
-		}
+		for (let [id, c] of concepts) for (let req of c.reqs) links.push({
+			'from': concepts.get(req), 'to': c
+		});
 
 		this.links = this.group.selectAll('.link')
 			.data(links)
@@ -88,7 +87,7 @@ let D3Map = React.createClass({
 			let concept = concepts[i];
 			concept.force = force;
 			for (let j = 0; j < concepts.length; j++) {
-				if (_.find(concept.reqs, r => r.id == concepts[j].id)) {
+				if (_.includes(concept.reqs, concepts[j].id)) {
 					links.push({'source': j, 'target': i});
 				}
 			}
@@ -123,18 +122,15 @@ let D3Map = React.createClass({
 						'absY': container.absY - HF_HEIGHT + d.y
 					});
 					for (let req of d.reqs) {
-						let source = this.concepts.get(req.id);
+						let source = this.concepts.get(req);
 						let x = source.absX - d.absX, y = source.absY - d.absY;
 						let k, sqLength;
 						if (sqLength = x * x + y * y) {
 							let length = Math.sqrt(sqLength);
-							let dist = _(req.siblings)
-								.map(id => this.concepts.get(id))
-								.reduce((r, c) => c.r + r, - 2 * BASE_RAD);
-							console.log(dist);
-							length = e.alpha * OUTER_STRENGTH * (length - dist) / length;
-							x *= length;
-							y *= length;
+							let dist = 40;
+							let multiplier = (e.alpha / 4) * OUTER_STRENGTH * (length - dist) / length;
+							x *= multiplier;
+							y *= multiplier;
 							d.x -= x * (k = 1 / 2);
 							d.y -= y * k;
 							source.x += x * (k = 1 - k);
@@ -170,7 +166,7 @@ let D3Map = React.createClass({
 				.linkDistance(d => d.source.r + d.target.r + 2 * BASE_RAD)
 				.start();
 
-			if (container && container.force) container.force.resume();
+			//if (container && container.force) container.force.resume();
 		});
 
 		return el;
