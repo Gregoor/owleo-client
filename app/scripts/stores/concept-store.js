@@ -69,6 +69,27 @@ let conceptStore = Reflux.createStore({
 
 	triggerAll() {
 		this.trigger({'all': this.all, 'selected': this.selected});
+	},
+
+	getNested() {
+		if (!this.nested) {
+			let containers = this.containers = new Map();
+			for (let [id, concept] of this.all) {
+				let {container} = concept;
+				if (!containers.has(container)) containers.set(container, [concept]);
+				else containers.get(container).push(concept);
+			}
+			this.nested = this.withContainees(null);
+		}
+		return this.nested;
+	},
+
+	withContainees(id) {
+		let containees = this.containers.get(id);
+		return containees === undefined ? [] : containees.map(c => {
+			c.containees = this.withContainees(c.id);
+			return c;
+		})
 	}
 
 });

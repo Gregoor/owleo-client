@@ -5,9 +5,11 @@ let DefaultRoute = Router.DefaultRoute;
 
 let Layout = require('./components/layout');
 let MapLayout = require('./components/map-layout');
+let ListLayout = require('./components/list-layout');
 
 let routes = (
 	<Route handler={Layout}>
+		<Route path="/list" handler={ListLayout}/>
 		<Route path=":conceptId" handler={MapLayout}/>
 		<DefaultRoute handler={MapLayout} />
 	</Route>
