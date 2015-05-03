@@ -12,11 +12,16 @@
 			cursor: move;
 		}
 
+		&:not(.grabbed) {
+			.node circle {
+				cursor: pointer;
+			}
+		}
+
 		.node {
 			circle {
 				stroke: black;
-				stroke-width: 3px;
-				cursor: pointer;
+				stroke-width: 4px;
 
 				&.selected {
 					stroke: #bdc3c7;
@@ -27,8 +32,8 @@
 
 		line.link {
 			stroke: #bababa;
-			stroke-opacity: .6;
-			stroke-width: 3px;
+			stroke-opacity: .2;
+			stroke-width: 2px;
 		}
 
 		text.label {
