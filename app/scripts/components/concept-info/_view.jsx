@@ -10,22 +10,20 @@ let ConceptView = React.createClass({
 		let concept = this.props.concept;
 
 		let editActions;
-		if (this.props.editMode) {
-			editActions = [
-				(
-					<div className="col-xs-4">
-						<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
-						            onClick={this.props.onEdit}/>
-					</div>
-				),
-				(
-					<div className="col-xs-4">
-						<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-						            onClick={this.onDelete}/>
-					</div>
-				)
-			];
-		}
+		editActions = [
+			(
+				<div className="col-xs-4">
+					<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
+											onClick={this.props.onEdit}/>
+				</div>
+			),
+			(
+				<div className="col-xs-4">
+					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
+											onClick={this.onDelete}/>
+				</div>
+			)
+		];
 
 		let containerRow;
 		if (concept.container && concept.container.id) {

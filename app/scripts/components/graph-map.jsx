@@ -103,7 +103,7 @@ let GraphMap = React.createClass({
 			if (!this.state.wasPanning) this.props.onSelect(d.id);
 		}).bind(this);
 		let circle = el.append('circle')
-			.style({'stroke': d => d.color || 'white', 'fill': 'transparent'})
+			.style({'stroke': d => d.color || 'white', 'fill': 'rgba(0, 0, 0, .05)'})
 			.on('click', onClick);
 			//.call(force.drag);
 

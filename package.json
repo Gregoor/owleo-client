@@ -20,7 +20,8 @@
     "reflux": "~0.2.5",
     "superagent": "^1.1.0",
     "victor": "^0.2.6",
-    "vis": "^3.11.0"
+    "vis": "^3.11.0",
+    "babel": "~5.2.6"
   },
   "devDependencies": {
     "babelify": "^6.0.1",

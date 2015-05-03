@@ -1,4 +1,5 @@
-let request = require('superagent');
+import request from 'superagent';
+import _ from 'lodash';
 
 let host = require('../configs/api.custom').host;
 
@@ -32,7 +33,9 @@ export default {
 	},
 
 	reposition(concepts) {
-		return promiseWrap(request.post(`${endpoint}/position`, {concepts}));
+		return promiseWrap(request.post(`${endpoint}/position`, {
+			'concepts': concepts.map(c => _.pick(c, 'id', 'x', 'y', 'r'))
+		}));
 	}
 
 };

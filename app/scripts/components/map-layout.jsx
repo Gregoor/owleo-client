@@ -3,11 +3,10 @@ let Router = require('react-router');
 let Reflux = require('reflux');
 
 let ConceptActions = require('../actions/concept-actions');
-let MapActions = require('../actions/map-actions');
 let conceptStore = require('../stores/concept-store');
 let userStore = require('../stores/user-store');
 
-let Map = require('./map');
+let GraphMap = require('./graph-map');
 let Search = require('./search');
 let ConceptInfo = require('./concept-info/concept-info');
 let MapFab = require('./map-fab');
@@ -22,7 +21,7 @@ let MapLayout = React.createClass({
   ],
 
   getInitialState() {
-    return {'editMode': false, 'isLocked': true};
+    return {'isLocked': true};
   },
 
   componentWillMount() {
@@ -46,34 +45,23 @@ let MapLayout = React.createClass({
     let conceptInfo;
     let selectedConcept = this.state.selectedConcept;
     if (selectedConcept) {
-      conceptInfo = <ConceptInfo concept={selectedConcept}
-                                 editMode={this.state.editMode}/>;
+      conceptInfo = <ConceptInfo concept={selectedConcept}/>;
     }
 
 	  let actions;
-	  if (this.state.editMode) {
-		  let {isLocked} = this.state;
-		  actions = [
-			  (
-				  <MapFab title="Leave edit mode" secondary={true} icon="eye"
-				          onClick={this.onSwitchEdit}/>
-			  ),
-			  (
-				  <MapFab title={isLocked ? 'Unlock' : 'Lock'}
-				          secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
-				          onClick={isLocked ? this.onUnlock : this.onLock}/>
-			  ),
-			  (<MapFab title="Add Concept" icon="plus" onClick={this.onNew}/>)
-		  ];
-	  } else {
-		  actions = (
-			  <MapFab title="Edit mode" icon="pencil" onClick={this.onSwitchEdit}/>
-		  );
-	  }
+		let {isLocked} = this.state;
+		actions = [
+			(
+				<MapFab title={isLocked ? 'Unlock' : 'Lock'}
+								secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
+								onClick={isLocked ? this.onUnlock : this.onLock}/>
+			),
+			(<MapFab title="Add Concept" icon="plus" onClick={this.onNew}/>)
+		];
 
     return (
       <div>
-	      <Map concepts={this.state.concepts}
+	      <GraphMap concepts={this.state.concepts}
 						 selectedConcept={selectedConcept}
 						 focusedConceptId={this.state.focusedConceptId}
 						 onSelect={this.onSelect}/>
@@ -95,10 +83,6 @@ let MapLayout = React.createClass({
 		} else ConceptActions.unselect();
 	},
 
-	onSwitchEdit() {
-		this.setState({'editMode': !this.state.editMode});
-	},
-
 	onSelect(id) {
 	  if (id !== undefined) ConceptActions.select(id);
 	  else ConceptActions.unselect();
@@ -111,16 +95,11 @@ let MapLayout = React.createClass({
 
 	onUnlock() {
 		this.setState({'isLocked': false});
-		MapActions.unlock();
 	},
 
 	onLock() {
 		this.setState({'isLocked': true});
-		MapActions.getPositions();
-		this.listenTo(MapActions.gotPositions, (concepts) => {
-			this.stopListeningTo(MapActions.gotPositions);
-			ConceptActions.reposition(concepts);
-		});
+		ConceptActions.reposition();
 	},
 
 	onNew() {

@@ -3,23 +3,23 @@ let Reflux = require('reflux');
 let _ = require('lodash');
 
 let ConceptActions = require('../actions/concept-actions');
-let conceptAPI = require('../api/concept-api');
+let ConceptAPI = require('../api/concept-api');
 
 let conceptStore = Reflux.createStore({
 
   listenables: ConceptActions,
 
 	getAll() {
-		conceptAPI.all().then(this.setAll);
+		ConceptAPI.all().then(this.setAll);
 	},
 
-	reposition(concepts) {
-		conceptAPI.reposition(concepts).then(this.setAll);
+	reposition() {
+		ConceptAPI.reposition(Array.from(this.all.values())).then(this.setAll);
 	},
 
   select(id) {
 	  if (this.selected && id == this.selected.id) return;
-    conceptAPI.find(id).then(this.setSelected);
+    ConceptAPI.find(id).then(this.setSelected);
   },
 
 	unselect() {
@@ -37,21 +37,21 @@ let conceptStore = Reflux.createStore({
 	},
 
 	create(data) {
-		conceptAPI.create(data).then((serverData) => {
+		ConceptAPI.create(data).then((serverData) => {
 			ConceptActions.created(serverData);
 			this.setSelected(serverData);
 		});
 	},
 
 	update(data) {
-		conceptAPI.update(this.selected.id, data).then((serverData) => {
+		ConceptAPI.update(this.selected.id, data).then((serverData) => {
 			ConceptActions.updated(serverData);
 			this.setSelected(serverData);
 		});
 	},
 
 	delete(id) {
-		conceptAPI.delete(id).then(() => {
+		ConceptAPI.delete(id).then(() => {
 			ConceptActions.deleted(id);
 			this.setSelected();
 		});
