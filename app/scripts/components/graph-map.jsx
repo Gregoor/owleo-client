@@ -3,12 +3,12 @@ import 'd3';
 import _ from 'lodash';
 import Victor from 'victor';
 
-let MapNavigationMixin = require('./mixins/MapNavigationMixin');
+import MapNavigationMixin from './mixins/MapNavigationMixin';
+import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
 const WIDTH = 500, HEIGHT = 500;
 const HF_WIDTH = WIDTH / 2, HF_HEIGHT = HEIGHT / 2;
 const BASE_RAD = 10;
-const OUTER_STRENGTH = -.3;
 
 let sqr = n => Math.pow(n, 2);
 
@@ -18,10 +18,11 @@ let GraphMap = React.createClass({
 		concepts: React.PropTypes.object,
 		selectedConcept: React.PropTypes.object,
 		focusedConceptId: React.PropTypes.string,
-		onSelect: React.PropTypes.func
+		onSelect: React.PropTypes.func,
+		physical: React.PropTypes.bool
 	},
 
-	mixins: [MapNavigationMixin],
+	mixins: [MapNavigationMixin, MapPhysicsMixin],
 
 	componentDidMount() {
 		this.concepts = new Map();
@@ -33,68 +34,78 @@ let GraphMap = React.createClass({
 	},
 
 	buildMap(props) {
-		let {concepts} = props;
-		if (!concepts || this.mapBuilt) return;
-		this.mapBuilt = true;
+		let {concepts, physical} = props;
+		if (concepts && !this.mapBuilt) {
+			this.mapBuilt = true;
+			let svg = d3.select(this.getDOMNode())
+				.attr({'width': WIDTH, 'height': HEIGHT});
 
-		let svg = d3.select(this.getDOMNode())
-			.attr({'width': WIDTH, 'height': HEIGHT});
+			this.group = svg.append('g')
+				.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
 
-		this.group = svg.append('g')
-			.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
+			this.animated = false;
 
-		this.animated = false;
+			this.concepts = concepts;
 
-		this.concepts = concepts;
+			let containers = this.containers = new Map();
+			for (let [id, concept] of concepts) {
+				let {container} = concept;
+				if (container && !concept.color) concept.color = container.color;
+				if (!containers.has(container)) containers.set(container, [concept]);
+				else containers.get(container).push(concept);
+			}
 
-		let containers = this.containers = new Map();
-		for (let [id, concept] of concepts) {
-			let {container} = concept;
-			if (!containers.has(container)) containers.set(container, [concept]);
-			else containers.get(container).push(concept);
+			let links = [];
+			for (let [id, c] of concepts) for (let req of c.reqs) {
+				links.push({'from': concepts.get(req), 'to': c});
+			}
+
+			this.links = this.group.selectAll('.link')
+				.data(links)
+				.enter().append('line')
+				.attr('class', 'link');
+
+			this.createHierarchy(this.group, containers.get(null));
+			this.renderLinks();
 		}
 
-		let links = [];
-		for (let [id, c] of concepts) for (let req of c.reqs) {
-			links.push({'from': concepts.get(req), 'to': c});
+		if (this.physicsInited) {
+			if (physical) {
+				this.startPhysics();
+				this.startAnimationLoop();
+			} else {
+				this.stopPhysics();
+				this.stopAnimationLoop();
+			}
+		} else if (physical && this.layers) {
+			this.physicsInited = true;
+			this.layers.forEach(l => this.addPhysicsTo(l));
+			this.startAnimationLoop();
 		}
-
-		this.links = this.group.selectAll('.link')
-			.data(links)
-			.enter().append('line')
-			.attr('class', 'link');
-
-		this.renderLinks();
-		this.createDeepForces(this.group, containers.get(null));
 	},
 
-	createDeepForces(parentEl, concepts) {
+	createHierarchy(parentEl, concepts) {
 		let self = this;
 		if (!concepts || concepts.length == 0) return;
 
-		this.createForceLayout(parentEl, concepts).each(function (d) {
-			self.createDeepForces(d3.select(this), self.containers.get(d.id));
+		this.createNodesFor(parentEl, concepts).each(function (d) {
+			self.createHierarchy(d3.select(this), self.containers.get(d.id));
 		});
 	},
 
-	createForceLayout(parentEl, concepts) {
-		let force = d3.layout.force().size([WIDTH, HEIGHT]);
-
+	createNodesFor(parentEl, concepts) {
 		let container = this.concepts.get(concepts[0].container) ||
 			{'absX': 0, 'absY': 0};
 
 		let links = [];
 		for (let i = 0; i < concepts.length; i++) {
 			let concept = concepts[i];
-			concept.force = force;
 			for (let j = 0; j < concepts.length; j++) {
 				if (_.includes(concept.reqs, concepts[j].id)) {
 					links.push({'source': j, 'target': i});
 				}
 			}
 		}
-
-		force.nodes(concepts).links(links).start();
 
 		let el = parentEl.selectAll('.node').data(concepts).enter()
 			.append('g').attr('class', 'node');
@@ -103,83 +114,26 @@ let GraphMap = React.createClass({
 			if (!this.state.wasPanning) this.props.onSelect(d.id);
 		}).bind(this);
 		let circle = el.append('circle')
-			.style({'stroke': d => d.color || 'white', 'fill': 'rgba(0, 0, 0, .05)'})
+			.style({
+				'stroke': d => d.color || (d.color = container.color) || 'white',
+				'fill': 'rgba(0, 0, 0, .05)'
+			})
 			.on('click', onClick);
-			//.call(force.drag);
 
-		circle.append('title')
-			.text(d => d.name).on('click', onClick);
+		circle.append('title').text(d => d.name);
 
 		let label = el.append('text')
 			.text(d => d.name)
+			.on('click', onClick)
 			.attr({
 				'class': 'label',
 				'x': function(d) { return -this.getComputedTextLength() / 2 }
 			});
 
-		force.on('tick', (e) => {
-			el.attr('transform', d => `translate(
-            ${d.x - HF_WIDTH},
-            ${d.y - HF_HEIGHT})
-        `)
-				.each((d) => {
-					_.assign(d, {
-						'absX': container.absX - HF_WIDTH + d.x,
-						'absY': container.absY - HF_HEIGHT + d.y
-					});
-					//for (let i = 0; i < d.reqs.length; i++) {
-					//	let req = d.reqs[i];
-					//	if (!_.isObject(req)) req = d.reqs[i] = {
-					//		'other': this.concepts.get(req), 'lastDists': [], 'targetDist': 50
-					//	};
-					//	let {other, lastDists} = req;
-					//	let x = other.absX - d.absX, y = other.absY - d.absY;
-					//	let k, sqDist;
-					//	if (sqDist = x * x + y * y) {
-					//		let dist = Math.sqrt(sqDist);
-                    //
-					//		//lastDists.push(dist);
-					//		//lastDists = req.lastDists = _.drop(lastDists, lastDists.length - 30);
-                    //
-					//		//let total = lastDists.reduce((n, t) => t + n, 0);
-					//		//let deviation = (total - req.targetDist) / (lastDists.length || 1);
-					//		//if (deviation > 50) req.targetDist += .3;
-					//		//else if (deviation < 30) req.targetDist -= .1;
-                    //
-					//		let distFrac = (dist - req.targetDist) / dist;
-					//		let multiplier = (e.alpha / 4) * OUTER_STRENGTH * distFrac;
-					//		x *= multiplier;
-					//		y *= multiplier;
-					//		d.x -= x * (k = 1 / 2);
-					//		d.y -= y * k;
-					//		req.x += x * (k = 1 - k);
-					//		req.y += y * k;
-					//	}
-					//}
-				});
-
-			circle.attr('r', d => d.r = BASE_RAD +
-				(!this.containers.has(d.id) ? 0 :
-					this.containers.get(d.id).reduce((maxR, concept) => {
-						let {x, y, r} = concept;
-						if (!r) r = BASE_RAD;
-						return Math.max(
-							maxR,
-							r + Math.sqrt(sqr(x - HF_WIDTH) + sqr(y - HF_HEIGHT))
-						);
-					}, 0)
-				)
-			);
-
-			label.attr('y', d => d.r + 18);
-
-			force
-				.charge(d => -200 + sqr(d.r) * -.19)
-				.linkDistance(d => d.source.r + d.target.r + 2 * BASE_RAD)
-				.start();
-
-			//if (container && container.force) container.force.resume();
-		});
+		let layer = {container, concepts, links, el, circle, label};
+		if (!this.layers) this.layers = [layer];
+		else this.layers.push(layer);
+		this.renderLayer(layer);
 
 		return el;
 	},
@@ -203,6 +157,35 @@ let GraphMap = React.createClass({
 		this.getGroup().attr('transform',
 			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
 		);
+	},
+
+	renderLayer(layer) {
+		let {el, circle, label, container} = layer;
+		el.attr('transform', d => `translate(
+            ${d.x - HF_WIDTH},
+            ${d.y - HF_HEIGHT})
+        `)
+			.each((d) => {
+				_.assign(d, {
+					'absX': container.absX - HF_WIDTH + d.x,
+					'absY': container.absY - HF_HEIGHT + d.y
+				});
+			});
+
+		circle.attr('r', d => d.r = BASE_RAD +
+				(!this.containers.has(d.id) ? 0 :
+					this.containers.get(d.id).reduce((maxR, concept) => {
+						let {x, y, r} = concept;
+						if (!r) r = BASE_RAD;
+						return Math.max(
+							maxR,
+							r + Math.sqrt(sqr(x - HF_WIDTH) + sqr(y - HF_HEIGHT))
+						);
+					}, 0)
+				)
+		);
+
+		label.attr('y', d => d.r + 18);
 	},
 
 	renderLinks() {
@@ -229,8 +212,24 @@ let GraphMap = React.createClass({
 				'x1': d => d.x1, 'y1': d => d.y1,
 				'x2': d => d.x2, 'y2': d => d.y2
 			});
+	},
 
-		window.requestAnimationFrame(this.renderLinks);
+	startAnimationLoop() {
+		this.animated = true;
+		this.animationLoop();
+	},
+
+	stopAnimationLoop() {
+		this.animated = false;
+	},
+
+	animationLoop() {
+		if (!this.animated) return;
+		window.requestAnimationFrame(() => {
+			this.layers.forEach(l => this.renderLayer(l));
+			this.renderLinks();
+			this.startAnimationLoop();
+		});
 	},
 
 	getGroup() {

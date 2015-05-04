@@ -13,42 +13,42 @@ let MapFab = require('./map-fab');
 
 let MapLayout = React.createClass({
 
-  mixins: [
-	  Reflux.ListenerMixin,
-	  Reflux.connect(userStore, 'user'),
-	  Router.State,
-	  Router.Navigation
-  ],
+	mixins: [
+		Reflux.ListenerMixin,
+		Reflux.connect(userStore, 'user'),
+		Router.State,
+		Router.Navigation
+	],
 
-  getInitialState() {
-    return {'isLocked': true};
-  },
+	getInitialState() {
+		return {'isLocked': true};
+	},
 
-  componentWillMount() {
-	  this.onRoute();
-	  Router.HashLocation.addChangeListener(this.onRoute);
-	  this.listenTo(conceptStore, (concepts) => {
-		  let path = '/';
-		  let selectedConcept = concepts.selected;
-		  if (selectedConcept) {
-			  if (selectedConcept.isNew) path += 'new';
-			  else path += selectedConcept.id;
-		  }
-		  this.transitionTo(path);
-		  this.setState({selectedConcept, 'concepts': concepts.all});
-	  });
+	componentWillMount() {
+		this.onRoute();
+		Router.HashLocation.addChangeListener(this.onRoute);
+		this.listenTo(conceptStore, (concepts) => {
+			let path = '/';
+			let selectedConcept = concepts.selected;
+			if (selectedConcept) {
+				if (selectedConcept.isNew) path += 'new';
+				else path += selectedConcept.id;
+			}
+			this.transitionTo(path);
+			this.setState({selectedConcept, 'concepts': concepts.all});
+		});
 
-	  ConceptActions.getAll();
-  },
+		ConceptActions.getAll();
+	},
 
-  render() {
-    let conceptInfo;
-    let selectedConcept = this.state.selectedConcept;
-    if (selectedConcept) {
-      conceptInfo = <ConceptInfo concept={selectedConcept}/>;
-    }
+	render() {
+		let conceptInfo;
+		let selectedConcept = this.state.selectedConcept;
+		if (selectedConcept) {
+			conceptInfo = <ConceptInfo concept={selectedConcept}/>;
+		}
 
-	  let actions;
+		let actions;
 		let {isLocked} = this.state;
 		actions = [
 			(
@@ -59,21 +59,23 @@ let MapLayout = React.createClass({
 			(<MapFab title="Add Concept" icon="plus" onClick={this.onNew}/>)
 		];
 
-    return (
-      <div>
-	      <GraphMap concepts={this.state.concepts}
-						 selectedConcept={selectedConcept}
-						 focusedConceptId={this.state.focusedConceptId}
-						 onSelect={this.onSelect}/>
-        <div className="info-container">
-	        <Search onSelect={this.onSearchSelect}/>
-          {conceptInfo}
-        </div>
-	      <div className="map-actions">
-		      {actions}
-	      </div>
-      </div>);
-  },
+		return (
+			<div>
+				<GraphMap concepts={this.state.concepts}
+									physical={!isLocked}
+									selectedConcept={selectedConcept}
+									focusedConceptId={this.state.focusedConceptId}
+									onSelect={this.onSelect}/>
+
+				<div className="info-container">
+					<Search onSelect={this.onSearchSelect}/>
+					{conceptInfo}
+				</div>
+				<div className="map-actions">
+					{actions}
+				</div>
+			</div>);
+	},
 
 	onRoute() {
 		let id = this.getParams().conceptId;
@@ -84,9 +86,9 @@ let MapLayout = React.createClass({
 	},
 
 	onSelect(id) {
-	  if (id !== undefined) ConceptActions.select(id);
-	  else ConceptActions.unselect();
-  },
+		if (id !== undefined) ConceptActions.select(id);
+		else ConceptActions.unselect();
+	},
 
 	onSearchSelect(id) {
 		this.onSelect(id);
