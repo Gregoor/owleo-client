@@ -10,7 +10,13 @@ const WIDTH = 500, HEIGHT = 500;
 const HF_WIDTH = WIDTH / 2, HF_HEIGHT = HEIGHT / 2;
 const BASE_RAD = 10;
 
+const SELECTED_CLASS = 'selected';
+
 let sqr = n => Math.pow(n, 2);
+let initListOrPush = (map, key, val) => {
+	if (map.has(key)) map.get(key).push(val);
+	else map.set(key, [val]);
+};
 
 let GraphMap = React.createClass({
 
@@ -26,6 +32,8 @@ let GraphMap = React.createClass({
 
 	componentDidMount() {
 		this.concepts = new Map();
+		this.layers = [];
+		this.reqLinks = new Map();
 		this.update(this.props);
 	},
 
@@ -34,7 +42,7 @@ let GraphMap = React.createClass({
 	},
 
 	update(props) {
-		let {concepts, physical, focusedConceptId} = props;
+		let {concepts, physical, selectedConceptId, focusedConceptId} = props;
 
 		this.buildMap(concepts);
 
@@ -50,6 +58,16 @@ let GraphMap = React.createClass({
 			this.physicsInited = true;
 			this.layers.forEach(l => this.addPhysicsTo(l));
 			this.startAnimationLoop();
+		}
+
+		if (selectedConceptId && this.links &&
+				selectedConceptId != this.props.selectedConceptId) {
+			this.group.selectAll(`.link.${SELECTED_CLASS}`)
+				.classed(SELECTED_CLASS, false);
+			let linkNodes = this.reqLinks.get(selectedConceptId);
+			if (linkNodes) linkNodes.forEach(el => {
+				el.classList.add(SELECTED_CLASS);
+			});
 		}
 
 		this.focusOn(focusedConceptId);
@@ -72,8 +90,7 @@ let GraphMap = React.createClass({
 		for (let [id, concept] of concepts) {
 			let {container} = concept;
 			if (container && !concept.color) concept.color = container.color;
-			if (!containers.has(container)) containers.set(container, [concept]);
-			else containers.get(container).push(concept);
+			initListOrPush(containers, container, concept);
 		}
 
 		let links = [];
@@ -81,10 +98,15 @@ let GraphMap = React.createClass({
 			links.push({'from': concepts.get(req), 'to': c});
 		}
 
+		let reqLinks = this.reqLinks;
 		this.links = this.group.selectAll('.link')
 			.data(links)
 			.enter().append('line')
-			.attr('class', 'link');
+			.attr('class', 'link')
+			.each(function(d) {
+				initListOrPush(reqLinks, d.from.id, this);
+				initListOrPush(reqLinks, d.to.id, this);
+			});
 
 		this.createHierarchy(this.group, containers.get(null));
 		this.renderLinks();
@@ -149,8 +171,7 @@ let GraphMap = React.createClass({
 			});
 
 		let layer = {container, concepts, links, el, circle, label};
-		if (!this.layers) this.layers = [layer];
-		else this.layers.push(layer);
+		this.layers.push(layer);
 		this.renderLayer(layer);
 
 		return el;
