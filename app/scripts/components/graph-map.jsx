@@ -16,7 +16,7 @@ let GraphMap = React.createClass({
 
 	propTypes: {
 		concepts: React.PropTypes.object,
-		selectedConcept: React.PropTypes.object,
+		selectedConceptId: React.PropTypes.object,
 		focusedConceptId: React.PropTypes.string,
 		onSelect: React.PropTypes.func,
 		physical: React.PropTypes.bool
@@ -26,15 +26,16 @@ let GraphMap = React.createClass({
 
 	componentDidMount() {
 		this.concepts = new Map();
-		this.buildMap(this.props);
+		this.update(this.props);
 	},
 
 	componentWillReceiveProps(props) {
-		this.buildMap(props);
+		this.update(props);
 	},
 
-	buildMap(props) {
-		let {concepts, physical} = props;
+	update(props) {
+		let {concepts, physical, focusedConceptId} = props;
+
 		if (concepts && !this.mapBuilt) {
 			this.mapBuilt = true;
 			let svg = d3.select(this.getDOMNode())
@@ -82,6 +83,20 @@ let GraphMap = React.createClass({
 			this.layers.forEach(l => this.addPhysicsTo(l));
 			this.startAnimationLoop();
 		}
+
+		this.focusOn(focusedConceptId);
+	},
+
+	focusOn(conceptId) {
+		let focusedConcept = this.concepts.get(conceptId);
+		if (!conceptId || !focusedConcept) return;
+
+		let boundingRect = this.getDOMNode().getBoundingClientRect();
+		this.transitioning = true;
+		this.setNavState({'pos': {
+			'x': boundingRect.width / 2 - focusedConcept.absX,
+			'y': boundingRect.height / 2 - focusedConcept.absY
+		}});
 	},
 
 	createHierarchy(parentEl, concepts) {
@@ -151,8 +166,7 @@ let GraphMap = React.createClass({
 	},
 
 	renderD3() {
-		let pos = this.navState.position;
-		let scale = this.navState.scale;
+		let {pos, scale} = this.navState;
 
 		this.getGroup().attr('transform',
 			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
@@ -234,8 +248,8 @@ let GraphMap = React.createClass({
 	},
 
 	getGroup() {
-		if (this.animated) {
-			this.animated = false;
+		if (this.transitioning) {
+			this.transitioning = false;
 			return this.group.transition();
 		} else {
 			return this.group;

@@ -63,7 +63,7 @@ let MapLayout = React.createClass({
 			<div>
 				<GraphMap concepts={this.state.concepts}
 									physical={!isLocked}
-									selectedConcept={selectedConcept}
+									selectedConceptId={selectedConcept}
 									focusedConceptId={this.state.focusedConceptId}
 									onSelect={this.onSelect}/>
 
@@ -82,12 +82,16 @@ let MapLayout = React.createClass({
 		if (id) {
 			if (id == 'new') ConceptActions.new();
 			else ConceptActions.select(id);
+			this.setState({'focusedConceptId': id});
 		} else ConceptActions.unselect();
 	},
 
 	onSelect(id) {
 		if (id !== undefined) ConceptActions.select(id);
-		else ConceptActions.unselect();
+		else {
+			ConceptActions.unselect();
+			this.setState({'focusedConceptId': null});
+		}
 	},
 
 	onSearchSelect(id) {

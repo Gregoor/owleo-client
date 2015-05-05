@@ -6,10 +6,9 @@ export default {
 	getInitialState() {
 		let x = 0, y = 0;
 		this.navState = {
-			'position': {x: window.innerWidth / 2, y: window.innerHeight / 2},
+			'pos': {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			'panDelta': {x, y},
-			'scale': 1,
-			'focusedPosition': {x, y}
+			'scale': 1
 		};
 		return {'panning': false};
 	},
@@ -29,12 +28,12 @@ export default {
 	},
 
 	onPan(event) {
-		let pos = this.navState.position;
+		let {pos} = this.navState;
 		let prevDelta = this.navState.panDelta;
 		let x = event.deltaX, y = event.deltaY;
 
 		this.setNavState({
-			'position': {
+			'pos': {
 				'x': pos.x + (x - prevDelta.x),
 				'y': pos.y + (y - prevDelta.y)
 			},
@@ -59,7 +58,7 @@ export default {
 		let scale = oldScale - (oldScale * event.deltaY/steps);
 		if (scale === oldScale) { return; }
 
-		let pos = this.navState.position;
+		let {pos} = this.navState;
 		let eventX = event.pageX;
 		let eventY = event.pageY;
 
@@ -69,7 +68,7 @@ export default {
 
 		this.setNavState({
 			'scale': scale,
-			'position': {
+			'pos': {
 				'x': x,
 				'y': y
 			}
