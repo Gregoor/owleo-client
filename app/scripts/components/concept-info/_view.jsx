@@ -13,14 +13,14 @@ let ConceptView = React.createClass({
 		editActions = [
 			(
 				<div className="col-xs-4">
-					<IconButton iconClassName="icon icon-pencil" tooltip="Edit"
-											onClick={this.props.onEdit}/>
+					<IconButton key="edit" iconClassName="icon icon-pencil"
+											tooltip="Edit" onClick={this.props.onEdit}/>
 				</div>
 			),
 			(
 				<div className="col-xs-4">
-					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-											onClick={this.onDelete}/>
+					<IconButton key="delete" iconClassName="icon icon-bin"
+											tooltip="Delete" onClick={this.onDelete}/>
 				</div>
 			)
 		];
@@ -37,12 +37,14 @@ let ConceptView = React.createClass({
 			);
 		}
 
-		let tags = concept.tags.map((tag) => (<span className="tag">{tag}</span>));
+		let tags = concept.tags.map((tag) => {
+			return (<span key={tag} className="tag">{tag}</span>)
+		});
 
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
-				<a href={`#/${req.id}`}>{nameAndContainer(req)}</a>
+				<a key={req.id} href={`#/${req.id}`}>{nameAndContainer(req)}</a>
 			);
 			reqLinks.push(', ');
 		}
@@ -69,7 +71,7 @@ let ConceptView = React.createClass({
 			let paths = parser.pathname.split('/');
 			let partial = `${parser.hostname}/../${paths[paths.length - 1]}`;
 			return (
-				<div className="row middle-xs">
+				<div key={link.url} className="row middle-xs">
 					<div className="col-xs-8">
 						<a className="link" target="_blank" href={link.url}>{partial}</a>
 					</div>

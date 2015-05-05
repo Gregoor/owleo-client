@@ -43,27 +43,17 @@ let MapLayout = React.createClass({
 
 	render() {
 		let conceptInfo;
-		let selectedConcept = this.state.selectedConcept;
+		let {isLocked, selectedConcept} = this.state;
+
 		if (selectedConcept) {
 			conceptInfo = <ConceptInfo concept={selectedConcept}/>;
 		}
-
-		let actions;
-		let {isLocked} = this.state;
-		actions = [
-			(
-				<MapFab title={isLocked ? 'Unlock' : 'Lock'}
-								secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
-								onClick={isLocked ? this.onUnlock : this.onLock}/>
-			),
-			(<MapFab title="Add Concept" icon="plus" onClick={this.onNew}/>)
-		];
 
 		return (
 			<div>
 				<GraphMap concepts={this.state.concepts}
 									physical={!isLocked}
-									selectedConceptId={selectedConcept}
+									selectedConceptId={selectedConcept ? selectedConcept.id : ''}
 									focusedConceptId={this.state.focusedConceptId}
 									onSelect={this.onSelect}/>
 
@@ -72,7 +62,11 @@ let MapLayout = React.createClass({
 					{conceptInfo}
 				</div>
 				<div className="map-actions">
-					{actions}
+					<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
+									secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
+									onClick={isLocked ? this.onUnlock : this.onLock}/>
+					<MapFab key="add" title="Add Concept" icon="plus"
+									onClick={this.onNew}/>
 				</div>
 			</div>);
 	},

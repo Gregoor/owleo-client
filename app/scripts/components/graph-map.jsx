@@ -16,7 +16,7 @@ let GraphMap = React.createClass({
 
 	propTypes: {
 		concepts: React.PropTypes.object,
-		selectedConceptId: React.PropTypes.object,
+		selectedConceptId: React.PropTypes.string,
 		focusedConceptId: React.PropTypes.string,
 		onSelect: React.PropTypes.func,
 		physical: React.PropTypes.bool
@@ -36,39 +36,7 @@ let GraphMap = React.createClass({
 	update(props) {
 		let {concepts, physical, focusedConceptId} = props;
 
-		if (concepts && !this.mapBuilt) {
-			this.mapBuilt = true;
-			let svg = d3.select(this.getDOMNode())
-				.attr({'width': WIDTH, 'height': HEIGHT});
-
-			this.group = svg.append('g')
-				.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
-
-			this.animated = false;
-
-			this.concepts = concepts;
-
-			let containers = this.containers = new Map();
-			for (let [id, concept] of concepts) {
-				let {container} = concept;
-				if (container && !concept.color) concept.color = container.color;
-				if (!containers.has(container)) containers.set(container, [concept]);
-				else containers.get(container).push(concept);
-			}
-
-			let links = [];
-			for (let [id, c] of concepts) for (let req of c.reqs) {
-				links.push({'from': concepts.get(req), 'to': c});
-			}
-
-			this.links = this.group.selectAll('.link')
-				.data(links)
-				.enter().append('line')
-				.attr('class', 'link');
-
-			this.createHierarchy(this.group, containers.get(null));
-			this.renderLinks();
-		}
+		this.buildMap(concepts);
 
 		if (this.physicsInited) {
 			if (physical) {
@@ -85,6 +53,41 @@ let GraphMap = React.createClass({
 		}
 
 		this.focusOn(focusedConceptId);
+	},
+
+	buildMap(concepts) {
+		if (!concepts || this.mapBuilt) return;
+		this.mapBuilt = true;
+		let svg = d3.select(this.getDOMNode())
+			.attr({'width': WIDTH, 'height': HEIGHT});
+
+		this.group = svg.append('g')
+			.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
+
+		this.animated = false;
+
+		this.concepts = concepts;
+
+		let containers = this.containers = new Map();
+		for (let [id, concept] of concepts) {
+			let {container} = concept;
+			if (container && !concept.color) concept.color = container.color;
+			if (!containers.has(container)) containers.set(container, [concept]);
+			else containers.get(container).push(concept);
+		}
+
+		let links = [];
+		for (let [id, c] of concepts) for (let req of c.reqs) {
+			links.push({'from': concepts.get(req), 'to': c});
+		}
+
+		this.links = this.group.selectAll('.link')
+			.data(links)
+			.enter().append('line')
+			.attr('class', 'link');
+
+		this.createHierarchy(this.group, containers.get(null));
+		this.renderLinks();
 	},
 
 	focusOn(conceptId) {
