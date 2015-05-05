@@ -76,9 +76,9 @@ let MapLayout = React.createClass({
 		if (id) {
 			if (id == 'new') ConceptActions.new();
 			else ConceptActions.select(id);
-			if (!e || e.type != 'push') {
-				this.setState({'focusedConceptId': id});
-			}
+
+			if (!e || e.type != 'push') this.setState({'focusedConceptId': id});
+
 		} else ConceptActions.unselect();
 	},
 
