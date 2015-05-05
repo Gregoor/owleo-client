@@ -71,12 +71,14 @@ let MapLayout = React.createClass({
 			</div>);
 	},
 
-	onRoute() {
+	onRoute(e) {
 		let id = this.getParams().conceptId;
 		if (id) {
 			if (id == 'new') ConceptActions.new();
 			else ConceptActions.select(id);
-			this.setState({'focusedConceptId': id});
+			if (!e || e.type != 'push') {
+				this.setState({'focusedConceptId': id});
+			}
 		} else ConceptActions.unselect();
 	},
 
