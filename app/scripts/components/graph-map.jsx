@@ -215,6 +215,7 @@ let GraphMap = React.createClass({
 	},
 
 	startAnimationLoop() {
+		if (this.animated) return;
 		this.animated = true;
 		this.animationLoop();
 	},
@@ -228,7 +229,7 @@ let GraphMap = React.createClass({
 		window.requestAnimationFrame(() => {
 			this.layers.forEach(l => this.renderLayer(l));
 			this.renderLinks();
-			this.startAnimationLoop();
+			this.animationLoop();
 		});
 	},
 
