@@ -104,21 +104,25 @@ let ConceptForm = React.createClass({
 					</div>
 						*/}
 					<div className="row">
+						<div className="col-xs-4">
+							<div className="colorbox" style={{
+								'background-color': this.state.color || concept.color
+							}}></div>
+						</div>
 						<div className="col-xs-8">
 							<ColorPicker floatingLabelText="Concept color"
 										 defaultValue={concept.color}
 										 onChange={this.onChangeColor}
 										 saturationHeight={50}
 										 saturationWidth={100}/>
-							</div>
-						<div className="col-xs-4">
-							<div className="colorbox" style={{'background-color': concept.color}}></div>
 						</div>
 						<div className="col-xs-12">
 							<h2>Contained by</h2>
 							<Select name="container"
 											placeholder="Container"
-											defaultValue={concept.container ? this.nameObjToOption(concept.container) : undefined}
+											defaultValue={concept.container ?
+												this.nameObjToOption(concept.container) :
+												undefined}
 											autoload={false}
 											asyncOptions={this.onGetOptionsOf('Concept')}/>
 						</div>
@@ -128,7 +132,9 @@ let ConceptForm = React.createClass({
 							<h2>Requirements</h2>
 							<Select name="reqs"
 											placeholder="Requirements"
-							        defaultValue={concept.reqs ? concept.reqs.map(this.nameObjToOption) : undefined}
+							        defaultValue={concept.reqs ?
+							        	concept.reqs.map(this.nameObjToOption) :
+							        	undefined}
 							        multi={true}
 										  autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Concept')}/>
@@ -213,6 +219,7 @@ let ConceptForm = React.createClass({
 	},
 
 	onChangeColor(color) {
+		this.setState({'color': color});
 		this.formData.color = color;
 	}
 

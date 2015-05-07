@@ -86,11 +86,12 @@ let ConceptView = React.createClass({
 			<div>
 				<div className="row">
 					<div className="col-xs-8">
-						<h1 title={concept.name}>{concept.name}</h1>
+						<h1 title={concept.name} style={{
+								'borderLeft': `5px solid ${concept.color}`
+							}}>
+							{concept.name}
+						</h1>
 					</div>
-					{/*<div className="col-xs-2">
-						<div className="colorbox" style={{'background-color': concept.color}}></div>
-					</div>*/}
 					<div className="col-xs-4">
 						<div className="row end-xs">
 							<div className="col-xs-4">
