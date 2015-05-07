@@ -58,7 +58,8 @@ let MapLayout = React.createClass({
 									onSelect={this.onSelect}/>
 
 				<div className="info-container">
-					<Search onSelect={this.onSearchSelect}/>
+					<Search onSelect={this.onSearchSelect}
+									onFocus={this.onSelect.bind(this, undefined)}/>
 					{conceptInfo}
 				</div>
 				<div className="map-actions">

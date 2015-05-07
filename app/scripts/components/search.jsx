@@ -11,7 +11,7 @@ let Search = React.createClass({
 		return (
 			<Select placeholder="Search" autoload={false}
 			        asyncOptions={this.onLoadOptions}
-			        onChange={this.onChange}/>
+			        onChange={this.onChange} {...this.props}/>
 		);
 	},
 
