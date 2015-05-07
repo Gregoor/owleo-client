@@ -80,6 +80,22 @@ let GraphMap = React.createClass({
 		let svg = d3.select(this.getDOMNode())
 			.attr({'width': WIDTH, 'height': HEIGHT});
 
+		let glowFilter = svg.append('defs')
+			.append('filter').attr('id', 'white-glow');
+
+		glowFilter.append('feColorMatrix').attr({'type': 'matrix', 'values': `
+			0 0 0 0 1
+			0 0 0 0 1
+			0 0 0 0 1
+			.5 .5 .5 .5 0
+		`});
+
+		glowFilter.append('feGaussianBlur')
+			.attr({'stdDeviation': 2.5, 'result': 'boloredBlur'});
+		let blurMerge = glowFilter.append('feMerge');
+		blurMerge.append('feMergeNode').attr('in', 'colordBlur');
+		blurMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
 		this.group = svg.append('g')
 			.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
 
@@ -104,7 +120,7 @@ let GraphMap = React.createClass({
 			.data(links)
 			.enter().append('line')
 			.attr('class', 'link')
-			.each(function(d) {
+			.each(function (d) {
 				initListOrPush(reqLinks, d.from.id, this);
 				initListOrPush(reqLinks, d.to.id, this);
 			});
@@ -119,10 +135,12 @@ let GraphMap = React.createClass({
 
 		let boundingRect = this.getDOMNode().getBoundingClientRect();
 		this.transitioning = true;
-		this.setNavState({'pos': {
-			'x': boundingRect.width / 2 - focusedConcept.absX,
-			'y': boundingRect.height / 2 - focusedConcept.absY
-		}});
+		this.setNavState({
+			'pos': {
+				'x': boundingRect.width / 2 - focusedConcept.absX,
+				'y': boundingRect.height / 2 - focusedConcept.absY
+			}
+		});
 	},
 
 	createHierarchy(parentEl, concepts) {
@@ -151,13 +169,20 @@ let GraphMap = React.createClass({
 		let el = parentEl.selectAll('.node').data(concepts).enter()
 			.append('g').attr('class', 'node');
 
-		let onClick = (d => {
-			if (!this.state.wasPanning) this.props.onSelect(d.id);
-		}).bind(this);
+		let self = this;
+		let onClick = function(d) {
+			if (!self.state.wasPanning) self.props.onSelect(d.id);
+		};
 		let circle = el.append('circle')
 			.style({
 				'stroke': d => d.color || (d.color = container.color) || 'white',
 				'fill': 'rgba(0, 0, 0, .05)'
+			})
+			.on('mouseover', function() {
+				d3.select(this).attr('filter', 'url(#white-glow)');
+			})
+			.on('mouseout', function() {
+				d3.select(this).attr('filter', '');
 			})
 			.on('click', onClick);
 
@@ -168,7 +193,9 @@ let GraphMap = React.createClass({
 			.on('click', onClick)
 			.attr({
 				'class': 'label',
-				'x': function(d) { return -this.getComputedTextLength() / 2 }
+				'x': function (d) {
+					return -this.getComputedTextLength() / 2
+				}
 			});
 
 		let layer = {container, concepts, links, el, circle, label};
