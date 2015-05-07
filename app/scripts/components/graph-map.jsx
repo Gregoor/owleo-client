@@ -6,10 +6,6 @@ import Victor from 'victor';
 import MapNavigationMixin from './mixins/MapNavigationMixin';
 import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
-const WIDTH = 500, HEIGHT = 500;
-const HF_WIDTH = WIDTH / 2, HF_HEIGHT = HEIGHT / 2;
-const BASE_RAD = 10;
-
 const SELECTED_CLASS = 'selected';
 
 let sqr = n => Math.pow(n, 2);
@@ -19,6 +15,10 @@ let initListOrPush = (map, key, val) => {
 };
 
 let GraphMap = React.createClass({
+
+	WIDTH: 500,
+	HEIGHT: 500,
+	BASE_RAD: 10,
 
 	propTypes: {
 		concepts: React.PropTypes.object,
@@ -75,6 +75,7 @@ let GraphMap = React.createClass({
 
 	buildMap(concepts) {
 		if (!concepts || this.mapBuilt) return;
+		const {WIDTH, HEIGHT} = this;
 		this.mapBuilt = true;
 		let svg = d3.select(this.getDOMNode())
 			.attr({'width': WIDTH, 'height': HEIGHT});
@@ -198,15 +199,19 @@ let GraphMap = React.createClass({
 	},
 
 	renderLayer(layer) {
+		const HALF_WIDTH = this.WIDTH / 2;
+		const HALF_HEIGHT = this.HEIGHT / 2;
+		const {BASE_RAD} = this;
 		let {el, circle, label, container} = layer;
+
 		el.attr('transform', d => `translate(
-            ${d.x - HF_WIDTH},
-            ${d.y - HF_HEIGHT})
+            ${d.x - HALF_WIDTH},
+            ${d.y - HALF_HEIGHT})
         `)
 			.each((d) => {
 				_.assign(d, {
-					'absX': container.absX - HF_WIDTH + d.x,
-					'absY': container.absY - HF_HEIGHT + d.y
+					'absX': container.absX - HALF_WIDTH + d.x,
+					'absY': container.absY - HALF_HEIGHT + d.y
 				});
 			});
 
@@ -217,7 +222,7 @@ let GraphMap = React.createClass({
 						if (!r) r = BASE_RAD;
 						return Math.max(
 							maxR,
-							r + Math.sqrt(sqr(x - HF_WIDTH) + sqr(y - HF_HEIGHT))
+							r + Math.sqrt(sqr(x - HALF_WIDTH) + sqr(y - HALF_HEIGHT))
 						);
 					}, 0)
 				)
