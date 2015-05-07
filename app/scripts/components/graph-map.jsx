@@ -84,10 +84,10 @@ let GraphMap = React.createClass({
 			.append('filter').attr('id', 'white-glow');
 
 		glowFilter.append('feColorMatrix').attr({'type': 'matrix', 'values': `
-			0 0 0 0 1
-			0 0 0 0 1
-			0 0 0 0 1
-			.5 .5 .5 .5 0
+			0 0 0 0 .8
+			0 0 0 0 .8
+			0 0 0 0 .8
+			.3 .3 .3 .3 0
 		`});
 
 		glowFilter.append('feGaussianBlur')
@@ -178,11 +178,19 @@ let GraphMap = React.createClass({
 				'stroke': d => d.color || (d.color = container.color) || 'white',
 				'fill': 'rgba(0, 0, 0, .05)'
 			})
-			.on('mouseover', function() {
+			.on('mouseover', function(d) {
+				let linkNodes = self.reqLinks.get(d.id);
+				if (linkNodes) linkNodes.forEach(el => {
+					d3.select(el).attr('filter', 'url(#white-glow)');
+				});
 				d3.select(this).attr('filter', 'url(#white-glow)');
 			})
-			.on('mouseout', function() {
-				d3.select(this).attr('filter', '');
+			.on('mouseout', function(d) {
+				let linkNodes = self.reqLinks.get(d.id);
+				if (linkNodes) linkNodes.forEach(el => {
+					d3.select(el).attr('filter', null);
+				});
+				d3.select(this).attr('filter', null);
 			})
 			.on('click', onClick);
 
