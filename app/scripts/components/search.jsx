@@ -1,9 +1,9 @@
-let React = require('react');
+import React from 'react';
 
-let searchAPI = require('../api/search-api');
-let Select = require('./select');
+import searchAPI from '../api/search-api';
+import Select from './select';
 
-let nameAndContainer = require('./helpers/nameAndContainer');
+import nameAndContainer from './helpers/nameAndContainer';
 
 let Search = React.createClass({
 
@@ -17,15 +17,28 @@ let Search = React.createClass({
 
 	onLoadOptions(query, callback) {
 		searchAPI({'q': query, 'for': ['Concept']}).then(result => {
-			let options = result.map(concept => {
-				return {'value': concept.id, 'label': nameAndContainer(concept)};
+			let options = result.map(data => {
+				let value, label;
+
+				switch (data.type) {
+					case 'Concept':
+						value = data.id;
+						label = nameAndContainer(data);
+						break;
+					case 'Tag':
+						value = data.name;
+						label = `tagged: ${data.name}`;
+						break;
+				}
+
+				return {value, label, 'type': data.type};
 			});
 			callback(null, {options, 'complete': options.length < 10});
 		});
 	},
 
-	onChange(id) {
-		this.props.onSelect(id || undefined);
+	onChange(value, selected) {
+		this.props.onSelect(selected[0]);
 	}
 
 });

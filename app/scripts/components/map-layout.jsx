@@ -1,15 +1,16 @@
-let React = require('react');
-let Router = require('react-router');
-let Reflux = require('reflux');
+import React from 'react';
+import Router from 'react-router';
+import Reflux from 'reflux';
 
-let ConceptActions = require('../actions/concept-actions');
-let conceptStore = require('../stores/concept-store');
-let userStore = require('../stores/user-store');
+import searchAPI from '../api/search-api';
+import ConceptActions from '../actions/concept-actions';
+import conceptStore from '../stores/concept-store';
+import userStore from '../stores/user-store';
 
-let GraphMap = require('./graph-map');
-let Search = require('./search');
-let ConceptInfo = require('./concept-info/concept-info');
-let MapFab = require('./map-fab');
+import GraphMap from './graph-map';
+import Search from './search';
+import ConceptInfo from './concept-info/concept-info';
+import MapFab from './map-fab';
 
 let MapLayout = React.createClass({
 
@@ -21,7 +22,7 @@ let MapLayout = React.createClass({
 	],
 
 	getInitialState() {
-		return {'isLocked': true};
+		return {'isLocked': true, 'filter': {}};
 	},
 
 	componentWillMount() {
@@ -43,7 +44,8 @@ let MapLayout = React.createClass({
 
 	render() {
 		let conceptInfo;
-		let {isLocked, selectedConcept} = this.state;
+		let {concepts, focusedConceptId, filter,
+			isLocked, selectedConcept} = this.state;
 
 		if (selectedConcept) {
 			conceptInfo = <ConceptInfo concept={selectedConcept}/>;
@@ -51,10 +53,11 @@ let MapLayout = React.createClass({
 
 		return (
 			<div>
-				<GraphMap concepts={this.state.concepts}
+				<GraphMap concepts={concepts}
 									physical={!isLocked}
 									selectedConceptId={selectedConcept ? selectedConcept.id : ''}
-									focusedConceptId={this.state.focusedConceptId}
+									focusedConceptId={focusedConceptId}
+									filter={filter}
 									onSelect={this.onSelect}/>
 
 				<div className="info-container">
@@ -91,9 +94,20 @@ let MapLayout = React.createClass({
 		}
 	},
 
-	onSearchSelect(id) {
-		this.onSelect(id);
-		this.setState({'focusedConceptId': id});
+	onSearchSelect(selected) {
+		switch (selected.type) {
+			case 'Concept':
+				let id = selected.value;
+				this.onSelect(id);
+				this.setState({'focusedConceptId': id});
+				break;
+			case 'Tag':
+				let tags = [selected.value];
+				searchAPI({'for': ['Concept'], tags}).then(result => {
+					this.setState({'filter': {'tags': result}});
+				});
+				break
+		}
 	},
 
 	onUnlock() {

@@ -42,7 +42,8 @@ let GraphMap = React.createClass({
 	},
 
 	update(props) {
-		let {concepts, physical, selectedConceptId, focusedConceptId} = props;
+		let {concepts, physical, selectedConceptId, focusedConceptId,
+			filter} = props;
 
 		this.buildMap(concepts);
 
