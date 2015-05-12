@@ -24,8 +24,12 @@
 				stroke-width: 4px;
 
 				&.selected {
-					stroke: #bdc3c7;
-					stroke-width: 2px;
+					fill: hsla(0, 100%, 100%, 0.05) !important;
+					stroke-dasharray: 8, 4;
+				}
+
+				&.highlighted {
+					fill: hsla(0, 100%, 100%, 0.05) !important;
 				}
 			}
 		}
@@ -33,10 +37,18 @@
 		polygon.link {
 			fill: #bababa;
 			fill-opacity: .2;
+			stroke: white;
+			stroke-opacity: .4;
+			stroke-width: 0.5px;
 
 			&.selected {
-				stroke: white;
 				stroke-opacity: 1;
+				fill-opacity: .5;
+			}
+
+			&.highlighted {
+				stroke-opacity: 1;
+				fill-opacity: .5;
 			}
 		}
 

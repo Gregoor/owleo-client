@@ -7,6 +7,8 @@ import MapNavigationMixin from './mixins/MapNavigationMixin';
 import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
 const SELECTED_CLASS = 'selected';
+const HIGHLIGHT_CLASS = 'highlighted';
+
 const LINK_WIDTH = 1;
 const ARROW_WIDTH = 5;
 const ARROW_HEIGHT = 10;
@@ -35,7 +37,8 @@ let GraphMap = React.createClass({
 
 	componentDidMount() {
 		this.concepts = new Map();
-		this.layers = [];
+		this.conceptNodes = new Map();
+		this.layers = new Map();
 		this.reqLinks = new Map();
 		this.update(this.props);
 	},
@@ -58,20 +61,23 @@ let GraphMap = React.createClass({
 				this.stopPhysics();
 				this.stopAnimationLoop();
 			}
-		} else if (physical && this.layers) {
+		} else if (physical) {
 			this.physicsInited = true;
-			this.layers.forEach(l => this.addPhysicsTo(l));
+			for (let layer of this.layers.values()) this.addPhysicsTo(layer);
 			this.startAnimationLoop();
 		}
 
-		if (selectedConceptId && this.links &&
-				selectedConceptId != this.props.selectedConceptId) {
-			this.group.selectAll(`.link.${SELECTED_CLASS}`)
+		if (this.links && selectedConceptId != this.state.selectedConceptId) {
+			this.setState({selectedConceptId});
+			this.group.selectAll(`.${SELECTED_CLASS}`)
 				.classed(SELECTED_CLASS, false);
-			let linkNodes = this.reqLinks.get(selectedConceptId);
-			if (linkNodes) linkNodes.forEach(el => {
-				el.classList.add(SELECTED_CLASS);
-			});
+			if (selectedConceptId) {
+				this.conceptNodes.get(selectedConceptId).classList.add(SELECTED_CLASS);
+				let linkNodes = this.reqLinks.get(selectedConceptId);
+				if (linkNodes) linkNodes.forEach(el => {
+					el.classList.add(SELECTED_CLASS);
+				});
+			}
 		}
 
 		this.focusOn(focusedConceptId);
@@ -83,22 +89,6 @@ let GraphMap = React.createClass({
 		this.mapBuilt = true;
 		let svg = d3.select(this.getDOMNode())
 			.attr({'width': WIDTH, 'height': HEIGHT});
-
-		let glowFilter = svg.append('defs')
-			.append('filter').attr('id', 'white-glow');
-
-		glowFilter.append('feColorMatrix').attr({'type': 'matrix', 'values': `
-			0 0 0 0 .8
-			0 0 0 0 .8
-			0 0 0 0 .8
-			.3 .3 .3 .3 0
-		`});
-
-		glowFilter.append('feGaussianBlur')
-			.attr({'stdDeviation': 2.5, 'result': 'boloredBlur'});
-		let blurMerge = glowFilter.append('feMerge');
-		blurMerge.append('feMergeNode').attr('in', 'colordBlur');
-		blurMerge.append('feMergeNode').attr('in', 'SourceGraphic');
 
 		this.group = svg.append('g')
 			.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
@@ -182,19 +172,22 @@ let GraphMap = React.createClass({
 				'stroke': d => d.color || (d.color = container.color) || 'white',
 				'fill': 'rgba(0, 0, 0, .05)'
 			})
+			.each(function(d) {
+				self.conceptNodes.set(d.id, this);
+			})
 			.on('mouseover', function(d) {
 				let linkNodes = self.reqLinks.get(d.id);
 				if (linkNodes) linkNodes.forEach(el => {
-					d3.select(el).attr('filter', 'url(#white-glow)');
+					d3.select(el).classed(HIGHLIGHT_CLASS, true);
 				});
-				d3.select(this).attr('filter', 'url(#white-glow)');
+				d3.select(this).classed(HIGHLIGHT_CLASS, true);
 			})
 			.on('mouseout', function(d) {
 				let linkNodes = self.reqLinks.get(d.id);
 				if (linkNodes) linkNodes.forEach(el => {
-					d3.select(el).attr('filter', null);
+					d3.select(el).classed(HIGHLIGHT_CLASS, false);
 				});
-				d3.select(this).attr('filter', null);
+				d3.select(this).classed(HIGHLIGHT_CLASS, false);
 			})
 			.on('click', onClick);
 
@@ -211,7 +204,7 @@ let GraphMap = React.createClass({
 			});
 
 		let layer = {container, concepts, links, el, circle, label};
-		this.layers.push(layer);
+		this.layers.set(container.id, layer);
 		this.renderLayer(layer);
 
 		return el;
@@ -322,7 +315,7 @@ let GraphMap = React.createClass({
 	animationLoop() {
 		if (!this.animated) return;
 		window.requestAnimationFrame(() => {
-			this.layers.forEach(l => this.renderLayer(l));
+			for (let layer of this.layers.values()) this.renderLayer(layer);
 			this.renderLinks();
 			this.animationLoop();
 		});
