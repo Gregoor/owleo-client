@@ -7,6 +7,9 @@ import MapNavigationMixin from './mixins/MapNavigationMixin';
 import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
 const SELECTED_CLASS = 'selected';
+const LINK_WIDTH = 1;
+const ARROW_WIDTH = 3;
+const ARROW_HEIGHT = 10;
 
 let sqr = n => Math.pow(n, 2);
 let initListOrPush = (map, key, val) => {
@@ -119,7 +122,7 @@ let GraphMap = React.createClass({
 		let reqLinks = this.reqLinks;
 		this.links = this.group.selectAll('.link')
 			.data(links)
-			.enter().append('line')
+			.enter().append('polygon')
 			.attr('class', 'link')
 			.each(function (d) {
 				initListOrPush(reqLinks, d.from.id, this);
@@ -274,23 +277,36 @@ let GraphMap = React.createClass({
 				let fromV = new Victor(d.from.absX, d.from.absY);
 				let toV = new Victor(d.to.absX, d.to.absY);
 
-				let betweenV = fromV.clone().subtract(toV).norm();
+				let between = fromV.clone().subtract(toV).norm();
+				let invertBetween = between.clone().norm().invert();
+				let orthBetween = (new Victor(-between.y, between.x)).norm();
 
-				let fromRadV = scale(betweenV, d.from.r);
-				let toRadV = scale(betweenV, d.to.r);
+				let fromRad = scale(between, d.from.r);
+				let toRad = scale(between, d.to.r);
 
-				fromV.subtract(fromRadV);
-				toV.add(toRadV);
+				fromV.subtract(fromRad);
+				toV.add(toRad);
 
-				_.assign(d, {
-					'x1': fromV.x, 'y1': fromV.y,
-					'x2': toV.x, 'y2': toV.y
-				});
+				let arrowTop = toV.clone();
+
+				toV
+					.subtract(scale(invertBetween, ARROW_HEIGHT))
+					.subtract(scale(invertBetween, 4));
+
+				let fromL = fromV.clone().add(scale(orthBetween, LINK_WIDTH));
+				let fromR = fromV.clone().subtract(scale(orthBetween, LINK_WIDTH));
+
+				let toL = toV.clone().add(scale(orthBetween, LINK_WIDTH));
+				let toR = toV.clone().subtract(scale(orthBetween, LINK_WIDTH));
+
+				let arrowL = scale(orthBetween, ARROW_WIDTH).add(toV);
+				let arrowR = scale(orthBetween, -ARROW_WIDTH).add(toV);
+
+				d.points = [fromL, fromR, toR, arrowR, arrowTop, arrowL, toL];
 			})
-			.attr({
-				'x1': d => d.x1, 'y1': d => d.y1,
-				'x2': d => d.x2, 'y2': d => d.y2
-			});
+			.attr('points', d => d.points.reduce((str, v) => {
+				return `${str} ${v.x},${v.y}`;
+			}, ''));
 	},
 
 	startAnimationLoop() {
