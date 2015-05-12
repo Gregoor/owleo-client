@@ -11,7 +11,7 @@ export default {
 		force.on('tick', () => {
 			force
 				.charge(d => -200 + Math.pow(d.r, 2) * -.19)
-				.linkDistance(d => d.source.r + d.target.r + 2 * this.BASE_RAD)
+				.linkDistance(d => d.source.r * 2 + d.target.r * 2)
 				.start();
 		});
 	},

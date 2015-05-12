@@ -8,7 +8,7 @@ import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
 const SELECTED_CLASS = 'selected';
 const LINK_WIDTH = 1;
-const ARROW_WIDTH = 3;
+const ARROW_WIDTH = 5;
 const ARROW_HEIGHT = 10;
 
 let sqr = n => Math.pow(n, 2);
