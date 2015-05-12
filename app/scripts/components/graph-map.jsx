@@ -147,6 +147,7 @@ let GraphMap = React.createClass({
 	},
 
 	createNodesFor(parentEl, concepts) {
+		let self = this;
 		let container = this.concepts.get(concepts[0].container) ||
 			{'absX': 0, 'absY': 0};
 
@@ -161,9 +162,11 @@ let GraphMap = React.createClass({
 		}
 
 		let el = parentEl.selectAll('.node').data(concepts).enter()
-			.append('g').attr('class', 'node');
+			.append('g').attr('class', 'node')
+			.each(function(d) {
+				self.conceptNodes.set(d.id, this);
+			});
 
-		let self = this;
 		let onClick = function(d) {
 			if (!self.state.wasPanning) self.props.onSelect(d.id);
 		};
@@ -171,9 +174,6 @@ let GraphMap = React.createClass({
 			.style({
 				'stroke': d => d.color || (d.color = container.color) || 'white',
 				'fill': 'rgba(0, 0, 0, .05)'
-			})
-			.each(function(d) {
-				self.conceptNodes.set(d.id, this);
 			})
 			.on('mouseover', function(d) {
 				let linkNodes = self.reqLinks.get(d.id);
