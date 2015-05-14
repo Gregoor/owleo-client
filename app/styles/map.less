@@ -49,7 +49,6 @@
 				> .label {
 					font-weight: 900;
 					font-size: medium;
-					text-decoration: underline
 				}
 			}
 		}
@@ -61,14 +60,10 @@
 			stroke-opacity: .4;
 			stroke-width: 0.5px;
 
-			&.selected {
+			&.selected, &.highlighted {
 				stroke-opacity: 1;
 				fill-opacity: .5;
-			}
-
-			&.highlighted {
-				stroke-opacity: 1;
-				fill-opacity: .5;
+				stroke-width: 1px;
 			}
 		}
 	}
