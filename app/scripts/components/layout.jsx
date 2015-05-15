@@ -1,17 +1,16 @@
-var React = require('react');
-var Router = require('react-router');
-var RouteHandler = Router.RouteHandler;
+import React from 'react';
+import Router from 'react-router';
 
-var Layout = React.createClass({
+let {RouteHandler} = Router;
 
+let Layout = React.createClass({
   render: function() {
-
     return (
       <div className="App">
-        <RouteHandler />
+        <RouteHandler/>
       </div>
     );
   }
 });
 
-module.exports = Layout;
+export default Layout;

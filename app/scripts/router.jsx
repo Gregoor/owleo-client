@@ -1,20 +1,23 @@
-let React = require('react');
-let Router = require('react-router');
-let Route = Router.Route;
-let DefaultRoute = Router.DefaultRoute;
+import React from 'react';
+import Router from 'react-router';
 
-let Layout = require('./components/layout');
-let MapLayout = require('./components/map-layout');
+import Layout from './components/layout';
+import MapLayout from './components/map-layout';
+import AuthDialog from './components/auth-dialog';
+
+let {Route, DefaultRoute} = Router;
 
 let routes = (
 	<Route handler={Layout}>
-		<Route path=":conceptId" handler={MapLayout}/>
-		<DefaultRoute handler={MapLayout} />
+		<Route path="/" handler={MapLayout}>
+			<Route path="login" handler={AuthDialog}/>
+			<Route path=":conceptId"/>
+		</Route>
 	</Route>
 );
 
 exports.start = () => {
-  Router.run(routes, (Handler) => {
-		React.render(<Handler />, document.getElementById('content'));
+  Router.run(routes, Handler => {
+		React.render(<Handler/>, document.getElementById('content'));
 	});
 };

@@ -11,6 +11,9 @@ import GraphMap from './graph-map';
 import Search from './search';
 import ConceptInfo from './concept-info/concept-info';
 import MapFab from './map-fab';
+import UserPanel from './user-panel';
+
+let {RouteHandler} = Router;
 
 let MapLayout = React.createClass({
 
@@ -22,20 +25,20 @@ let MapLayout = React.createClass({
 	],
 
 	getInitialState() {
-		return {'isLocked': true, 'filter': {}};
+		return {'isLocked': true, 'filter': {}, 'user': {}};
 	},
 
 	componentWillMount() {
 		this.onRoute();
 		Router.HashLocation.addChangeListener(this.onRoute);
-		this.listenTo(conceptStore, (concepts) => {
+		this.listenTo(conceptStore, concepts => {
 			let path = '/';
 			let selectedConcept = concepts.selected;
 			if (selectedConcept) {
 				if (selectedConcept.isNew) path += 'new';
 				else path += selectedConcept.id;
 			}
-			this.transitionTo(path);
+			//this.transitionTo(path);
 			this.setState({selectedConcept, 'concepts': concepts.all});
 		});
 
@@ -45,7 +48,7 @@ let MapLayout = React.createClass({
 	render() {
 		let conceptInfo;
 		let {concepts, focusedConceptId, filter,
-			isLocked, selectedConcept} = this.state;
+			isLocked, selectedConcept, user} = this.state;
 
 		if (selectedConcept) {
 			conceptInfo = <ConceptInfo concept={selectedConcept}/>;
@@ -53,6 +56,7 @@ let MapLayout = React.createClass({
 
 		return (
 			<div>
+				<RouteHandler/>
 				<GraphMap concepts={concepts}
 									physical={!isLocked}
 									selectedConceptId={selectedConcept ? selectedConcept.id : ''}
@@ -65,6 +69,7 @@ let MapLayout = React.createClass({
 									onFocus={this.onSelect.bind(this, undefined)}/>
 					{conceptInfo}
 				</div>
+				<UserPanel className="uesr" user={user}/>
 				<div className="map-actions">
 					<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
 									secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
@@ -76,6 +81,7 @@ let MapLayout = React.createClass({
 	},
 
 	onRoute(e) {
+		return;
 		let id = this.getParams().conceptId;
 		if (id) {
 			if (id == 'new') ConceptActions.new();
