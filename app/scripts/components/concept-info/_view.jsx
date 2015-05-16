@@ -1,16 +1,16 @@
-let React = require('react');
-let IconButton = require('material-ui').IconButton;
+import React from 'react';
+import {IconButton} from 'material-ui';
 
-let ConceptActions = require('../../actions/concept-actions');
-let nameAndContainer = require('../helpers/nameAndContainer');
+import ConceptActions from '../../actions/concept-actions';
+import nameAndContainer from '../helpers/nameAndContainer';
 
 let ConceptView = React.createClass({
 
 	render() {
-		let concept = this.props.concept;
+		let {concept, editMode} = this.props;
 
 		let editActions;
-		editActions = [
+		if (editMode) editActions = [
 			(
 				<div className="col-xs-4">
 					<IconButton key="edit" iconClassName="icon icon-pencil"
@@ -94,10 +94,6 @@ let ConceptView = React.createClass({
 					</div>
 					<div className="col-xs-4">
 						<div className="row end-xs">
-							<div className="col-xs-4">
-								<IconButton iconClassName="icon icon-eye"
-								            tooltip="Show in map"/>
-							</div>
 							{editActions}
 						</div>
 					</div>

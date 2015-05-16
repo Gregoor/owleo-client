@@ -51,8 +51,18 @@ let MapLayout = React.createClass({
 			isLocked, selectedConcept, user} = this.state;
 
 		if (selectedConcept) {
-			conceptInfo = <ConceptInfo concept={selectedConcept}/>;
+			conceptInfo = <ConceptInfo concept={selectedConcept}
+																 editMode={user.admin}/>;
 		}
+
+		let actionsHTML;
+		if (user.admin) actionsHTML = [
+			<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
+							secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
+							onClick={isLocked ? this.onUnlock : this.onLock}/>,
+			<MapFab key="add" title="Add Concept" icon="plus"
+							onClick={this.onNew}/>
+		];
 
 		return (
 			<div>
@@ -71,11 +81,7 @@ let MapLayout = React.createClass({
 				</div>
 				<UserPanel className="uesr" user={user} onLogout={this.onLogout}/>
 				<div className="map-actions">
-					<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
-									secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
-									onClick={isLocked ? this.onUnlock : this.onLock}/>
-					<MapFab key="add" title="Add Concept" icon="plus"
-									onClick={this.onNew}/>
+					{actionsHTML}
 				</div>
 			</div>);
 	},
