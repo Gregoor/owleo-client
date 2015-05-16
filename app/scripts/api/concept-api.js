@@ -21,21 +21,27 @@ export default {
 	},
 
 	create(concept) {
-		return promiseWrap(request.post(endpoint, {concept}));
+		return promiseWrap(
+			request.post(endpoint, {concept}).withCredentials()
+		);
 	},
 
 	update(id, concept) {
-		return promiseWrap(request.post(resource(id), {concept}));
+		return promiseWrap(
+			request.post(resource(id), {concept}).withCredentials()
+		);
 	},
 
 	delete(id) {
-		return promiseWrap(request.del(resource(id)));
+		return promiseWrap(
+			request.del(resource(id)).withCredentials()
+		);
 	},
 
 	reposition(concepts) {
 		return promiseWrap(request.post(`${endpoint}/position`, {
 			'concepts': concepts.map(c => _.pick(c, 'id', 'x', 'y', 'r'))
-		}));
+		}).withCredentials());
 	}
 
 };
