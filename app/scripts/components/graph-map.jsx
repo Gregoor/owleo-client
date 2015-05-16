@@ -72,11 +72,14 @@ let GraphMap = React.createClass({
 			this.group.selectAll(`.${SELECTED_CLASS}`)
 				.classed(SELECTED_CLASS, false);
 			if (selectedConceptId) {
-				this.conceptNodes.get(selectedConceptId).classList.add(SELECTED_CLASS);
-				let linkNodes = this.reqLinks.get(selectedConceptId);
-				if (linkNodes) linkNodes.forEach(el => {
-					el.classList.add(SELECTED_CLASS);
-				});
+				let conceptNode = this.conceptNodes.get(selectedConceptId);
+				if (conceptNode) {
+					conceptNode.classList.add(SELECTED_CLASS);
+					let linkNodes = this.reqLinks.get(selectedConceptId);
+					if (linkNodes) linkNodes.forEach(el => {
+						el.classList.add(SELECTED_CLASS);
+					});
+				}
 			}
 		}
 
