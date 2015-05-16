@@ -32,13 +32,15 @@ let MapLayout = React.createClass({
 		this.onRoute();
 		Router.HashLocation.addChangeListener(this.onRoute);
 		this.listenTo(conceptStore, concepts => {
-			let path = '/';
 			let selectedConcept = concepts.selected;
-			if (selectedConcept) {
-				if (selectedConcept.isNew) path += 'new';
-				else path += selectedConcept.id;
+			if (this.getPath() != '/login') {
+				let path = '/';
+				if (selectedConcept) {
+					if (selectedConcept.isNew) path += 'new';
+					else path += selectedConcept.id;
+				}
+				this.transitionTo(path);
 			}
-			//this.transitionTo(path);
 			this.setState({selectedConcept, 'concepts': concepts.all});
 		});
 
@@ -87,7 +89,6 @@ let MapLayout = React.createClass({
 	},
 
 	onRoute(e) {
-		return;
 		let id = this.getParams().conceptId;
 		if (id) {
 			if (id == 'new') ConceptActions.new();
