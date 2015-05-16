@@ -1,12 +1,15 @@
 import React from 'react';
 import {Toolbar, ToolbarGroup, RaisedButton} from 'material-ui';
 
+import userStore from '../stores/user-store';
+
 let UserPanel = React.createClass({
 
 	propTypes: {
 		'user': React.PropTypes.shape({
 			'loggedIn': React.PropTypes.bool
-		}).isRequired
+		}).isRequired,
+		'onLogout': React.PropTypes.func.isRequired
 	},
 
 	render() {
@@ -14,20 +17,20 @@ let UserPanel = React.createClass({
 
 		let panelHTML;
 		if (user.loggedIn) {
-			panelHTML = (
-				<a href="/logout">Logout</a>
-			);
+			panelHTML = [
+				<h5 className="name">{user.name}</h5>,
+				<RaisedButton label="Logout" primary={true} onClick={this.props.onLogout}/>
+			];
 		} else {
-			panelHTML = (
-				<a href="/login">Login</a>
-			);
+			panelHTML = <RaisedButton label="Auth" primary={true}
+																className="extra-padding"
+																linkButton={true} href="#/login" />;
 		}
 
 		return (
 			<Toolbar className="user">
 				<ToolbarGroup float="right">
-					<RaisedButton label="Auth" primary={true}
-												linkButton={true} href="#/login" />
+					{panelHTML}
 				</ToolbarGroup>
 			</Toolbar>
 		);

@@ -69,7 +69,7 @@ let MapLayout = React.createClass({
 									onFocus={this.onSelect.bind(this, undefined)}/>
 					{conceptInfo}
 				</div>
-				<UserPanel className="uesr" user={user}/>
+				<UserPanel className="uesr" user={user} onLogout={this.onLogout}/>
 				<div className="map-actions">
 					<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
 									secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
@@ -114,6 +114,10 @@ let MapLayout = React.createClass({
 				});
 				break
 		}
+	},
+
+	onLogout() {
+		userStore.logout();
 	},
 
 	onUnlock() {
