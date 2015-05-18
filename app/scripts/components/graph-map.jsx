@@ -1,7 +1,7 @@
 import React from 'react';
 import 'd3';
 import _ from 'lodash';
-import Victor from 'victor';
+import Vector from 'wacktor';
 
 import MapNavigationMixin from './mixins/MapNavigationMixin';
 import MapPhysicsMixin from './mixins/MapPhysicsMixin';
@@ -269,34 +269,31 @@ let GraphMap = React.createClass({
 	renderLinks() {
 		this.links
 			.each(d => {
-				let scale = (v, n) => v.clone().multiply(new Victor(n, n));
-				let fromV = new Victor(d.from.absX, d.from.absY);
-				let toV = new Victor(d.to.absX, d.to.absY);
+				let fromV = new Vector(d.from.absX, d.from.absY);
+				let toV = new Vector(d.to.absX, d.to.absY);
 
-				let between = fromV.clone().subtract(toV).norm();
-				let invertBetween = between.clone().norm().invert();
-				let orthBetween = (new Victor(-between.y, between.x)).norm();
+				let between = fromV.sub(toV).norm();
+				let invertBetween = between.norm().neg();
+				let orthBetween = (new Vector(-between.y, between.x)).norm();
 
-				let fromRad = scale(between, d.from.r);
-				let toRad = scale(between, d.to.r);
+				let fromRad = between.mul(d.from.r);
+				let toRad = between.mul(d.to.r);
 
-				fromV.subtract(fromRad);
-				toV.add(toRad);
+				fromV = fromV.sub(fromRad);
+				let arrowTop = toV = toV.add(toRad);
 
-				let arrowTop = toV.clone();
+				toV = toV
+					.sub(invertBetween.mul(ARROW_HEIGHT))
+					.sub(invertBetween.mul(4));
 
-				toV
-					.subtract(scale(invertBetween, ARROW_HEIGHT))
-					.subtract(scale(invertBetween, 4));
+				let fromL = fromV.add(orthBetween.mul(LINK_WIDTH));
+				let fromR = fromV.sub(orthBetween.mul(LINK_WIDTH));
 
-				let fromL = fromV.clone().add(scale(orthBetween, LINK_WIDTH));
-				let fromR = fromV.clone().subtract(scale(orthBetween, LINK_WIDTH));
+				let toL = toV.add(orthBetween.mul(LINK_WIDTH));
+				let toR = toV.sub(orthBetween.mul(LINK_WIDTH));
 
-				let toL = toV.clone().add(scale(orthBetween, LINK_WIDTH));
-				let toR = toV.clone().subtract(scale(orthBetween, LINK_WIDTH));
-
-				let arrowL = scale(orthBetween, ARROW_WIDTH).add(toV);
-				let arrowR = scale(orthBetween, -ARROW_WIDTH).add(toV);
+				let arrowL = orthBetween.mul(ARROW_WIDTH).add(toV);
+				let arrowR = orthBetween.mul(-ARROW_WIDTH).add(toV);
 
 				d.points = [fromL, fromR, toR, arrowR, arrowTop, arrowL, toL];
 			})

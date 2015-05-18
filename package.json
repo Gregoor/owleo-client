@@ -19,11 +19,11 @@
     "react-tap-event-plugin": "^0.1.4",
     "reflux": "~0.2.5",
     "superagent": "^1.1.0",
-    "victor": "^0.2.6",
     "vis": "^3.11.0",
-    "babel": "~5.4.3"
+    "wacktor": "^1.0.1"
   },
   "devDependencies": {
+    "babel": "~5.4.3",
     "babelify": "^6.1.1",
     "brfs": "^1.4.0",
     "browserify": "~9.0.3",

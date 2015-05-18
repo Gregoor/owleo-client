@@ -19,7 +19,8 @@ let UserPanel = React.createClass({
 		if (user.loggedIn) {
 			panelHTML = [
 				<h5 className="name">{user.name}</h5>,
-				<RaisedButton label="Logout" primary={true} onClick={this.props.onLogout}/>
+				<RaisedButton label="Logout" primary={true}
+											onClick={this.props.onLogout}/>
 			];
 		} else {
 			panelHTML = <RaisedButton label="Auth" primary={true}
