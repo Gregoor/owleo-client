@@ -10,6 +10,7 @@ let ConceptView = React.createClass({
 		let {concept, editMode} = this.props;
 
 		let editActions;
+		// the edit and delete buttons in concept view
 		if (editMode) editActions = [
 			(
 				<div className="col-xs-4">
@@ -24,7 +25,7 @@ let ConceptView = React.createClass({
 				</div>
 			)
 		];
-
+    // view part of container, is rendered within return function
 		let containerRow;
 		if (concept.container && concept.container.id) {
 			containerRow = (
@@ -41,6 +42,7 @@ let ConceptView = React.createClass({
 			return (<span key={tag} className="tag">{tag}</span>)
 		});
 
+		// requirement array gets generated here
 		let reqLinks = [];
 		for (let req of concept.reqs) {
 			reqLinks.push(
@@ -50,6 +52,7 @@ let ConceptView = React.createClass({
 		}
 		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
 		if (reqLinks.length == 0) reqLinks.push(<em>None</em>);
+
 
 		let summarySourceRow;
 		if (concept.summarySource) {

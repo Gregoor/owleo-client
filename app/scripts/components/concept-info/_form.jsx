@@ -2,7 +2,7 @@ let React = require('react');
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
 let Select = require('../select');
-let FormData = require('../mixins/FormData');//require('react-form-data');
+let FormData = require('../mixins/FormData'); //require('react-form-data');
 let ColorPicker = require('react-color-picker');
 let ConceptActions = require('../../actions/concept-actions');
 let searchAPI = require('../../api/search-api');
@@ -48,6 +48,7 @@ let ConceptForm = React.createClass({
 			}
 
 			let link = concept.isNew ? {} : concept.links[i] || {};
+
 			linkRows.push(
 				<div key={`link-${i}`} className="row middle-xs">
 					<div className="col-xs-7">
@@ -89,26 +90,14 @@ let ConceptForm = React.createClass({
 					</div>
 				</div>
 				<div className="scroll">
-					{/*
-					<div className="row">
-						<div className="col-xs-12">
-							<h2>Tags</h2>
-							<Select name="tags"
-											placeholder="Tags"
-							        defaultValue={concept.tags}
-							        multi={true}
-											autoload={false}
-							        asyncOptions={this.onGetOptionsOf('Tag')}
-							        createable={true}/>
-						</div>
-					</div>
-						*/}
+
 					<div className="row">
 						<div className="col-xs-4">
-							<div className="colorbox" style={{
-								'background-color': this.state.color || concept.color
-							}}></div>
+							<div className="colorbox" style=
+								{{'background-color': this.state.color || concept.color}}>
+							</div>
 						</div>
+
 						<div className="col-xs-8">
 							<ColorPicker floatingLabelText="Concept color"
 										 defaultValue={concept.color}
@@ -138,6 +127,18 @@ let ConceptForm = React.createClass({
 							        multi={true}
 										  autoload={false}
 							        asyncOptions={this.onGetOptionsOf('Concept')}/>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-xs-12">
+							<h2>Tags</h2>
+							<Select name="tags"
+											placeholder="Tags"
+											defaultValue={concept.tags}
+											multi={true}
+											autoload={false}
+											asyncOptions={this.onGetOptionsOf('Tag')}
+											createable={true}/>
 						</div>
 					</div>
 					<div className="row">
@@ -196,11 +197,11 @@ let ConceptForm = React.createClass({
 		let splitValueOfName = (name) => _.compact(getValueOfName(name).split(','));
 		e.preventDefault();
 
-		let data = _.cloneDeep(this.formData);
-		data.links = data.links.filter((l) => l.url);
-		data.reqs = splitValueOfName('reqs');
+		let data       = _.cloneDeep(this.formData);
+		data.links     = data.links.filter((l) => l.url);
+		data.reqs      = splitValueOfName('reqs');
 		data.container = getValueOfName('container');
-		// data.tags = splitValueOfName('tags');
+		data.tags      = splitValueOfName('tags');
 		ConceptActions.save(data);
 		this.props.onDone();
 	},
