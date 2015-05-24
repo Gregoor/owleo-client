@@ -1,7 +1,9 @@
 import React from 'react';
+import _ from 'lodash';
 import {IconButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
+import LinkActions from '../../actions/link-actions';
 import nameAndContainer from '../helpers/nameAndContainer';
 
 let ConceptView = React.createClass({
@@ -65,22 +67,30 @@ let ConceptView = React.createClass({
 			);
 		}
 
-		let linkRows = concept.links.map((link) => {
+		let linkRows = _(concept.links).sortBy(l => l.votes * -1).map((link) => {
 			let parser = document.createElement('a');
 			parser.href = link.url;
 			let paths = parser.pathname.split('/');
-			let partial = `${parser.hostname}/../${paths[paths.length - 1]}`;
+			let label = link.name ||
+				`${parser.hostname}/../${paths[paths.length - 1]}`;
 			return (
 				<div key={link.url} className="row middle-xs">
-					<div className="col-xs-8">
-						<a className="link" target="_blank" href={link.url}>{partial}</a>
+					<div className="col-xs-2">
+						<button type="button" onClick={() => this.onVote(link)}>
+							{link.votes}
+						</button>
 					</div>
-					<div className="col-xs-4">
+					<div className="col-xs-8">
+						<a className="link" target="_blank" href={link.url}>
+							{label}
+						</a>
+					</div>
+					<div className="col-xs-2">
 						{link.paywalled ? '$' : ''}
 					</div>
 				</div>
 			);
-		});
+		}).value();
 
 		return (
 			<div>
@@ -128,6 +138,11 @@ let ConceptView = React.createClass({
 		if (!confirm('Ya sure?')) return;
 
 		ConceptActions.delete(this.props.concept.id);
+	},
+
+	onVote(link) {
+		if (link.hasVoted) LinkActions.unvote(link.id);
+		else LinkActions.vote(link.id);
 	}
 
 });

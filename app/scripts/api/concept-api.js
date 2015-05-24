@@ -1,47 +1,35 @@
-import request from 'superagent';
 import _ from 'lodash';
 
-let host = require('../configs/api.custom').host;
+import {http, forResource} from './api-helpers';
 
-let endpoint = `${host}/concepts`;
-let resource = (id) => `${endpoint}/${id}`;
-
-let promiseWrap = (req) => new Promise((resolve) => {
-	req.end((err, res) => resolve(res.body));
-});
+let {endpoint, member} = forResource('concepts');
 
 export default {
 
 	all() {
-		return promiseWrap(request.get(endpoint));
+		return http.get(endpoint);
 	},
 
 	find(id) {
-		return promiseWrap(request.get(resource(id)));
+		return http.get(member(id));
 	},
 
 	create(concept) {
-		return promiseWrap(
-			request.post(endpoint, {concept}).withCredentials()
-		);
+		return http.post(endpoint, {concept});
 	},
 
 	update(id, concept) {
-		return promiseWrap(
-			request.post(resource(id), {concept}).withCredentials()
-		);
+		return http.post(member(id), {concept});
 	},
 
 	delete(id) {
-		return promiseWrap(
-			request.del(resource(id)).withCredentials()
-		);
+		return http.delete(member(id));
 	},
 
 	reposition(concepts) {
-		return promiseWrap(request.post(`${endpoint}/position`, {
+		return http.post(`${endpoint}/position`, {
 			'concepts': concepts.map(c => _.pick(c, 'id', 'x', 'y', 'r'))
-		}).withCredentials());
+		});
 	}
 
 };

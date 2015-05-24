@@ -1,4 +1,4 @@
-let Reflux = require('reflux');
+import Reflux from 'reflux';
 
 let ConceptActions = Reflux.createActions([
   'getAll',

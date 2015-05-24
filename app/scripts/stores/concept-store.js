@@ -1,13 +1,28 @@
-let Reflux = require('reflux');
+import Reflux from 'reflux';
+import _ from 'lodash';
 
-let _ = require('lodash');
-
-let ConceptActions = require('../actions/concept-actions');
-let ConceptAPI = require('../api/concept-api');
+import ConceptActions from '../actions/concept-actions';
+import LinkActions from '../actions/link-actions';
+import ConceptAPI from '../api/concept-api';
+import LinkAPI from '../api/link-api';
 
 let conceptStore = Reflux.createStore({
 
-  listenables: ConceptActions,
+	listenables: [ConceptActions, LinkActions],
+
+	setAll(concepts) {
+		this.all = new Map(concepts);
+		this.triggerAll();
+	},
+
+	setSelected(concept) {
+		this.selected = concept;
+		this.triggerAll();
+	},
+
+	triggerAll() {
+		this.trigger({'all': this.all, 'selected': this.selected});
+	},
 
 	getAll() {
 		ConceptAPI.all().then(this.setAll);
@@ -57,18 +72,27 @@ let conceptStore = Reflux.createStore({
 		});
 	},
 
-	setAll(concepts) {
-		this.all = new Map(concepts);
-		this.triggerAll();
+	vote(linkId) {
+		LinkAPI.vote(this.selected.id, linkId)
+			.then(this.handleVoteResponse(linkId, true));
 	},
 
-  setSelected(concept) {
-	  this.selected = concept;
-	  this.triggerAll();
-  },
+	unvote(linkId) {
+		LinkAPI.unvote(this.selected.id, linkId)
+			.then(this.handleVoteResponse(linkId, false));
+	},
 
-	triggerAll() {
-		this.trigger({'all': this.all, 'selected': this.selected});
+	handleVoteResponse(linkId, hasVoted) {
+		return (resp) => {
+			let {selected} = this;
+			if (selected) {
+				let link = _.find(selected.links, {'id': linkId});
+				if (link) {
+					_.assign(link, {'votes': resp.votes, hasVoted});
+					this.triggerAll();
+				}
+			}
+		}
 	}
 
 });
