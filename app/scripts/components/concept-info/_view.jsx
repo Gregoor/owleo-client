@@ -165,7 +165,9 @@ let ConceptView = React.createClass({
 			'url': linkUrl.getValue(),
 			'paywalled': linkPaywalled.isChecked()
 		});
-
+		linkName.setValue('');
+		linkUrl.setValue('');
+		linkPaywalled.setChecked(false);
 	},
 
 	onVoteLink(link) {
