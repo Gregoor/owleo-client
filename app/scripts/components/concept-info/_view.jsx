@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {IconButton} from 'material-ui';
+import {IconButton, TextField, Checkbox, FlatButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
 import LinkActions from '../../actions/link-actions';
@@ -76,7 +76,7 @@ let ConceptView = React.createClass({
 			return (
 				<div key={link.url} className="row middle-xs">
 					<div className="col-xs-2">
-						<button type="button" onClick={() => this.onVote(link)}>
+						<button type="button" onClick={() => this.onVoteLink(link)}>
 							{link.votes}
 						</button>
 					</div>
@@ -128,6 +128,24 @@ let ConceptView = React.createClass({
 						</div>
 					</div>
 					{summarySourceRow}
+					<form onSubmit={this.onCreateLink}>
+						<div className="row">
+							<div className="col-xs-6">
+								<TextField floatingLabelText="Name" ref="linkName"/>
+							</div>
+							<div className="col-xs-6">
+								<Checkbox label="paywalled" ref="linkPaywalled"/>
+							</div>
+						</div>
+						<div className="row">
+							<div className="col-xs-8">
+								<TextField floatingLabelText="URL" ref="linkUrl"/>
+							</div>
+							<div className="col-xs-4 center-xs">
+								<FlatButton label="Create" secondary={true} type="submit"/>
+							</div>
+						</div>
+					</form>
 					{linkRows}
 				</div>
 			</div>
@@ -140,7 +158,17 @@ let ConceptView = React.createClass({
 		ConceptActions.delete(this.props.concept.id);
 	},
 
-	onVote(link) {
+	onCreateLink() {
+		let {linkName, linkUrl, linkPaywalled} = this.refs;
+		LinkActions.create({
+			'name': linkName.getValue(),
+			'url': linkUrl.getValue(),
+			'paywalled': linkPaywalled.isChecked()
+		});
+
+	},
+
+	onVoteLink(link) {
 		if (link.hasVoted) LinkActions.unvote(link.id);
 		else LinkActions.vote(link.id);
 	}

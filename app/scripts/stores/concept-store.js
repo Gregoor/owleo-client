@@ -2,13 +2,19 @@ import Reflux from 'reflux';
 import _ from 'lodash';
 
 import ConceptActions from '../actions/concept-actions';
-import LinkActions from '../actions/link-actions';
 import ConceptAPI from '../api/concept-api';
-import LinkAPI from '../api/link-api';
+import linkStore from './link-store';
 
 let conceptStore = Reflux.createStore({
 
-	listenables: [ConceptActions, LinkActions],
+	listenables: ConceptActions,
+
+	init() {
+		this.listenTo(linkStore, (links) => {
+			this.selected.links = links;
+			this.triggerAll();
+		})
+	},
 
 	setAll(concepts) {
 		this.all = new Map(concepts);
@@ -17,6 +23,7 @@ let conceptStore = Reflux.createStore({
 
 	setSelected(concept) {
 		this.selected = concept;
+		linkStore.setLinks(concept.links, concept.id);
 		this.triggerAll();
 	},
 
@@ -70,29 +77,6 @@ let conceptStore = Reflux.createStore({
 			ConceptActions.deleted(id);
 			this.setSelected();
 		});
-	},
-
-	vote(linkId) {
-		LinkAPI.vote(this.selected.id, linkId)
-			.then(this.handleVoteResponse(linkId, true));
-	},
-
-	unvote(linkId) {
-		LinkAPI.unvote(this.selected.id, linkId)
-			.then(this.handleVoteResponse(linkId, false));
-	},
-
-	handleVoteResponse(linkId, hasVoted) {
-		return (resp) => {
-			let {selected} = this;
-			if (selected) {
-				let link = _.find(selected.links, {'id': linkId});
-				if (link) {
-					_.assign(link, {'votes': resp.votes, hasVoted});
-					this.triggerAll();
-				}
-			}
-		}
 	}
 
 });
