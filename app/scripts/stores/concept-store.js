@@ -23,7 +23,7 @@ let conceptStore = Reflux.createStore({
 
 	setSelected(concept) {
 		this.selected = concept;
-		linkStore.setLinks(concept.links, concept.id);
+		if (concept) linkStore.setLinks(concept.links, concept.id);
 		this.triggerAll();
 	},
 
