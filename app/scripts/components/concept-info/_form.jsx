@@ -2,7 +2,7 @@ let React = require('react');
 let _ = require('lodash');
 let {TextField, FlatButton, Checkbox} = require('material-ui');
 let Select = require('../select');
-let FormData = require('../mixins/FormData'); //require('react-form-data');
+let FormData = require('../mixins/FormData');//require('react-form-data');
 let ColorPicker = require('react-color-picker');
 let ConceptActions = require('../../actions/concept-actions');
 let searchAPI = require('../../api/search-api');
@@ -15,13 +15,12 @@ let ConceptForm = React.createClass({
 	mixins: [FormData],
 
 	getInitialState() {
-		return {'newLinksCount': 1, 'deletedLinks': []}
+		return {};
 	},
 
 	getInitialFormData() {
-		return _.merge({'links': [{'url': '', 'paywalled': false}]},
-			_.pick(this.props.concept, 'name','color', 'summary','summarySource', 'links')
-		);
+		return _.pick(this.props.concept,
+			'name','color', 'summary','summarySource');
 	},
 
 	componentDidMount() {
@@ -30,46 +29,7 @@ let ConceptForm = React.createClass({
 
 	render() {
 		let concept = this.props.concept,
-				abortButton = '',
-				linkRows = [],
-				deletedLinks = this.state.deletedLinks,
-				linksCount = this.state.newLinksCount;
-
-		if (!concept.isNew) linksCount += concept.links.length;
-		for (var i = 0; i < linksCount; i++) {
-			let textFieldProps = {},
-					checkboxProps = {};
-			if (_.includes(deletedLinks, i)) {
-				continue;
-			}
-			if (i + 1 == linksCount) {
-				textFieldProps.onChange = this.onChangeLastLink;
-				checkboxProps.onClick = this.onChangeLastLink;
-			}
-
-			let link = concept.isNew ? {} : concept.links[i] || {};
-
-			linkRows.push(
-				<div key={`link-${i}`} className="row middle-xs">
-					<div className="col-xs-7">
-						<TextField name={`links[url][${i}]`}
-											 floatingLabelText="URL"
-											 defaultValue={link.url} {...textFieldProps}/>
-					</div>
-					<div className="col-xs-3">
-						<Checkbox name={`links[paywalled][${i}]`}
-											label="paywalled"
-						          defaultSwitched={link.paywalled} {...checkboxProps} />
-					</div>
-					<div className="col-xs-2">
-						<IconButton type="button"
-												iconClassName="icon icon-bin"
-												tooltip="Delete"
-												onClick={this.onDeleteLink.bind(this, i)}/>
-					</div>
-				</div>
-			);
-		}
+				abortButton = '';
 
 		if (!concept.isNew) {
 			abortButton = (
@@ -157,7 +117,6 @@ let ConceptForm = React.createClass({
 												 defaultValue={concept.summarySource} />
 						</div>
 					</div>
-					{linkRows}
 				</div>
 				<div className="row end-xs">
 					{abortButton}
@@ -177,11 +136,6 @@ let ConceptForm = React.createClass({
 		});
 	},
 
-	onChangeLastLink() {
-		this.formData.links.push({'url': '', 'paywalled': false});
-		this.setState({'newLinksCount': this.state.newLinksCount + 1});
-	},
-
 	onAbort() {
 		if (!confirm('Do you really want to discard your changes?')) return;
 		this.props.onDone();
@@ -197,11 +151,10 @@ let ConceptForm = React.createClass({
 		let splitValueOfName = (name) => _.compact(getValueOfName(name).split(','));
 		e.preventDefault();
 
-		let data       = _.cloneDeep(this.formData);
-		data.links     = data.links.filter((l) => l.url);
-		data.reqs      = splitValueOfName('reqs');
+		let data = _.cloneDeep(this.formData);
+		data.reqs = splitValueOfName('reqs');
 		data.container = getValueOfName('container');
-		data.tags      = splitValueOfName('tags');
+		data.tags = splitValueOfName('tags');
 		ConceptActions.save(data);
 		this.props.onDone();
 	},
@@ -210,13 +163,6 @@ let ConceptForm = React.createClass({
 		let value = obj.id || obj.name;
 		let label = obj.container ? nameAndContainer(obj) : obj.name;
 		return {value, label};
-	},
-
-	onDeleteLink(i) {
-		let deletedLinks = _.clone(this.state.deletedLinks);
-		deletedLinks.push(i);
-		this.setState({deletedLinks});
-		this.formData.links.splice(i, 1);
 	},
 
 	onChangeColor(color) {

@@ -1,38 +1,29 @@
-import request from 'superagent';
 import _ from 'lodash';
 
-import {host} from '../configs/api.custom';
+import {http, forResource} from './api-helpers';
 
-let endpoint = `${host}/users`;
-
-let promiseWrap = req => new Promise(resolve => {
-	req.end((err, res) => resolve(res.body));
-});
+let {endpoint} = forResource('users');
 
 export default {
 
 	exists(name) {
-		return promiseWrap(request.get(`${endpoint}/exists`, {name}));
+		return http.get(`${endpoint}/exists`, {name});
 	},
 
 	current() {
-		return promiseWrap(request.get(`${endpoint}/current`).withCredentials());
+		return http.get(`${endpoint}/current`);
 	},
 
 	login(user) {
-		return promiseWrap(
-			request.post(`${endpoint}/login`, {user}).withCredentials()
-		);
+		return http.post(`${endpoint}/login`, {user});
 	},
 
 	logout() {
-		return promiseWrap(request.post(`${endpoint}/logout`).withCredentials());
+		return http.post(`${endpoint}/logout`);
 	},
 
 	register(user) {
-		return promiseWrap(
-			request.post(`${endpoint}/register`, {user}).withCredentials()
-		);
+		return http.post(`${endpoint}/register`, {user});
 	}
 
 };
