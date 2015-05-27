@@ -71,9 +71,7 @@ let ConceptView = React.createClass({
 			<div>
 				<div className="row">
 					<div className="col-xs-8">
-						<h1 title={concept.name} style={{
-								'borderLeft': `5px solid ${concept.color}`
-							}}>
+						<h1 title={concept.name}>
 							{concept.name}
 						</h1>
 					</div>
@@ -102,26 +100,6 @@ let ConceptView = React.createClass({
 						</div>
 					</div>
 					{summarySourceRow}
-					{/*<form onSubmit={this.onCreateLink}>
-						<div className="row">
-							<div className="col-xs-6">
-								<TextField floatingLabelText="Name" ref="linkName"/>
-							</div>
-							<div className="col-xs-6">
-								<Checkbox label="paywalled" ref="linkPaywalled"/>
-							</div>
-						</div>
-						<div className="row">
-							<div className="col-xs-8">
-								<TextField floatingLabelText="URL" ref="linkUrl"/>
-							</div>
-							<div className="col-xs-4 center-xs">
-								<FlatButton label="Create" secondary={true} type="submit"/>
-							</div>
-						</div>
-					</form>
-					{linkRows}
-					 */}
 				</div>
 			</div>
 		);

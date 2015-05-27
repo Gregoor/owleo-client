@@ -1,4 +1,4 @@
-let Router = require('./router');
+var Router = require('./router');
 require('babel/polyfill');
 require('react-tap-event-plugin');
 

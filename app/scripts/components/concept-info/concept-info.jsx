@@ -38,7 +38,7 @@ let ConceptInfo = React.createClass({
 		}
 
 		return (
-			<div className="concept-info">{comp}</div>
+			<div className="concept-info" style={{'border': `8px solid ${this.props.concept.color}`}} >{comp}</div>
 		);
 	},
 
