@@ -2,6 +2,13 @@ import React from 'react';
 
 import searchAPI from '../../api/search-api';
 
+let asLink = concept => <a href={`/#${concept.id}`}>{concept.name}</a>;
+
+let withContainer = concept => {
+	let {container} = concept;
+	if (container) return (<span>in {asLink(container)}</span>);
+};
+
 let ConceptNeighbors = React.createClass({
 
 	propTypes: {
@@ -29,8 +36,11 @@ let ConceptNeighbors = React.createClass({
 		let neighborsHTML = neighbors ? neighbors.map(neighborConcept => {
 			return (
 				<div className="row">
-					<div className="col-xs-12">
-						<a href={`/#${neighborConcept.id}`}>{neighborConcept.name}</a>
+					<div className="col-xs-6">
+						{asLink(neighborConcept)}
+					</div>
+					<div className="col-xs-6">
+						{withContainer(neighborConcept)}
 					</div>
 				</div>
 			)
@@ -41,8 +51,8 @@ let ConceptNeighbors = React.createClass({
 				<div className="row">
 					<div className="head">
 						{relationType == 'reqBy' ? 'Followups for' : 'Requirements of'}
-						{' '}
-						<a href={`/#${concept.id}`}>{concept.name}</a>
+						{' '} {asLink(concept)} {' '}
+						{withContainer(concept)}
 					</div>
 				</div>
 				{neighborsHTML}
