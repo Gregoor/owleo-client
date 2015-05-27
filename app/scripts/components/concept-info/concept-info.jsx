@@ -1,8 +1,10 @@
-let React = require('react');
+import React from 'react';
+import Router from 'react-router';
 
-let ConceptView = require('./_view');
-let ConceptForm = require('./_form');
-let ConceptActions = require('../../actions/concept-actions');
+import ConceptView from './_view';
+import ConceptForm from './_form';
+import ConceptNeighbors from './_neighbors';
+import ConceptActions from '../../actions/concept-actions';
 
 let ConceptInfo = React.createClass({
 
@@ -15,10 +17,16 @@ let ConceptInfo = React.createClass({
 
 	componentWillMount() {
 		window.addEventListener('keydown', this.onKeydown);
+		Router.HashLocation.addChangeListener(this.resetState);
 	},
 
 	componentWillUnmount() {
 		window.removeEventListener('keydown', this.onKeydown);
+		Router.HashLocation.removeChangeListener(this.resetState);
+	},
+
+	resetState() {
+		this.setState({'relationType': null})
 	},
 
 	componentWillReceiveProps(props) {
@@ -29,12 +37,23 @@ let ConceptInfo = React.createClass({
 	},
 
 	render() {
-		let comp;
+		let {edit, relationType, neighbors} = this.state;
 
-		if (this.state.edit || this.props.concept.isNew) {
-			comp = (<ConceptForm onDone={this.onShow} onChange={this.onChange} {...this.props}/>);
+		let comp;
+		if (edit || this.props.concept.isNew) {
+			comp = (
+				<ConceptForm key="f" onDone={this.onShow} onChange={this.onChange}
+										 {...this.props}/>
+			);
+		} else if (relationType) {
+			comp = (
+				<ConceptNeighbors key="n" relationType={relationType} {...this.props} />
+			)
 		} else {
-			comp = (<ConceptView onEdit={this.onEdit} {...this.props}/>);
+			comp = (
+				<ConceptView key="v" onEdit={this.onEdit} onSearch={this.onSearch}
+										 {...this.props}/>
+			);
 		}
 
 		return (
@@ -63,6 +82,10 @@ let ConceptInfo = React.createClass({
 				!confirm('Do you really want to discard your changes?')) return;
 			ConceptActions.unselect();
 		}
+	},
+
+	onSearch(param) {
+		this.setState({'relationType': param});
 	}
 
 });
