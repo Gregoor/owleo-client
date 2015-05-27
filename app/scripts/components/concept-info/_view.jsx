@@ -134,9 +134,7 @@ let ConceptView = React.createClass({
 	},
 
 	onSearchFor(param) {
-		return () => {
-			this.props.onSearch(param, this.props.concept.name);
-		};
+		return () => this.props.onSearch(param);
 	},
 
 	onCreateLink() {
