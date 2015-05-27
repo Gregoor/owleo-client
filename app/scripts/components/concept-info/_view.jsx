@@ -27,34 +27,6 @@ let ConceptView = React.createClass({
 				</div>
 			)
 		];
-    // view part of container, is rendered within return function
-		let containerRow;
-		if (concept.container && concept.container.id) {
-			containerRow = (
-				<div className="row">
-					<div className="col-xs-12" style={{'display': 'inline'}}>
-						<h2>Container</h2>
-						{nameAndContainer(concept.container)}
-					</div>
-				</div>
-			);
-		}
-
-		let tags = concept.tags.map((tag) => {
-			return (<span key={tag} className="tag">{tag}</span>)
-		});
-
-		// requirement array gets generated here
-		let reqLinks = [];
-		for (let req of concept.reqs) {
-			reqLinks.push(
-				<a key={req.id} href={`#/${req.id}`}>{nameAndContainer(req)}</a>
-			);
-			reqLinks.push(', ');
-		}
-		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
-		if (reqLinks.length == 0) reqLinks.push(<em>None</em>);
-
 
 		let summarySourceRow;
 		if (concept.summarySource) {
@@ -112,26 +84,25 @@ let ConceptView = React.createClass({
 					</div>
 				</div>
 				<div className="scroll">
-					{containerRow}
 					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							{tags}
+						<div className="col-xs-6">
+							<FlatButton label={`${concept.reqCount} Requirements`}
+													secondary={true} disabled={!concept.reqCount}
+													onClick={this.onSearchFor('leadsTo')}/>
+						</div>
+						<div className="col-xs-6">
+							<FlatButton label={`${concept.followupCount} Followups`}
+													secondary={true} disabled={!concept.followupCount}
+													onClick={this.onSearchFor('reqBy')}/>
 						</div>
 					</div>
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Requirements:</h2>
-							{reqLinks}
-						</div>
-					</div>
-					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Summary:</h2>
 							{concept.summary}
 						</div>
 					</div>
 					{summarySourceRow}
-					<form onSubmit={this.onCreateLink}>
+					{/*<form onSubmit={this.onCreateLink}>
 						<div className="row">
 							<div className="col-xs-6">
 								<TextField floatingLabelText="Name" ref="linkName"/>
@@ -150,6 +121,7 @@ let ConceptView = React.createClass({
 						</div>
 					</form>
 					{linkRows}
+					 */}
 				</div>
 			</div>
 		);
@@ -159,6 +131,12 @@ let ConceptView = React.createClass({
 		if (!confirm('Ya sure?')) return;
 
 		ConceptActions.delete(this.props.concept.id);
+	},
+
+	onSearchFor(param) {
+		return () => {
+			this.props.onSearch(param, this.props.concept.name);
+		};
 	},
 
 	onCreateLink() {
