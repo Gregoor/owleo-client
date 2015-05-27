@@ -268,13 +268,17 @@ let GraphMap = React.createClass({
 
 	renderLinks() {
 		this.links
-			.each(d => {
+			.each(function(d) {
 				let fromV = new Vector(d.from.absX, d.from.absY);
 				let toV = new Vector(d.to.absX, d.to.absY);
 
 				let between = fromV.sub(toV).norm();
 				let invertBetween = between.norm().neg();
 				let orthBetween = (new Vector(-between.y, between.x)).norm();
+
+				if (d.from.container != d.to.container) {
+					this.classList.add('long-distance-relationship');
+				}
 
 				let fromRad = between.mul(d.from.r);
 				let toRad = between.mul(d.to.r);
