@@ -1,13 +1,35 @@
-let Reflux = require('reflux');
+import Reflux from 'reflux';
+import _ from 'lodash';
 
-let _ = require('lodash');
-
-let ConceptActions = require('../actions/concept-actions');
-let ConceptAPI = require('../api/concept-api');
+import ConceptActions from '../actions/concept-actions';
+import ConceptAPI from '../api/concept-api';
+import linkStore from './link-store';
 
 let conceptStore = Reflux.createStore({
 
-  listenables: ConceptActions,
+	listenables: ConceptActions,
+
+	init() {
+		this.listenTo(linkStore, (links) => {
+			this.selected.links = links;
+			this.triggerAll();
+		})
+	},
+
+	setAll(concepts) {
+		this.all = new Map(concepts);
+		this.triggerAll();
+	},
+
+	setSelected(concept) {
+		this.selected = concept;
+		if (concept) linkStore.setLinks(concept.links, concept.id);
+		this.triggerAll();
+	},
+
+	triggerAll() {
+		this.trigger({'all': this.all, 'selected': this.selected});
+	},
 
 	getAll() {
 		ConceptAPI.all().then(this.setAll);
@@ -55,20 +77,6 @@ let conceptStore = Reflux.createStore({
 			ConceptActions.deleted(id);
 			this.setSelected();
 		});
-	},
-
-	setAll(concepts) {
-		this.all = new Map(concepts);
-		this.triggerAll();
-	},
-
-  setSelected(concept) {
-	  this.selected = concept;
-	  this.triggerAll();
-  },
-
-	triggerAll() {
-		this.trigger({'all': this.all, 'selected': this.selected});
 	}
 
 });
