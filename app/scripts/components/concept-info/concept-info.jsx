@@ -17,13 +17,16 @@ let ConceptInfo = React.createClass({
 
 	componentWillMount() {
 		window.addEventListener('keydown', this.onKeydown);
-		Router.HashLocation.addChangeListener(() => {
-			this.setState({'relationType': null})
-		});
+		Router.HashLocation.addChangeListener(this.resetState);
 	},
 
 	componentWillUnmount() {
 		window.removeEventListener('keydown', this.onKeydown);
+		Router.HashLocation.removeChangeListener(this.resetState);
+	},
+
+	resetState() {
+		this.setState({'relationType': null})
 	},
 
 	componentWillReceiveProps(props) {
