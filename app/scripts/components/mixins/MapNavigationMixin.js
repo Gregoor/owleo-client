@@ -57,7 +57,7 @@ export default {
 		let steps = 1500; // use this to adjust zoom behavior
 		let prevScale = this.navState.scale;
 		let scale = prevScale - (prevScale * event.deltaY / steps);
-		if (scale == prevScale) return;
+		if (scale == prevScale || scale > 1.5 || scale < .1) return;
 
 		let {pos} = this.navState;
 		let eventX = event.pageX;
