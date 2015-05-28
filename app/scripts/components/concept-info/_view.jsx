@@ -84,8 +84,8 @@ let ConceptView = React.createClass({
 				<div className="scroll">
 					<div className="row">
 						<div className="col-xs-6">
-							<FlatButton label={`${concept.reqCount} Requirements`}
-													secondary={true} disabled={!concept.reqCount}
+							<FlatButton label={`${concept.reqs.length} Requirements`}
+													secondary={true} disabled={!concept.reqs.length}
 													onClick={this.onSearchFor('leadsTo')}/>
 						</div>
 						<div className="col-xs-6">
