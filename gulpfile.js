@@ -6,6 +6,7 @@ var browserify = require('browserify');
 var watchify   = require('watchify');
 var source     = require('vinyl-source-stream');
 var path       = require('path');
+var ga         = require('gulp-ga');
 
 
 var bundler = {
@@ -112,6 +113,12 @@ gulp.task('minify:css', function() {
     .pipe($.size());
 });
 
+gulp.task('ga', function(){
+	gulp.src('dist/index.html')
+		.pipe(ga({url: 'owleo.com', uid: 'UA-63315310-1', tag: 'head'}))
+		.pipe(gulp.dest('dist'));
+});
+
 gulp.task('minify', ['minify:js', 'minify:css']);
 
 gulp.task('clean', del.bind(null, 'dist'));
@@ -122,7 +129,7 @@ gulp.task('clean-bundle', sync(['clean', 'bundle']));
 
 gulp.task('build', ['clean-bundle'], bundler.stop.bind(bundler));
 
-gulp.task('build:production', sync(['set-production', 'build', 'minify']));
+gulp.task('build:production', sync(['set-production', 'build', 'minify', 'ga']));
 
 gulp.task('serve:production', sync(['build:production', 'serve']));
 gulp.task('test', ['jest']);

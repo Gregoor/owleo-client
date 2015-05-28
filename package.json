@@ -54,7 +54,8 @@
     "run-sequence": "~1.0.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "~1.0.0",
-    "watchify": "^2.6.0"
+    "watchify": "^2.6.0",
+    "gulp-ga": "0.0.3"
   },
   "engines": {
     "node": ">=0.10.0"
