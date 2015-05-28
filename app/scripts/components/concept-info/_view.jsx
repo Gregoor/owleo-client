@@ -74,9 +74,9 @@ let ConceptView = React.createClass({
 
 				<div className="scroll">
 					<div className="row">
-						<div className="col-xs-6">
-							<FlatButton label={`${concept.reqCount} Requirements`}
-													secondary={true} disabled={!concept.reqCount}
+						<div className="col-xs-3">
+							<IconButton iconClassName="icon icon-arrow-left"
+													disabled={!concept.reqs.length}
 													onClick={this.onSearchFor('leadsTo')}/>
 						</div>
 							<div className="col-xs-6">
@@ -92,7 +92,7 @@ let ConceptView = React.createClass({
 							</div>
 						<div className="col-xs-3">
 							<IconButton iconClassName="icon icon-arrow-right"
-													secondary={true} disabled={!concept.followupCount}
+													disabled={!concept.followupCount}
 													onClick={this.onSearchFor('reqBy')}/>
 						</div>
 					</div>
