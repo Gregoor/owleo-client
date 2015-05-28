@@ -237,7 +237,7 @@ let GraphMap = React.createClass({
 	renderD3(navState) {
 		let {pos, prevScale, scale} = navState;
 
-		const MIN_TEXT_R = 7;
+		const MIN_TEXT_R = 9;
 		if (prevScale != scale) {
 			let invScale = 1 / scale;
 			d3.selectAll(this.labels)
@@ -245,7 +245,7 @@ let GraphMap = React.createClass({
 				.attr('y', d => (d.r + 18) * scale)
 				.style('opacity', d => {
 					let scaledR = d.r * scale;
-					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 5) / Math.pow(MIN_TEXT_R, 5);
+					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 4) / Math.pow(MIN_TEXT_R, 4);
 				});
 			d3.selectAll(Array.from(this.conceptNodes.values()))
 				.style('opacity', d => {
