@@ -15,13 +15,13 @@ let ConceptView = React.createClass({
 		// the edit and delete buttons in concept view
 		if (editMode) editActions = [
 			(
-				<div className="col-xs-4">
+				<div className="col-xs-1.5">
 					<IconButton key="edit" iconClassName="icon icon-pencil"
 											tooltip="Edit" onClick={this.props.onEdit}/>
 				</div>
 			),
 			(
-				<div className="col-xs-4">
+				<div className="col-xs-1.5">
 					<IconButton key="delete" iconClassName="icon icon-bin"
 											tooltip="Delete" onClick={this.onDelete}/>
 				</div>
@@ -69,31 +69,35 @@ let ConceptView = React.createClass({
 
 		return (
 			<div>
-				<div className="row">
-					<div className="col-xs-8">
-						<h1 title={concept.name}>
-							{concept.name}
-						</h1>
-					</div>
-					<div className="col-xs-4">
 						<div className="row end-xs">
-							{editActions}
-						</div>
-					</div>
-				</div>
+							{editActions} </div>
+
 				<div className="scroll">
-					<div className="row">
-						<div className="col-xs-6">
-							<FlatButton label={`${concept.reqCount} Requirements`}
+					<div className="row center-xs">
+						<div className="col-xs-3">
+
+							<IconButton iconClassName="icon icon-arrow-left"
 													secondary={true} disabled={!concept.reqCount}
 													onClick={this.onSearchFor('leadsTo')}/>
 						</div>
-						<div className="col-xs-6">
-							<FlatButton label={`${concept.followupCount} Followups`}
+							<div className="col-xs-6">
+								<div>
+								<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
+									{concept.name}
+								</div>
+								in
+								<div>
+								{concept.container.name}
+								</div>
+									</div>
+							</div>
+						<div className="col-xs-3">
+							<IconButton iconClassName="icon icon-arrow-right"
 													secondary={true} disabled={!concept.followupCount}
 													onClick={this.onSearchFor('reqBy')}/>
 						</div>
 					</div>
+
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
 							{concept.summary}
@@ -104,7 +108,6 @@ let ConceptView = React.createClass({
 			</div>
 		);
 	},
-
 	onDelete() {
 		if (!confirm('Ya sure?')) return;
 
