@@ -35,11 +35,17 @@ let GraphMap = React.createClass({
 
 	mixins: [MapNavigationMixin, MapPhysicsMixin],
 
-	componentDidMount() {
+	componentWillMount() {
 		this.concepts = new Map();
 		this.conceptNodes = new Map();
 		this.layers = new Map();
 		this.reqLinks = new Map();
+		this.labels = [];
+
+		this.onNavStateChange = this.renderD3;
+	},
+
+	componentDidMount() {
 		this.update(this.props);
 	},
 
@@ -204,6 +210,9 @@ let GraphMap = React.createClass({
 				'x': function (d) {
 					return -this.getComputedTextLength() / 2
 				}
+			})
+			.each(function() {
+				self.labels.push(this);
 			});
 
 		let layer = {container, concepts, links, el, circle, label};
@@ -225,8 +234,25 @@ let GraphMap = React.createClass({
 		else this.props.onSelect();
 	},
 
-	renderD3() {
-		let {pos, scale} = this.navState;
+	renderD3(navState) {
+		let {pos, prevScale, scale} = navState;
+
+		const MIN_TEXT_R = 7;
+		if (prevScale != scale) {
+			let invScale = 1 / scale;
+			d3.selectAll(this.labels)
+				.attr('transform', `scale(${invScale})`)
+				.attr('y', d => (d.r + 18) * scale)
+				.style('opacity', d => {
+					let scaledR = d.r * scale;
+					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 5) / Math.pow(MIN_TEXT_R, 5);
+				});
+			d3.selectAll(Array.from(this.conceptNodes.values()))
+				.style('opacity', d => {
+					let scaledR = d.r * scale;
+					return scaledR > MIN_TEXT_R ? 1 : scaledR / MIN_TEXT_R;
+				});
+		}
 
 		this.getGroup().attr('transform',
 			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
