@@ -26,7 +26,7 @@ let ConceptNeighbors = React.createClass({
 
 	fetchNeighbors() {
 		let {concept, relationType} = this.props;
-		searchAPI({'type': ['Concept'], [relationType]: concept.id})
+		searchAPI({'for': ['Concept'], [relationType]: concept.id})
 			.then(neighbors => this.setState({neighbors}));
 	},
 

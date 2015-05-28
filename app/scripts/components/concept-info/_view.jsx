@@ -73,10 +73,9 @@ let ConceptView = React.createClass({
 							{editActions} </div>
 
 				<div className="scroll">
-					<div className="row center-xs">
-						<div className="col-xs-3">
-
-							<IconButton iconClassName="icon icon-arrow-left"
+					<div className="row">
+						<div className="col-xs-6">
+							<FlatButton label={`${concept.reqCount} Requirements`}
 													secondary={true} disabled={!concept.reqCount}
 													onClick={this.onSearchFor('leadsTo')}/>
 						</div>
@@ -97,7 +96,6 @@ let ConceptView = React.createClass({
 													onClick={this.onSearchFor('reqBy')}/>
 						</div>
 					</div>
-
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
 							{concept.summary}
@@ -108,6 +106,7 @@ let ConceptView = React.createClass({
 			</div>
 		);
 	},
+
 	onDelete() {
 		if (!confirm('Ya sure?')) return;
 
