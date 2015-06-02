@@ -75,25 +75,33 @@ let ConceptView = React.createClass({
 				<div className="scroll">
 					<div className="row">
 						<div className="col-xs-3">
-							<IconButton iconClassName="icon icon-arrow-left"
-													disabled={!concept.reqs.length}
-													onClick={this.onSearchFor('leadsTo')}/>
+									<IconButton iconClassName="icon icon-arrow-left"
+															style={{paddingBottom: 1}}
+															disabled={!concept.reqs.length}
+															onClick={this.onSearchFor('leadsTo')}/>
+									<span className="center-xs" style={{fontSize: 9}}>
+										REQUIREMENTS
+									</span>
 						</div>
-							<div className="col-xs-6">
-								<div>
-								<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
-									{concept.name}
-								</div>
-								in
-								<div>
-								{concept.container.name}
-								</div>
-									</div>
+						<div className="col-xs-6">
+							<div>
+							<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
+								{concept.name}
 							</div>
+							in
+							<div>
+							{concept.container.name}
+							</div>
+								</div>
+						</div>
 						<div className="col-xs-3">
 							<IconButton iconClassName="icon icon-arrow-right"
 													disabled={!concept.followupCount}
+													style={{paddingBottom: 1}}
 													onClick={this.onSearchFor('reqBy')}/>
+							<span className="center-xs" style={{fontSize: 9}}>
+									FOLLOWUPS
+							</span>
 						</div>
 					</div>
 					<div className="row">
