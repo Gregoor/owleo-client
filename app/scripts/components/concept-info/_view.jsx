@@ -40,6 +40,7 @@ let ConceptView = React.createClass({
 			);
 		}
 
+		let {fetching} = concept;
 		return (
 			<div>
 						<div className="row end-xs">
@@ -50,22 +51,24 @@ let ConceptView = React.createClass({
 						<div className="col-xs-3">
 									<IconButton iconClassName="icon icon-arrow-left"
 															style={{paddingBottom: 1}}
-															disabled={!concept.reqs.length}
+															disabled={fetching || !concept.reqs.length}
 															onClick={this.onSearchFor('leadsTo')}/>
 									<span className="center-xs" style={{fontSize: 9}}>
 										REQUIREMENTS
 									</span>
 						</div>
 						<div className="col-xs-6">
-							<div>
 							<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
 								{concept.name}
 							</div>
-							in
-							<div>
-							{concept.container.name}
-							</div>
+							<div className="row">
+								<div className="col-xs-1">
+									in
 								</div>
+								<div className="col-xs-11">
+									{concept.container.name}
+								</div>
+							</div>
 						</div>
 						<div className="col-xs-3">
 							<IconButton iconClassName="icon icon-arrow-right"
@@ -79,7 +82,7 @@ let ConceptView = React.createClass({
 					</div>
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
-							{concept.summary}
+							{fetching ? 'Loading...' : concept.summary}
 						</div>
 					</div>
 					{summarySourceRow}

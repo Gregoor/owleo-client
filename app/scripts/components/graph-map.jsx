@@ -177,7 +177,10 @@ let GraphMap = React.createClass({
 			});
 
 		let onClick = function(d) {
-			if (!self.state.wasPanning) self.props.onSelect(d.id);
+			if (!self.state.wasPanning) {
+				self.props.onSelect(d.id);
+				this.selectedAt = Date.now();
+			}
 		};
 		let circle = el.append('circle')
 			.style({
@@ -231,7 +234,7 @@ let GraphMap = React.createClass({
 
 	onSelect() {
 		if (this.state.wasPanning) this.setState({'wasPanning': false});
-		else this.props.onSelect();
+		else if (Date.now() - this.selectedAt > 1000) this.props.onSelect();
 	},
 
 	renderD3(navState) {
