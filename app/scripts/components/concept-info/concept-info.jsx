@@ -1,10 +1,13 @@
 import React from 'react';
 import Router from 'react-router';
+import _ from 'lodash';
+import {IconButton} from 'material-ui';
 
 import ConceptView from './_view';
 import ConceptForm from './_form';
 import ConceptNeighbors from './_neighbors';
 import ConceptActions from '../../actions/concept-actions';
+import LinkActions from '../../actions/link-actions';
 
 let ConceptInfo = React.createClass({
 
@@ -56,30 +59,39 @@ let ConceptInfo = React.createClass({
 			);
 		}
 
-		let linksHTML = (this.props.concept.links || []).map(link => {
-			let parser = document.createElement('a');
-			parser.href = link.url;
-			let paths = parser.pathname.split('/');
-			let label = link.name ||
-				`${parser.hostname}/../${paths[paths.length - 1]}`;
+		let linksHTML = _(this.props.concept.links || [])
+			.sortBy(link => -link.votes)
+			.map(link => {
+				let parser = document.createElement('a');
+				parser.href = link.url;
+				let paths = parser.pathname.split('/');
+				let label = link.name ||
+					`${parser.hostname}/../${paths[paths.length - 1]}`;
 
-			return (
-				<div className="card" key={link.url}>
-					<div className="row">
-						<div className="col-xs-2">
-							<button type="button" onClick={() => this.onVoteLink(link)}>
+				let votedClass = link.hasVoted ? 'voted' : '';
+
+				return (
+					<div className="card link" key={link.url}>
+						<div className="row">
+							<div className="col-xs-1">
+								<IconButton iconClassName="icon icon-arrow-up" tooltip="Vote"
+														onClick={() => this.onVoteLink(link)}
+														className={votedClass}
+														style={{fontSize: 9, padding: 0}}/>
+							</div>
+							<div className="col-xs-1">
 								{link.votes}
-							</button>
-						</div>
-						<div className="col-xs-10">
-							<a className="link and-so-on" target="_blank" href={link.url}>
-								{label}
-							</a>
+							</div>
+							<div className="col-xs-10">
+								<a className="link and-so-on" target="_blank" href={link.url}>
+									{label}
+								</a>
+							</div>
 						</div>
 					</div>
-				</div>
-			);
-		});
+				);
+			})
+			.value();
 
 		return (
 			<div>
@@ -117,6 +129,23 @@ let ConceptInfo = React.createClass({
 
 	onSearch(param) {
 		this.setState({'relationType': param});
+	},
+
+	onCreateLink() {
+		let {linkName, linkUrl, linkPaywalled} = this.refs;
+		LinkActions.create({
+			'name': linkName.getValue(),
+			'url': linkUrl.getValue(),
+			'paywalled': linkPaywalled.isChecked()
+		});
+		linkName.setValue('');
+		linkUrl.setValue('');
+		linkPaywalled.setChecked(false);
+	},
+
+	onVoteLink(link) {
+		if (link.hasVoted) LinkActions.unvote(link.id);
+		else LinkActions.vote(link.id);
 	}
 
 });

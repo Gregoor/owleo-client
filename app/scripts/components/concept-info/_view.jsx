@@ -3,7 +3,6 @@ import _ from 'lodash';
 import {IconButton, TextField, Checkbox, FlatButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
-import LinkActions from '../../actions/link-actions';
 import nameAndContainer from '../helpers/nameAndContainer';
 
 let ConceptView = React.createClass({
