@@ -1,9 +1,10 @@
 import React from 'react';
 import Router from 'react-router';
 import _ from 'lodash';
-import {IconButton} from 'material-ui';
+import {IconButton, TextField, Checkbox} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
+import LinkActions from '../../actions/link-actions';
 import ConceptView from './_view';
 import ConceptForm from './_form';
 import ConceptNeighbors from './_neighbors';
@@ -14,7 +15,8 @@ let ConceptInfo = React.createClass({
 	getInitialState() {
 		return {
 			'edit': false,
-			'isDirty': false
+			'isDirty': false,
+			'expandLinkForm': false
 		};
 	},
 
@@ -40,7 +42,7 @@ let ConceptInfo = React.createClass({
 	},
 
 	render() {
-		let {edit, relationType} = this.state;
+		let {edit, relationType, expandLinkForm} = this.state;
 
 		let comp;
 		if (edit || this.props.concept.isNew) {
@@ -65,6 +67,8 @@ let ConceptInfo = React.createClass({
 				linksHTML.push(<LinkRow link={link}/>, <hr/>);
 			});
 
+
+		let linkFormClass = expandLinkForm ? 'expanded' : 'collapsed';
 		return (
 			<div>
 				<div className="concept-info card"
@@ -72,6 +76,27 @@ let ConceptInfo = React.createClass({
 					{comp}
 				</div>
 				<div className="card">
+					<form onSubmit={this.onCreateLink}>
+						<div className="row middle-xs">
+							<div className="col-xs-11">
+								<TextField ref="linkUrl" floatingLabelText="Add a link"
+													 onChange={this.onChangeLink}/>
+							</div>
+							<div className="col-xs-1">
+								<IconButton iconClassName="icon icon-plus" tooltip="Add link"
+														type="submit" className="small"/>
+							</div>
+						</div>
+						<div className={`row middle-xs link-form ${linkFormClass}`}>
+							<div className="col-xs-8">
+								<TextField ref="linkName" floatingLabelText="Link name (optional)"/>
+							</div>
+							<div className="col-xs-4">
+								<Checkbox ref="linkPaywalled" label="paywalled"/>
+							</div>
+						</div>
+					</form>
+					<hr/>
 					{linksHTML}
 				</div>
 			</div>
@@ -103,6 +128,23 @@ let ConceptInfo = React.createClass({
 
 	onSearch(param) {
 		this.setState({'relationType': param});
+	},
+
+	onChangeLink(e) {
+		this.setState({'expandLinkForm': e.target.value.length});
+	},
+
+	onCreateLink() {
+		let {linkName, linkUrl, linkPaywalled} = this.refs;
+		LinkActions.create({
+			'name': linkName.getValue(),
+			'url': linkUrl.getValue(),
+			'paywalled': linkPaywalled.isChecked()
+		});
+		linkName.setValue('');
+		linkUrl.setValue('');
+		linkPaywalled.setChecked(false);
+		this.setState({'expandLinkForm': false});
 	}
 
 });

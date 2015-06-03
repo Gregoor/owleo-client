@@ -18,7 +18,7 @@ let linkStore = Reflux.createStore({
 	},
 
 	create(data) {
-		LinkAPI.create(this.conceptIconced, data).then(link => {
+		LinkAPI.create(this.conceptId, data).then(link => {
 			this.links.push(link);
 			this.triggerAll();
 		})

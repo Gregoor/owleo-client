@@ -22,6 +22,24 @@
 				display: none;
 			}
 		}
+
+		.link-form {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 500ms;
+			&.expanded {
+				max-height: 500px;
+			}
+		}
+
+		.mui-text-field {
+			margin-top: -24px;
+			width: 100%;
+		}
+
+		.mui-icon-button[type=submit] {
+			color: @accent-1-color;
+		}
 	}
 
 	.link {

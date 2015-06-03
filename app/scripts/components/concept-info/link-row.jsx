@@ -19,8 +19,7 @@ let LinkRow = React.createClass({
 				<div className="col-xs-1">
 					<IconButton iconClassName="icon icon-arrow-up" tooltip="Vote"
 											onClick={() => this.onVoteLink(link)}
-											className={votedClass}
-											style={{fontSize: 9, padding: 0}}/>
+											className={`small ${votedClass}`}/>
 				</div>
 				<div className="col-xs-1">
 					{link.votes}
@@ -32,23 +31,11 @@ let LinkRow = React.createClass({
 				</div>
 				<div className="col-xs-1">
 					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-											onClick={() => this.onVoteDelete(link)}
-											style={{fontSize: 9, padding: 0}}/>
+											className="small"
+											onClick={() => this.onVoteDelete(link)}/>
 				</div>
 			</div>
 		);
-	},
-
-	onCreateLink() {
-		let {linkName, linkUrl, linkPaywalled} = this.refs;
-		LinkActions.create({
-			'name': linkName.getValue(),
-			'url': linkUrl.getValue(),
-			'paywalled': linkPaywalled.isChecked()
-		});
-		linkName.setValue('');
-		linkUrl.setValue('');
-		linkPaywalled.setChecked(false);
 	},
 
 	onVoteLink(link) {
