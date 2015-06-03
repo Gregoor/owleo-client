@@ -12,7 +12,6 @@ let ConceptView = React.createClass({
 		let {concept, editMode} = this.props;
 
 		let editActions;
-		// the edit and delete buttons in concept view
 		if (editMode) editActions = [
 			(
 				<div className="col-xs-1.5">
@@ -41,31 +40,6 @@ let ConceptView = React.createClass({
 				</div>
 			);
 		}
-
-		let linkRows = _(concept.links).sortBy(l => l.votes * -1).map((link) => {
-			let parser = document.createElement('a');
-			parser.href = link.url;
-			let paths = parser.pathname.split('/');
-			let label = link.name ||
-				`${parser.hostname}/../${paths[paths.length - 1]}`;
-			return (
-				<div key={link.url} className="row middle-xs">
-					<div className="col-xs-2">
-						<button type="button" onClick={() => this.onVoteLink(link)}>
-							{link.votes}
-						</button>
-					</div>
-					<div className="col-xs-8">
-						<a className="link" target="_blank" href={link.url}>
-							{label}
-						</a>
-					</div>
-					<div className="col-xs-2">
-						{link.paywalled ? '$' : ''}
-					</div>
-				</div>
-			);
-		}).value();
 
 		return (
 			<div>
@@ -123,23 +97,6 @@ let ConceptView = React.createClass({
 
 	onSearchFor(param) {
 		return () => this.props.onSearch(param);
-	},
-
-	onCreateLink() {
-		let {linkName, linkUrl, linkPaywalled} = this.refs;
-		LinkActions.create({
-			'name': linkName.getValue(),
-			'url': linkUrl.getValue(),
-			'paywalled': linkPaywalled.isChecked()
-		});
-		linkName.setValue('');
-		linkUrl.setValue('');
-		linkPaywalled.setChecked(false);
-	},
-
-	onVoteLink(link) {
-		if (link.hasVoted) LinkActions.unvote(link.id);
-		else LinkActions.vote(link.id);
 	}
 
 });

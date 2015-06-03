@@ -37,7 +37,7 @@ let ConceptInfo = React.createClass({
 	},
 
 	render() {
-		let {edit, relationType, neighbors} = this.state;
+		let {edit, relationType} = this.state;
 
 		let comp;
 		if (edit || this.props.concept.isNew) {
@@ -56,8 +56,39 @@ let ConceptInfo = React.createClass({
 			);
 		}
 
+		let linksHTML = (this.props.concept.links || []).map(link => {
+			let parser = document.createElement('a');
+			parser.href = link.url;
+			let paths = parser.pathname.split('/');
+			let label = link.name ||
+				`${parser.hostname}/../${paths[paths.length - 1]}`;
+
+			return (
+				<div className="card" key={link.url}>
+					<div className="row">
+						<div className="col-xs-2">
+							<button type="button" onClick={() => this.onVoteLink(link)}>
+								{link.votes}
+							</button>
+						</div>
+						<div className="col-xs-10">
+							<a className="link and-so-on" target="_blank" href={link.url}>
+								{label}
+							</a>
+						</div>
+					</div>
+				</div>
+			);
+		});
+
 		return (
-			<div className="concept-info" style={{'border': `8px solid ${this.props.concept.color}`}} >{comp}</div>
+			<div>
+				<div className="concept-info card"
+						 style={{'border': `8px solid ${this.props.concept.color}`}}>
+					{comp}
+				</div>
+				{linksHTML}
+			</div>
 		);
 	},
 
