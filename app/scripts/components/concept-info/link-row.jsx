@@ -24,15 +24,10 @@ let LinkRow = React.createClass({
 				<div className="col-xs-1">
 					{link.votes}
 				</div>
-				<div className="col-xs-9">
+				<div className="col-xs-10">
 					<a className="link and-so-on" target="_blank" href={link.url}>
 						{label}
 					</a>
-				</div>
-				<div className="col-xs-1">
-					<IconButton iconClassName="icon icon-bin" tooltip="Delete"
-											className="small"
-											onClick={() => this.onVoteDelete(link)}/>
 				</div>
 			</div>
 		);
