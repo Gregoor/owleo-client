@@ -3,7 +3,6 @@ import _ from 'lodash';
 import {IconButton, TextField, Checkbox, FlatButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
-import LinkActions from '../../actions/link-actions';
 import nameAndContainer from '../helpers/nameAndContainer';
 
 let ConceptView = React.createClass({
@@ -12,49 +11,20 @@ let ConceptView = React.createClass({
 		let {concept, editMode} = this.props;
 
 		let editActions;
-		// the edit and delete buttons in concept view
 		if (editMode) editActions = [
 			(
-				<div className="col-xs-4">
+				<div className="col-xs-1.5">
 					<IconButton key="edit" iconClassName="icon icon-pencil"
 											tooltip="Edit" onClick={this.props.onEdit}/>
 				</div>
 			),
 			(
-				<div className="col-xs-4">
+				<div className="col-xs-1.5">
 					<IconButton key="delete" iconClassName="icon icon-bin"
 											tooltip="Delete" onClick={this.onDelete}/>
 				</div>
 			)
 		];
-    // view part of container, is rendered within return function
-		let containerRow;
-		if (concept.container && concept.container.id) {
-			containerRow = (
-				<div className="row">
-					<div className="col-xs-12" style={{'display': 'inline'}}>
-						<h2>Container</h2>
-						{nameAndContainer(concept.container)}
-					</div>
-				</div>
-			);
-		}
-
-		let tags = concept.tags.map((tag) => {
-			return (<span key={tag} className="tag">{tag}</span>)
-		});
-
-		// requirement array gets generated here
-		let reqLinks = [];
-		for (let req of concept.reqs) {
-			reqLinks.push(
-				<a key={req.id} href={`#/${req.id}`}>{nameAndContainer(req)}</a>
-			);
-			reqLinks.push(', ');
-		}
-		reqLinks = reqLinks.slice(0, reqLinks.length - 1);
-		if (reqLinks.length == 0) reqLinks.push(<em>None</em>);
-
 
 		let summarySourceRow;
 		if (concept.summarySource) {
@@ -70,86 +40,49 @@ let ConceptView = React.createClass({
 			);
 		}
 
-		let linkRows = _(concept.links).sortBy(l => l.votes * -1).map((link) => {
-			let parser = document.createElement('a');
-			parser.href = link.url;
-			let paths = parser.pathname.split('/');
-			let label = link.name ||
-				`${parser.hostname}/../${paths[paths.length - 1]}`;
-			return (
-				<div key={link.url} className="row middle-xs">
-					<div className="col-xs-2">
-						<button type="button" onClick={() => this.onVoteLink(link)}>
-							{link.votes}
-						</button>
-					</div>
-					<div className="col-xs-8">
-						<a className="link" target="_blank" href={link.url}>
-							{label}
-						</a>
-					</div>
-					<div className="col-xs-2">
-						{link.paywalled ? '$' : ''}
-					</div>
-				</div>
-			);
-		}).value();
-
 		return (
 			<div>
-				<div className="row">
-					<div className="col-xs-8">
-						<h1 title={concept.name} style={{
-								'borderLeft': `5px solid ${concept.color}`
-							}}>
-							{concept.name}
-						</h1>
-					</div>
-					<div className="col-xs-4">
 						<div className="row end-xs">
-							{editActions}
-						</div>
-					</div>
-				</div>
+							{editActions} </div>
+
 				<div className="scroll">
-					{containerRow}
 					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							{tags}
+						<div className="col-xs-3">
+									<IconButton iconClassName="icon icon-arrow-left"
+															style={{paddingBottom: 1}}
+															disabled={!concept.reqs.length}
+															onClick={this.onSearchFor('leadsTo')}/>
+									<span className="center-xs" style={{fontSize: 9}}>
+										REQUIREMENTS
+									</span>
+						</div>
+						<div className="col-xs-6">
+							<div>
+							<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
+								{concept.name}
+							</div>
+							in
+							<div>
+							{concept.container.name}
+							</div>
+								</div>
+						</div>
+						<div className="col-xs-3">
+							<IconButton iconClassName="icon icon-arrow-right"
+													disabled={!concept.followupCount}
+													style={{paddingBottom: 1}}
+													onClick={this.onSearchFor('reqBy')}/>
+							<span className="center-xs" style={{fontSize: 9}}>
+									FOLLOWUPS
+							</span>
 						</div>
 					</div>
 					<div className="row">
 						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Requirements:</h2>
-							{reqLinks}
-						</div>
-					</div>
-					<div className="row">
-						<div className="col-xs-12" style={{'display': 'inline'}}>
-							<h2>Summary:</h2>
 							{concept.summary}
 						</div>
 					</div>
 					{summarySourceRow}
-					<form onSubmit={this.onCreateLink}>
-						<div className="row">
-							<div className="col-xs-6">
-								<TextField floatingLabelText="Name" ref="linkName"/>
-							</div>
-							<div className="col-xs-6">
-								<Checkbox label="paywalled" ref="linkPaywalled"/>
-							</div>
-						</div>
-						<div className="row">
-							<div className="col-xs-8">
-								<TextField floatingLabelText="URL" ref="linkUrl"/>
-							</div>
-							<div className="col-xs-4 center-xs">
-								<FlatButton label="Create" secondary={true} type="submit"/>
-							</div>
-						</div>
-					</form>
-					{linkRows}
 				</div>
 			</div>
 		);
@@ -161,21 +94,8 @@ let ConceptView = React.createClass({
 		ConceptActions.delete(this.props.concept.id);
 	},
 
-	onCreateLink() {
-		let {linkName, linkUrl, linkPaywalled} = this.refs;
-		LinkActions.create({
-			'name': linkName.getValue(),
-			'url': linkUrl.getValue(),
-			'paywalled': linkPaywalled.isChecked()
-		});
-		linkName.setValue('');
-		linkUrl.setValue('');
-		linkPaywalled.setChecked(false);
-	},
-
-	onVoteLink(link) {
-		if (link.hasVoted) LinkActions.unvote(link.id);
-		else LinkActions.vote(link.id);
+	onSearchFor(param) {
+		return () => this.props.onSearch(param);
 	}
 
 });

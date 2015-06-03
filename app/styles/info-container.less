@@ -1,3 +1,5 @@
+@import '../../node_modules/material-ui/src/less/variables/custom-variables.less';
+
 @card-padding: 15px;
 
 .info-container {
@@ -6,12 +8,55 @@
   left: 30px;
   width: 450px - 2 * @card-padding;
 
+	.card {
+		margin-top: 3px;
+		width: 100%;
+		background-color: white;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		padding: 10px @card-padding;
+
+		hr {
+			margin: 6px 0;
+
+			&:last-child {
+				display: none;
+			}
+		}
+
+		.link-form {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 500ms;
+			&.expanded {
+				max-height: 500px;
+			}
+		}
+
+		.mui-text-field {
+			margin-top: -24px;
+			width: 100%;
+		}
+
+		.mui-icon-button[type=submit] {
+			color: @accent-1-color;
+		}
+	}
+
+	.link {
+		.mui-touch-ripple {
+			display: none;
+		}
+
+		color: black;
+
+		.voted {
+			color: @primary-1-color;
+		}
+
+		transition: color 300ms linear;
+	}
+
   .concept-info {
-    margin-top: 3px;
-    width: 100%;
-    background-color: white;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    padding: 10px @card-padding;
 
     h1 {
       font-size: 21px;
@@ -62,6 +107,10 @@
 
 		.mui-text-field {
 			width: 100% !important;
+		}
+		.mui-flat-button.mui-is-secondary {
+			color: black;
+			font-size: 8px;
 		}
   }
 

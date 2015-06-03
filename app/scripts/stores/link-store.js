@@ -25,11 +25,21 @@ let linkStore = Reflux.createStore({
 	},
 
 	vote(linkId) {
+		let link = _.find(this.links, {'id': linkId});
+		if (link) {
+			link.votes++;
+			link.hasVoted = true;
+		}
 		LinkAPI.vote(this.conceptId, linkId)
 			.then(this.handleVoteResponse(linkId, true));
 	},
 
 	unvote(linkId) {
+		let link = _.find(this.links, {'id': linkId});
+		if (link) {
+			link.votes--;
+			link.hasVoted = false;
+		}
 		LinkAPI.unvote(this.conceptId, linkId)
 			.then(this.handleVoteResponse(linkId, false));
 	},
