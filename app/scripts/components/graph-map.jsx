@@ -41,6 +41,7 @@ let GraphMap = React.createClass({
 		this.layers = new Map();
 		this.reqLinks = new Map();
 		this.labels = [];
+		this.selectedAt = 0;
 
 		this.onNavStateChange = this.renderD3;
 	},

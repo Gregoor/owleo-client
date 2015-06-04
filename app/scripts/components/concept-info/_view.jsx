@@ -29,7 +29,7 @@ let ConceptView = React.createClass({
 		let {fetching, container, summarySource} = concept;
 
 		let containerHTML;
-		if (container.id) containerHTML = (
+		if (container && container.id) containerHTML = (
 			<div className="row">
 				<div className="col-xs-1">
 					in
