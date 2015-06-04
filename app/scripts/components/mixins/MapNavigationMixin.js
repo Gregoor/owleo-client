@@ -56,7 +56,8 @@ export default {
 
 		let steps = 1500; // use this to adjust zoom behavior
 		let prevScale = this.navState.scale;
-		let scale = prevScale - (prevScale * event.deltaY / steps);
+		let multiply = event.deltaMode == 1 ? 10 : 1;
+		let scale = prevScale - (prevScale * (event.deltaY * multiply) / steps);
 		if (scale == prevScale || scale > 1.5 || scale < .1) return;
 
 		let {pos} = this.navState;
@@ -70,11 +71,11 @@ export default {
 		this.setNavState({prevScale, scale, 'pos': {x, y}});
 	},
 
+
 	setNavState(obj) {
 		_.merge(this.navState, obj);
 		this.navState.zoom = Math.max(0.1, this.navState.zoom);
 
 		this.onNavStateChange(this.navState);
 	}
-
 }
