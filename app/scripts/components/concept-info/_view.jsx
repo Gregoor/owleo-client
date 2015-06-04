@@ -26,21 +26,34 @@ let ConceptView = React.createClass({
 			)
 		];
 
+		let {fetching, container, summarySource} = concept;
+
+		let containerHTML;
+		if (container.id) containerHTML = (
+			<div className="row">
+				<div className="col-xs-1">
+					in
+				</div>
+				<div className="col-xs-11">
+					{container.name}
+				</div>
+			</div>
+		);
+
 		let summarySourceRow;
-		if (concept.summarySource) {
+		if (summarySource) {
 			summarySourceRow = (
 				<div className="row">
 					<div className="col-xs-12" style={{'display': 'inline'}}>
 						<h2>Source:</h2>
-						<a className="link" target="_blank" href={concept.summarySource}>
-							{concept.summarySource}
+						<a className="link" target="_blank" href={summarySource}>
+							{summarySource}
 						</a>
 					</div>
 				</div>
 			);
 		}
 
-		let {fetching} = concept;
 		return (
 			<div>
 						<div className="row end-xs">
@@ -61,14 +74,7 @@ let ConceptView = React.createClass({
 							<div style={{'font-size': '18px', 'font-weight': 'bold'}}>
 								{concept.name}
 							</div>
-							<div className="row">
-								<div className="col-xs-1">
-									in
-								</div>
-								<div className="col-xs-11">
-									{concept.container.name}
-								</div>
-							</div>
+							{containerHTML}
 						</div>
 						<div className="col-xs-3">
 							<IconButton iconClassName="icon icon-arrow-right"
