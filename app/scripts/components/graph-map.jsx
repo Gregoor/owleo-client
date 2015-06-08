@@ -138,14 +138,17 @@ let GraphMap = React.createClass({
 		let focusedConcept = this.concepts.get(conceptId);
 		if (!conceptId || !focusedConcept) return;
 
-		let boundingRect = this.getDOMNode().getBoundingClientRect();
+		let {width, height} = this.getDOMNode().getBoundingClientRect();
 		this.transitioning = true;
+		let scale = 1 - 0.0004 * focusedConcept.r;
 		this.setNavState({
 			'pos': {
-				'x': boundingRect.width / 2 - focusedConcept.absX,
-				'y': boundingRect.height / 2 - focusedConcept.absY
-			}
+				'x': scale * width / 2 - focusedConcept.absX,
+				'y': scale * height / 2 - focusedConcept.absY
+			},
+			scale
 		});
+		this.renderD3();
 	},
 
 	createHierarchy(parentEl, concepts) {
@@ -359,7 +362,9 @@ let GraphMap = React.createClass({
 	getGroup() {
 		if (this.transitioning) {
 			this.transitioning = false;
-			return this.group.transition();
+			let transition = this.group.transition();
+			transition.each('end', () => this.renderD3());
+			return transition;
 		} else {
 			return this.group;
 		}

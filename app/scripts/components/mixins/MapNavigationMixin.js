@@ -8,7 +8,7 @@ export default {
 		this.navState = {
 			'pos': {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			'panDelta': {x, y},
-			'prevScale': 1,
+			'prevScale': .19,
 			'scale': .2
 		};
 		return {'panning': false};
