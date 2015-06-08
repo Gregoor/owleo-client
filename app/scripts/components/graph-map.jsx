@@ -184,7 +184,7 @@ let GraphMap = React.createClass({
 		let onClick = function(d) {
 			if (!self.state.wasPanning) {
 				self.props.onSelect(d.id);
-				this.selectedAt = Date.now();
+				self.selectedAt = Date.now();
 			}
 		};
 		let circle = el.append('circle')
