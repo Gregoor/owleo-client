@@ -1,5 +1,7 @@
-let _ = require('lodash');
-let Hammer = require('hammerjs');
+import _ from 'lodash';
+import Hammer from 'hammerjs';
+
+const ZOOM_STEPS = 30;
 
 export default {
 
@@ -54,19 +56,16 @@ export default {
 	onScroll(event) {
 		event.preventDefault();
 
-		let steps = 1500; // use this to adjust zoom behavior
 		let prevScale = this.navState.scale;
-		let multiply = event.deltaMode == 1 ? 10 : 1;
-		let scale = prevScale - (prevScale * (event.deltaY * multiply) / steps);
+		let scale = prevScale + (event.deltaY > 0 ? -1 : 1) / ZOOM_STEPS;
 		if (scale == prevScale || scale > 1.5 || scale < .1) return;
 
 		let {pos} = this.navState;
-		let eventX = event.pageX;
-		let eventY = event.pageY;
+		let {pageX, pageY} = event;
 
 		let scaleD = scale / prevScale;
-		let x = scaleD * (pos.x - eventX) + eventX;
-		let y = scaleD * (pos.y - eventY) + eventY;
+		let x = scaleD * (pos.x - pageX) + pageX;
+		let y = scaleD * (pos.y - pageY) + pageY;
 
 		this.setNavState({prevScale, scale, 'pos': {x, y}});
 	},
@@ -76,6 +75,6 @@ export default {
 		_.merge(this.navState, obj);
 		this.navState.zoom = Math.max(0.1, this.navState.zoom);
 
-		this.onNavStateChange(this.navState);
+		this.onNavStateChange();
 	}
 }

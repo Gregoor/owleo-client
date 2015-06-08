@@ -1,23 +1,16 @@
 import React from 'react';
-import 'd3';
 import _ from 'lodash';
 import Vector from 'wacktor';
 
 import MapNavigationMixin from './mixins/MapNavigationMixin';
 import MapPhysicsMixin from './mixins/MapPhysicsMixin';
 
-const SELECTED_CLASS = 'selected';
-const HIGHLIGHT_CLASS = 'highlighted';
-
 const LINK_WIDTH = 1;
 const ARROW_WIDTH = 5;
 const ARROW_HEIGHT = 10;
+const LABEL_OFFSET = 15;
 
 let sqr = n => Math.pow(n, 2);
-let initListOrPush = (map, key, val) => {
-	if (map.has(key)) map.get(key).push(val);
-	else map.set(key, [val]);
-};
 
 let GraphMap = React.createClass({
 
@@ -36,29 +29,68 @@ let GraphMap = React.createClass({
 	mixins: [MapNavigationMixin, MapPhysicsMixin],
 
 	componentWillMount() {
-		this.concepts = new Map();
-		this.conceptNodes = new Map();
-		this.layers = new Map();
-		this.reqLinks = new Map();
-		this.labels = [];
-		this.selectedAt = 0;
+		this.baseConcepts = [];
+		this.links = [];
+		this.onNavStateChange = this.renderCanvas;
 
-		this.onNavStateChange = this.renderD3;
+		window.addEventListener('resize', this.onResize);
+		this.onResize();
+	},
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', this.onResize)
 	},
 
 	componentDidMount() {
 		this.update(this.props);
+		this.renderCanvas(this.navState);
 	},
 
 	componentWillReceiveProps(props) {
 		this.update(props);
 	},
 
+	componentDidUpdate() {
+		this.renderCanvas();
+	},
+
+	render() {
+		let {panning, width, height} = this.state;
+		return (
+			<canvas ref="base" className={`map ${panning ? 'grabbed' : ''}`}
+							width={width} height={height}
+							onWheel={this.onScroll} onClick={this.onSelect}
+							onMouseMove={this.onMouseMove}/>
+		);
+	},
+
+	onResize() {
+		this.setState({'width': window.innerWidth, 'height': window.innerHeight});
+	},
+
 	update(props) {
 		let {concepts, physical, selectedConceptId, focusedConceptId,
 			filter} = props;
 
-		this.buildMap(concepts);
+		if (concepts && !this.mapBuilt) {
+			this.mapBuilt = true;
+			for (let [,concept] of concepts) {
+				let {container} = concept;
+				if (container) {
+					container = concepts.get(container);
+					if (!container.children) container.children = [concept];
+					else container.children.push(concept);
+				} else this.baseConcepts.push(concept);
+
+				for (let req of concept.reqs) {
+					req = concepts.get(req);
+					let data = {'from': req, 'to': concept};
+					req.container == concept.container ?
+						this.links.unshift(data) :
+						this.links.push(data);
+				}
+			}
+		}
 
 		if (this.physicsInited) {
 			if (physical) {
@@ -70,270 +102,144 @@ let GraphMap = React.createClass({
 			}
 		} else if (physical) {
 			this.physicsInited = true;
-			for (let layer of this.layers.values()) this.addPhysicsTo(layer);
 			this.startAnimationLoop();
 		}
-
-		if (this.links && selectedConceptId != this.state.selectedConceptId) {
-			this.setState({selectedConceptId});
-			this.group.selectAll(`.${SELECTED_CLASS}`)
-				.classed(SELECTED_CLASS, false);
-			if (selectedConceptId) {
-				let conceptNode = this.conceptNodes.get(selectedConceptId);
-				if (conceptNode) {
-					conceptNode.classList.add(SELECTED_CLASS);
-					let linkNodes = this.reqLinks.get(selectedConceptId);
-					if (linkNodes) linkNodes.forEach(el => {
-						el.classList.add(SELECTED_CLASS);
-					});
-				}
-			}
-		}
-
 		this.focusOn(focusedConceptId);
 	},
 
-	buildMap(concepts) {
-		if (!concepts || this.mapBuilt) return;
-		const {WIDTH, HEIGHT} = this;
-		this.mapBuilt = true;
-		let svg = d3.select(this.getDOMNode())
-			.attr({'width': WIDTH, 'height': HEIGHT});
-
-		this.group = svg.append('g')
-			.attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`);
-
-		this.animated = false;
-
-		this.concepts = concepts;
-
-		let containers = this.containers = new Map();
-		for (let [id, concept] of concepts) {
-			let {container} = concept;
-			if (container && !concept.color) concept.color = container.color;
-			initListOrPush(containers, container, concept);
-		}
-
-		let links = [];
-		for (let [id, c] of concepts) for (let req of c.reqs) {
-			links.push({'from': concepts.get(req), 'to': c});
-		}
-
-		let reqLinks = this.reqLinks;
-		this.links = this.group.selectAll('.link')
-			.data(links)
-			.enter().append('polygon')
-			.attr('class', 'link')
-			.each(function (d) {
-				initListOrPush(reqLinks, d.from.id, this);
-				initListOrPush(reqLinks, d.to.id, this);
-			});
-
-		this.createHierarchy(this.group, containers.get(null));
-		this.renderLinks();
-	},
-
 	focusOn(conceptId) {
-		let focusedConcept = this.concepts.get(conceptId);
-		if (!conceptId || !focusedConcept) return;
-
-		let boundingRect = this.getDOMNode().getBoundingClientRect();
-		this.transitioning = true;
-		this.setNavState({
-			'pos': {
-				'x': boundingRect.width / 2 - focusedConcept.absX,
-				'y': boundingRect.height / 2 - focusedConcept.absY
-			}
-		});
 	},
 
-	createHierarchy(parentEl, concepts) {
-		let self = this;
-		if (!concepts || concepts.length == 0) return;
-
-		this.createNodesFor(parentEl, concepts).each(function (d) {
-			self.createHierarchy(d3.select(this), self.containers.get(d.id));
-		});
+	onSelect(event) {
+		if (this.state.wasPanning) return;
+		let selected = this.getConceptByEvent(event);
+		this.props.onSelect(selected ? selected.id : undefined);
 	},
 
-	createNodesFor(parentEl, concepts) {
-		let self = this;
-		let container = this.concepts.get(concepts[0].container) ||
-			{'absX': 0, 'absY': 0};
+	onMouseMove(event) {
+		this.hoveredConcept = this.getConceptByEvent(event);
+		this.renderCanvas();
+	},
 
-		let links = [];
-		for (let i = 0; i < concepts.length; i++) {
-			let concept = concepts[i];
-			for (let j = 0; j < concepts.length; j++) {
-				if (_.includes(concept.reqs, concepts[j].id)) {
-					links.push({'source': j, 'target': i});
-				}
+	getConceptByEvent(event) {
+		let {pageX, pageY} = event;
+		let {left, top} = this.refs.base.getDOMNode().getBoundingClientRect();
+		let {pos, scale} = this.navState;
+
+		let {x, y} = new Vector(pageX, pageY)
+			.sub(left, top)
+			.mul(1 / scale)
+			.sub(pos.x, pos.y);
+
+		let checkConcepts = this.baseConcepts.slice();
+		let selected;
+		while (checkConcepts && checkConcepts.length) {
+			let concept = checkConcepts.pop();
+			let magSq = new Vector(x, y).sub(concept.absX, concept.absY).magSq();
+			if (magSq <= sqr(concept.r)) {
+				selected = concept;
+				checkConcepts = concept.children ? concept.children.slice() : null;
 			}
 		}
-
-		let el = parentEl.selectAll('.node').data(concepts).enter()
-			.append('g').attr('class', 'node')
-			.each(function(d) {
-				self.conceptNodes.set(d.id, this);
-			});
-
-		let onClick = function(d) {
-			if (!self.state.wasPanning) {
-				self.props.onSelect(d.id);
-				this.selectedAt = Date.now();
-			}
-		};
-		let circle = el.append('circle')
-			.style({
-				'stroke': d => d.color || (d.color = container.color) || 'white',
-				'fill': 'rgba(0, 0, 0, .05)'
-			})
-			.on('mouseover', function(d) {
-				let linkNodes = self.reqLinks.get(d.id);
-				if (linkNodes) linkNodes.forEach(el => {
-					d3.select(el).classed(HIGHLIGHT_CLASS, true);
-				});
-				d3.select(this).classed(HIGHLIGHT_CLASS, true);
-			})
-			.on('mouseout', function(d) {
-				let linkNodes = self.reqLinks.get(d.id);
-				if (linkNodes) linkNodes.forEach(el => {
-					d3.select(el).classed(HIGHLIGHT_CLASS, false);
-				});
-				d3.select(this).classed(HIGHLIGHT_CLASS, false);
-			})
-			.on('click', onClick);
-
-		circle.append('title').text(d => d.name);
-
-		let label = el.append('text')
-			.text(d => d.name)
-			.on('click', onClick)
-			.attr({
-				'class': 'label',
-				'x': function (d) {
-					return -this.getComputedTextLength() / 2
-				}
-			})
-			.each(function() {
-				self.labels.push(this);
-			});
-
-		let layer = {container, concepts, links, el, circle, label};
-		this.layers.set(container.id, layer);
-		this.renderLayer(layer);
-
-		return el;
+		return selected;
 	},
 
-	render() {
-		return (
-			<svg className={`map ${this.state.panning ? 'grabbed' : ''}`}
-					 onWheel={this.onScroll} onClick={this.onSelect}/>
-		);
+	renderCanvas() {
+		let {pos, scale} = this.navState;
+		let canvas = this.refs.base.getDOMNode();
+		let ctx = canvas.getContext('2d');
+		ctx.save();
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.scale(scale, scale);
+		ctx.translate(pos.x, pos.y);
+		ctx.font = '500 13px Roboto';
+		this.renderLayer(ctx, this.baseConcepts);
+		this.renderLinks(ctx);
+		ctx.restore();
 	},
 
-	onSelect() {
-		if (this.state.wasPanning) this.setState({'wasPanning': false});
-		else if (Date.now() - this.selectedAt > 1000) this.props.onSelect();
-	},
-
-	renderD3(navState) {
-		let {pos, prevScale, scale} = navState;
-
-		const MIN_TEXT_R = 9;
-		if (prevScale != scale) {
-			let invScale = 1 / scale;
-			d3.selectAll(this.labels)
-				.attr('transform', `scale(${invScale})`)
-				.attr('y', d => (d.r + 18) * scale)
-				.style('opacity', d => {
-					let scaledR = d.r * scale;
-					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 4) / Math.pow(MIN_TEXT_R, 4);
-				});
-			d3.selectAll(Array.from(this.conceptNodes.values()))
-				.style('opacity', d => {
-					let scaledR = d.r * scale;
-					return scaledR > MIN_TEXT_R ? 1 : scaledR / MIN_TEXT_R;
-				});
-		}
-
-		this.getGroup().attr('transform',
-			`matrix(${scale}, 0, 0, ${scale}, ${pos.x}, ${pos.y})`
-		);
-	},
-
-	renderLayer(layer) {
+	renderLayer(ctx, concepts, containerColor = 'white', xOff = 0, yOff = 0) {
+		let {selectedConceptId} = this.props;
+		let {width, height} = this.state;
 		const HALF_WIDTH = this.WIDTH / 2;
 		const HALF_HEIGHT = this.HEIGHT / 2;
-		const {BASE_RAD} = this;
-		let {el, circle, label, container} = layer;
+		for (let concept of concepts) {
+			let {r, name, children} = concept;
+			let color = concept.color || containerColor;
+			let x = concept.absX =  concept.x + xOff - HALF_WIDTH;
+			let y = concept.absY = concept.y + yOff - HALF_HEIGHT;
 
-		el.attr('transform', d => `translate(
-            ${d.x - HALF_WIDTH},
-            ${d.y - HALF_HEIGHT})
-        `)
-			.each((d) => {
-				_.assign(d, {
-					'absX': container.absX - HALF_WIDTH + d.x,
-					'absY': container.absY - HALF_HEIGHT + d.y
-				});
-			});
+			ctx.setLineDash(selectedConceptId == concept.id ? [8, 4] : []);
+			ctx.strokeStyle = color || 'white';
+			ctx.lineWidth = 3;
+			ctx.beginPath();
+			ctx.arc(x, y, r, 0, 2 * Math.PI);
+			ctx.stroke();
+			if (concept.id == selectedConceptId ||
+					this.hoveredConcept && this.hoveredConcept.id == concept.id) {
+				ctx.fillStyle = 'rgba(255, 255, 255, .05)';
+				ctx.fill();
+			}
 
-		circle.attr('r', d => d.r = BASE_RAD +
-				(!this.containers.has(d.id) ? 0 :
-					this.containers.get(d.id).reduce((maxR, concept) => {
-						let {x, y, r} = concept;
-						if (!r) r = BASE_RAD;
-						return Math.max(
-							maxR,
-							r + Math.sqrt(sqr(x - HALF_WIDTH) + sqr(y - HALF_HEIGHT))
-						);
-					}, 0)
-				)
-		);
+			let textWidth = ctx.measureText(name).width;
+			ctx.fillStyle = 'white';
+			ctx.strokeStyle = 'black';
+			ctx.lineWidth = .2;
+			let textArgs = [name, x - textWidth / 2, y + r + LABEL_OFFSET];
+			ctx.fillText(...textArgs);
+			ctx.strokeText(...textArgs);
 
-		label.attr('y', d => d.r + 18);
+			if (children) this.renderLayer(ctx, children, color, x, y);
+		}
 	},
 
-	renderLinks() {
-		this.links
-			.each(function(d) {
-				let fromV = new Vector(d.from.absX, d.from.absY);
-				let toV = new Vector(d.to.absX, d.to.absY);
+	renderLinks(ctx) {
+		let {selectedConceptId} = this.props;
+		for (let link of this.links) {
+			let linkOfConcept = conceptId => {
+				return link.from.id == conceptId || link.to.id == conceptId;
+			};
+			let fromV = new Vector(link.from.absX, link.from.absY);
+			let toV = new Vector(link.to.absX, link.to.absY);
 
-				let between = fromV.sub(toV).norm();
-				let invertBetween = between.norm().neg();
-				let orthBetween = (new Vector(-between.y, between.x)).norm();
+			let between = fromV.sub(toV).norm();
+			let invertBetween = between.norm().neg();
+			let orthBetween = (new Vector(-between.y, between.x)).norm();
 
-				if (d.from.container != d.to.container) {
-					this.classList.add('long-distance-relationship');
-				}
+			if (linkOfConcept(selectedConceptId) ||
+					this.hoveredConcept && linkOfConcept(this.hoveredConcept.id)) {
+				ctx.globalAlpha = 1;
+			} else {
+				ctx.globalAlpha = link.from.container == link.to.container ? .1 : .05;
+			}
 
-				let fromRad = between.mul(d.from.r);
-				let toRad = between.mul(d.to.r);
+			let fromRad = between.mul(link.from.r);
+			let toRad = between.mul(link.to.r);
 
-				fromV = fromV.sub(fromRad);
-				let arrowTop = toV = toV.add(toRad);
+			fromV = fromV.sub(fromRad);
+			let arrowTop = toV = toV.add(toRad);
 
-				toV = toV
-					.sub(invertBetween.mul(ARROW_HEIGHT))
-					.sub(invertBetween.mul(4));
+			toV = toV
+				.sub(invertBetween.mul(ARROW_HEIGHT))
+				.sub(invertBetween.mul(4));
 
-				let fromL = fromV.add(orthBetween.mul(LINK_WIDTH));
-				let fromR = fromV.sub(orthBetween.mul(LINK_WIDTH));
+			let fromL = fromV.add(orthBetween.mul(LINK_WIDTH));
+			let fromR = fromV.sub(orthBetween.mul(LINK_WIDTH));
 
-				let toL = toV.add(orthBetween.mul(LINK_WIDTH));
-				let toR = toV.sub(orthBetween.mul(LINK_WIDTH));
+			let toL = toV.add(orthBetween.mul(LINK_WIDTH));
+			let toR = toV.sub(orthBetween.mul(LINK_WIDTH));
 
-				let arrowL = orthBetween.mul(ARROW_WIDTH).add(toV);
-				let arrowR = orthBetween.mul(-ARROW_WIDTH).add(toV);
+			let arrowL = orthBetween.mul(ARROW_WIDTH).add(toV);
+			let arrowR = orthBetween.mul(-ARROW_WIDTH).add(toV);
 
-				d.points = [fromL, fromR, toR, arrowR, arrowTop, arrowL, toL];
-			})
-			.attr('points', d => d.points.reduce((str, v) => {
-				return `${str} ${v.x},${v.y}`;
-			}, ''));
+			ctx.beginPath();
+			ctx.moveTo(fromL.x, fromL.y);
+			[fromR, toR, arrowR, arrowTop, arrowL, toL].forEach(v => {
+				ctx.lineTo(v.x, v.y);
+			});
+			ctx.closePath();
+			ctx.fill();
+		}
 	},
 
 	startAnimationLoop() {
@@ -349,19 +255,9 @@ let GraphMap = React.createClass({
 	animationLoop() {
 		if (!this.animated) return;
 		window.requestAnimationFrame(() => {
-			for (let layer of this.layers.values()) this.renderLayer(layer);
-			this.renderLinks();
+			this.renderCanvas();
 			this.animationLoop();
 		});
-	},
-
-	getGroup() {
-		if (this.transitioning) {
-			this.transitioning = false;
-			return this.group.transition();
-		} else {
-			return this.group;
-		}
 	}
 
 });

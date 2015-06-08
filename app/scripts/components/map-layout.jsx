@@ -100,8 +100,11 @@ let MapLayout = React.createClass({
 	},
 
 	onSelect(id) {
-		if (id !== undefined) ConceptActions.select(id);
-		else {
+		let {selectedConcept} = this.state;
+		if (id !== undefined &&
+				(!selectedConcept || selectedConcept.id != id)) {
+			ConceptActions.select(id);
+		} else {
 			ConceptActions.unselect();
 			this.setState({'focusedConceptId': null});
 		}
