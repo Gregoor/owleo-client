@@ -121,7 +121,7 @@ let GraphMap = React.createClass({
 
 	onMouseMove(event) {
 		this.hoveredConcept = this.getConceptByEvent(event);
-		this.renderCanvas();
+		requestAnimationFrame(() => this.renderCanvas());
 	},
 
 	getConceptByEvent(event) {
@@ -163,14 +163,13 @@ let GraphMap = React.createClass({
 
 	renderLayer(ctx, concepts, containerColor = 'white', xOff = 0, yOff = 0) {
 		let {selectedConceptId} = this.props;
-		let {width, height} = this.state;
 		const HALF_WIDTH = this.WIDTH / 2;
 		const HALF_HEIGHT = this.HEIGHT / 2;
 		for (let concept of concepts) {
 			let {r, name, children} = concept;
 			let color = concept.color || containerColor;
-			let x = concept.absX =  concept.x + xOff - HALF_WIDTH;
-			let y = concept.absY = concept.y + yOff - HALF_HEIGHT;
+			let x = concept.absX = Math.floor(concept.x + xOff - HALF_WIDTH);
+			let y = concept.absY = Math.floor(concept.y + yOff - HALF_HEIGHT);
 
 			ctx.setLineDash(selectedConceptId == concept.id ? [8, 4] : []);
 			ctx.strokeStyle = color || 'white';
@@ -236,9 +235,9 @@ let GraphMap = React.createClass({
 			let arrowR = orthBetween.mul(-ARROW_WIDTH).add(toV);
 
 			ctx.beginPath();
-			ctx.moveTo(fromL.x, fromL.y);
+			ctx.moveTo(Math.floor(fromL.x), Math.floor(fromL.y));
 			[fromR, toR, arrowR, arrowTop, arrowL, toL].forEach(v => {
-				ctx.lineTo(v.x, v.y);
+				ctx.lineTo(Math.floor(v.x), Math.floor(v.y));
 			});
 			ctx.closePath();
 			ctx.fill();
