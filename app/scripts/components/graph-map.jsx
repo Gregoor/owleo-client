@@ -111,7 +111,10 @@ let GraphMap = React.createClass({
 	},
 
 	onSelect(event) {
-		if (this.state.wasPanning) return;
+		if (this.state.wasPanning) {
+			this.setState({'wasPanning': false});
+			return;
+		}
 		let selected = this.getConceptByEvent(event);
 		this.props.onSelect(selected ? selected.id : undefined);
 	},
@@ -184,7 +187,7 @@ let GraphMap = React.createClass({
 			let textWidth = ctx.measureText(name).width;
 			ctx.fillStyle = 'white';
 			ctx.strokeStyle = 'black';
-			ctx.lineWidth = .2;
+			ctx.lineWidth = .3;
 			let textArgs = [name, x - textWidth / 2, y + r + LABEL_OFFSET];
 			ctx.fillText(...textArgs);
 			ctx.strokeText(...textArgs);
