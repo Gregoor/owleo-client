@@ -1,5 +1,5 @@
-let _ = require('lodash');
-let Hammer = require('hammerjs');
+import _ from 'lodash';
+import Hammer from 'hammerjs';
 
 export default {
 
@@ -9,7 +9,7 @@ export default {
 			'pos': {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			'panDelta': {x, y},
 			'prevScale': 1,
-			'scale': 1
+			'scale': .2
 		};
 		return {'panning': false};
 	},
@@ -76,6 +76,6 @@ export default {
 		_.merge(this.navState, obj);
 		this.navState.zoom = Math.max(0.1, this.navState.zoom);
 
-		this.onNavStateChange(this.navState);
+		this.onNavStateChange();
 	}
 }

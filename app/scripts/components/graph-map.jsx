@@ -131,6 +131,7 @@ let GraphMap = React.createClass({
 
 		this.createHierarchy(this.group, containers.get(null));
 		this.renderLinks();
+		this.renderD3();
 	},
 
 	focusOn(conceptId) {
@@ -238,8 +239,8 @@ let GraphMap = React.createClass({
 		else if (Date.now() - this.selectedAt > 1000) this.props.onSelect();
 	},
 
-	renderD3(navState) {
-		let {pos, prevScale, scale} = navState;
+	renderD3() {
+		let {pos, prevScale, scale} = this.navState;
 
 		const MIN_TEXT_R = 9;
 		if (prevScale != scale) {
@@ -249,7 +250,7 @@ let GraphMap = React.createClass({
 				.attr('y', d => (d.r + 18) * scale)
 				.style('opacity', d => {
 					let scaledR = d.r * scale;
-					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 4) / Math.pow(MIN_TEXT_R, 4);
+					return scaledR > MIN_TEXT_R ? 1 : Math.pow(scaledR, 5) / Math.pow(MIN_TEXT_R, 5);
 				});
 			d3.selectAll(Array.from(this.conceptNodes.values()))
 				.style('opacity', d => {
