@@ -37,7 +37,7 @@ let ConceptInfo = React.createClass({
 	componentWillReceiveProps(props) {
 		let oldConcept = this.props.concept;
 		if (oldConcept && oldConcept.id != props.concept.id) {
-			this.setState({'edit': false});
+			this.setState(this.getInitialState());
 		}
 	},
 
@@ -115,12 +115,12 @@ let ConceptInfo = React.createClass({
 	},
 
 	onChange() {
-		this.isDirty = true;
+		this.state.isDirty = true;
 	},
 
 	onKeydown(e) {
 		if (e.keyCode == 27/*ESC*/) {
-			if (this.isDirty &&
+			if (this.state.isDirty &&
 				!confirm('Do you really want to discard your changes?')) return;
 			ConceptActions.unselect();
 		}
