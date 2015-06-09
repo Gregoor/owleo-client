@@ -139,11 +139,12 @@ let ConceptInfo = React.createClass({
     this.setState({'relationType': param});
   },
 
-  onChangeLink(e) {
-    this.setState({'expandLinkForm': e.target.value.length});
+  onChangeLink(event) {
+    this.setState({'expandLinkForm': event.target.value.length});
   },
 
-  onCreateLink() {
+  onCreateLink(event) {
+    event.preventDefault();
     let {linkName, linkUrl, linkPaywalled} = this.refs;
     LinkActions.create({
       'name': linkName.getValue(),
