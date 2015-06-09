@@ -6,7 +6,7 @@ import LinkActions from '../../actions/link-actions';
 let LinkRow = React.createClass({
 
   render() {
-    let {link} = this.props;
+    let {link, voteDisabled} = this.props;
     let parser = document.createElement('a');
     parser.href = link.url;
     let path = parser.pathname.split('/');
@@ -19,6 +19,7 @@ let LinkRow = React.createClass({
         <div className="col-xs-1">
           <IconButton iconClassName="icon icon-arrow-up" tooltip="Vote"
                       onClick={() => this.onVoteLink(link)}
+                      disabled={voteDisabled}
                       className={`small ${votedClass}`}/>
         </div>
         <div className="col-xs-1">

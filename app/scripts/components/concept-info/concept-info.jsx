@@ -1,5 +1,6 @@
 import React from 'react';
 import Router from 'react-router';
+import Reflux from 'reflux';
 import _ from 'lodash';
 import {IconButton, TextField, Checkbox} from 'material-ui';
 
@@ -43,6 +44,7 @@ let ConceptInfo = React.createClass({
 
   render() {
     let {edit, relationType, expandLinkForm} = this.state;
+    let {user} = this.props;
 
     let comp;
     if (edit || this.props.concept.isNew) {
@@ -61,42 +63,50 @@ let ConceptInfo = React.createClass({
       );
     }
 
+    let linkFormHTML = [];
+    if (user && user.loggedIn) {
+      let linkFormClass = expandLinkForm ? 'expanded' : 'collapsed';
+      linkFormHTML = [
+        <form onSubmit={this.onCreateLink}>
+          <div className="row middle-xs">
+            <div className="col-xs-11">
+              <TextField ref="linkUrl" floatingLabelText="Add a link"
+                         onChange={this.onChangeLink}/>
+            </div>
+            <div className="col-xs-1">
+              <IconButton iconClassName="icon icon-plus" tooltip="Add link"
+                          type="submit" className="small"/>
+            </div>
+          </div>
+          <div className={`row middle-xs link-form ${linkFormClass}`}>
+            <div className="col-xs-8">
+              <TextField ref="linkName" floatingLabelText="Link name (optional)"/>
+            </div>
+            <div className="col-xs-4">
+              <Checkbox ref="linkPaywalled" label="paywalled"/>
+            </div>
+          </div>
+        </form>,
+        <hr/>
+      ];
+    }
+
     let linksHTML = [];
     _.sortBy(this.props.concept.links || [], link => -link.votes)
       .forEach(link => {
-        linksHTML.push(<LinkRow link={link}/>, <hr/>);
+        linksHTML.push(
+          <LinkRow link={link} voteDisabled={!user.loggedIn}/>,
+          <hr/>
+        );
       });
-
-
-    let linkFormClass = expandLinkForm ? 'expanded' : 'collapsed';
     return (
       <div>
         <div className="concept-info card"
              style={{'border': `8px solid ${this.props.concept.color}`}}>
           {comp}
         </div>
-        <div className="card">
-          <form onSubmit={this.onCreateLink}>
-            <div className="row middle-xs">
-              <div className="col-xs-11">
-                <TextField ref="linkUrl" floatingLabelText="Add a link"
-                           onChange={this.onChangeLink}/>
-              </div>
-              <div className="col-xs-1">
-                <IconButton iconClassName="icon icon-plus" tooltip="Add link"
-                            type="submit" className="small"/>
-              </div>
-            </div>
-            <div className={`row middle-xs link-form ${linkFormClass}`}>
-              <div className="col-xs-8">
-                <TextField ref="linkName" floatingLabelText="Link name (optional)"/>
-              </div>
-              <div className="col-xs-4">
-                <Checkbox ref="linkPaywalled" label="paywalled"/>
-              </div>
-            </div>
-          </form>
-          <hr/>
+        <div className="card" style={{display: linkFormHTML.length || linksHTML.length ? 'block' : 'none'}}>
+          {linkFormHTML}
           {linksHTML}
         </div>
       </div>

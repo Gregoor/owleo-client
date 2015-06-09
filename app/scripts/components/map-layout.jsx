@@ -54,6 +54,7 @@ let MapLayout = React.createClass({
 
     if (selectedConcept) {
       conceptInfo = <ConceptInfo concept={selectedConcept}
+                                 user={user}
                                  editMode={user.admin}/>;
     }
 
