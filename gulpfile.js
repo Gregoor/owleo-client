@@ -23,7 +23,9 @@ var bundler = {
   },
   bundle: function () {
     return this.w && this.w.bundle()
-        .on('error', $.util.log.bind($.util, 'Browserify Error'))
+        .on('error', function(error) {
+          $.util.log('Browserify Error', '\n', error.message);
+        })
         .pipe(source('app.js'))
         .pipe(gulp.dest('dist/scripts'));
   },

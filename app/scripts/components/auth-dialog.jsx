@@ -11,7 +11,7 @@ let AuthDialog = React.createClass({
   mixins: [Reflux.ListenerMixin, Router.Navigation],
 
   getInitialState() {
-    return {'exists': true, 'mismatch': false};
+    return {'exists': false, 'mismatch': false};
   },
 
   componentDidMount() {
@@ -19,11 +19,11 @@ let AuthDialog = React.createClass({
     if (userStore.user.loggedIn) this.onClose();
     this.listenTo(userStore, user => {
       if (user.loggedIn) this.onClose();
-    })
+    });
   },
 
   render() {
-    let {exists, mismatch} = this.state;
+    let {exists, mismatch, invalidPw, checking} = this.state;
 
     return (
       <Dialog ref="dialog" title="Auth" className="auth"
@@ -31,17 +31,18 @@ let AuthDialog = React.createClass({
         <form onSubmit={this.onSubmit}>
           <div className="row">
             <div className="col-xs-12">
+              Login with your existing user or enter a new user name.
+            </div>
+            <div className="col-xs-12">
               <TextField ref="name" floatingLabelText="Name"
+                         errorText={exists ? 'User exists' : ''}
                          onChange={this.onNameChange}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <TextField ref="pw" floatingLabelText="Password" type="password"
+                         errorText={invalidPw ? 'Invalid password': ''}
                          onChange={this.onCheckSame}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <TextField ref="pwRepeat" floatingLabelText="Repeat password"
                          type="password" disabled={exists}
@@ -53,13 +54,17 @@ let AuthDialog = React.createClass({
 
           <div className="row end-xs">
             <div className="col-xs-4">
-              <FlatButton label="Cancel" secondary={true}
+              <FlatButton type="button" label="Cancel" secondary={true}
+                          disabled={checking}
                           onClick={this.onClose}/>
             </div>
             <div className="col-xs-4">
-              <FlatButton
-                type="submit" label={exists ? 'Login' : 'Register'}
-                primary={true} disabled={!exists && mismatch}/></div>
+              <FlatButton type="submit"
+                          disabled={checking || invalidPw || !exists && mismatch}
+                          label={checking ? 'Checking' :
+                            (exists ? 'Login' : 'Register')}
+                          primary={true}/>
+            </div>
           </div>
         </form>
       </Dialog>
@@ -76,14 +81,19 @@ let AuthDialog = React.createClass({
   onCheckSame() {
     let {pw, pwRepeat} = this.refs;
     let pwVal = pw.getValue(), pwRepeatVal = pwRepeat.getValue();
-    this.setState({'mismatch': pwVal != pwRepeatVal && pwRepeatVal.length > 0});
+    this.setState({
+      'invalidPw': false,
+      'mismatch': pwVal != pwRepeatVal && pwRepeatVal.length > 0
+    });
   },
 
-  onSubmit() {
+  onSubmit(event) {
+    event.preventDefault();
     let {name, pw} = this.refs;
     let user = {'name': name.getValue(), 'password': pw.getValue()};
-    userStore.auth(user, this.state.exists);
-    this.onClose();
+    this.setState({'checking': true});
+    userStore.auth(user, this.state.exists)
+      .catch(() => this.setState({'invalidPw': true, 'checking': false}));
   },
 
   onClose() {

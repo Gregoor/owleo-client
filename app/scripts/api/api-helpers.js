@@ -2,8 +2,8 @@ import request from 'superagent';
 
 import {host} from '../configs/api.custom';
 
-let promiseWrap = (req) => new Promise((resolve) => {
-  req.end((err, res) => resolve(res.body));
+let promiseWrap = (req) => new Promise((resolve, reject) => {
+  req.end((err, res) => err ? reject(err) : resolve(res.body));
 });
 
 let wrapRequest = (req) => promiseWrap(req.withCredentials());

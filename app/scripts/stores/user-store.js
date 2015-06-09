@@ -21,7 +21,8 @@ let userStore = Reflux.createStore({
   },
 
   auth(user, exists) {
-    (exists ? userAPI.login(user) : userAPI.register(user)).then(this.setUser);
+    return (exists ? userAPI.login(user) : userAPI.register(user))
+      .then(this.setUser);
   },
 
   logout() {
