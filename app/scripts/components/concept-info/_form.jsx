@@ -1,14 +1,13 @@
-let React = require('react');
-let _ = require('lodash');
-let {TextField, FlatButton, Checkbox} = require('material-ui');
-let Select = require('../select');
-let FormData = require('../mixins/FormData');//require('react-form-data');
-let ColorPicker = require('react-color-picker');
-let ConceptActions = require('../../actions/concept-actions');
-let searchAPI = require('../../api/search-api');
-let IconButton = require('material-ui').IconButton;
-let nameAndContainer = require('../helpers/nameAndContainer');
+import React from 'react';
+import _ from 'lodash';
+import {IconButton, TextField, FlatButton, Checkbox} from 'material-ui';
+import ColorPicker from 'react-color-picker';
+import Select from '../select';
+import FormData from '../mixins/FormData';//require('react-form-data');
 
+import ConceptActions from '../../actions/concept-actions';
+import searchAPI from '../../api/search-api';
+import nameAndContainer from '../helpers/nameAndContainer';
 
 let ConceptForm = React.createClass({
 
@@ -28,9 +27,9 @@ let ConceptForm = React.createClass({
 	},
 
 	render() {
-		let concept = this.props.concept,
-				abortButton = '';
+		let {concept} = this.props;
 
+		let abortButton = '';
 		if (!concept.isNew) {
 			abortButton = (
 				<div className="col-xs-3">
@@ -52,18 +51,22 @@ let ConceptForm = React.createClass({
 				<div className="scroll">
 
 					<div className="row">
-						<div className="col-xs-4">
+						<div className="col-xs-3">
 							<div className="colorbox" style=
 								{{'background-color': this.state.color || concept.color}}>
 							</div>
 						</div>
 
-						<div className="col-xs-8">
-							<ColorPicker floatingLabelText="Concept color"
-										 defaultValue={concept.color}
-										 onChange={this.onChangeColor}
+						<div className="col-xs-6">
+							<ColorPicker
+										 value={this.state.color || concept.color}
+										 onDrag={this.onChangeColor}
 										 saturationHeight={50}
 										 saturationWidth={100}/>
+						</div>
+						<div className="col-xs-3">
+							<input type="text" value={this.state.color || concept.color}
+										 onInput={e => this.onChangeColor(e.target.value)}/>
 						</div>
 						<div className="col-xs-12">
 							<h2>Contained by</h2>
@@ -166,6 +169,7 @@ let ConceptForm = React.createClass({
 	},
 
 	onChangeColor(color) {
+		console.log(color);
 		this.setState({'color': color});
 		this.formData.color = color;
 	}
