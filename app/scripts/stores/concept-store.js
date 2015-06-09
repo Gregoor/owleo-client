@@ -7,80 +7,80 @@ import linkStore from './link-store';
 
 let conceptStore = Reflux.createStore({
 
-	listenables: ConceptActions,
+  listenables: ConceptActions,
 
-	init() {
-		this.listenTo(linkStore, (links) => {
-			this.selected.links = links;
-			this.triggerAll();
-		})
-	},
+  init() {
+    this.listenTo(linkStore, (links) => {
+      this.selected.links = links;
+      this.triggerAll();
+    })
+  },
 
-	setAll(concepts) {
-		this.all = new Map(concepts);
-		this.triggerAll();
-	},
+  setAll(concepts) {
+    this.all = new Map(concepts);
+    this.triggerAll();
+  },
 
-	setSelected(concept) {
-		this.selected = concept;
-		if (concept) linkStore.setLinks(concept.links, concept.id);
-		this.triggerAll();
-	},
+  setSelected(concept) {
+    this.selected = concept;
+    if (concept) linkStore.setLinks(concept.links, concept.id);
+    this.triggerAll();
+  },
 
-	triggerAll() {
-		this.trigger({'all': this.all, 'selected': this.selected});
-	},
+  triggerAll() {
+    this.trigger({'all': this.all, 'selected': this.selected});
+  },
 
-	getAll() {
-		ConceptAPI.all().then(this.setAll);
-	},
+  getAll() {
+    ConceptAPI.all().then(this.setAll);
+  },
 
-	reposition() {
-		ConceptAPI.reposition(Array.from(this.all.values())).then(this.setAll);
-	},
+  reposition() {
+    ConceptAPI.reposition(Array.from(this.all.values())).then(this.setAll);
+  },
 
   select(id) {
-	  if (this.selected && id == this.selected.id) return;
-		if (this.all && this.all.has(id)) {
-			this.setSelected(_.assign({'fetching': true}, this.all.get(id)));
-		}
+    if (this.selected && id == this.selected.id) return;
+    if (this.all && this.all.has(id)) {
+      this.setSelected(_.assign({'fetching': true}, this.all.get(id)));
+    }
     ConceptAPI.find(id).then(this.setSelected);
   },
 
-	unselect() {
-		this.setSelected();
-	},
+  unselect() {
+    this.setSelected();
+  },
 
-	new() {
-		this.setSelected({'isNew': true});
-	},
+  new() {
+    this.setSelected({'isNew': true});
+  },
 
-	save(data) {
-		data = _.pick(data, 'name', 'summary','color','summarySource', 'reqs','container', 'tags', 'links');
+  save(data) {
+    data = _.pick(data, 'name', 'summary', 'color', 'summarySource', 'reqs', 'container', 'tags', 'links');
 
-		(this.selected.isNew ? this.create : this.update)(data);
-	},
+    (this.selected.isNew ? this.create : this.update)(data);
+  },
 
-	create(data) {
-		ConceptAPI.create(data).then((serverData) => {
-			ConceptActions.created(serverData);
-			this.setSelected(serverData);
-		});
-	},
+  create(data) {
+    ConceptAPI.create(data).then((serverData) => {
+      ConceptActions.created(serverData);
+      this.setSelected(serverData);
+    });
+  },
 
-	update(data) {
-		ConceptAPI.update(this.selected.id, data).then((serverData) => {
-			ConceptActions.updated(serverData);
-			this.setSelected(serverData);
-		});
-	},
+  update(data) {
+    ConceptAPI.update(this.selected.id, data).then((serverData) => {
+      ConceptActions.updated(serverData);
+      this.setSelected(serverData);
+    });
+  },
 
-	delete(id) {
-		ConceptAPI.delete(id).then(() => {
-			ConceptActions.deleted(id);
-			this.setSelected();
-		});
-	}
+  delete(id) {
+    ConceptAPI.delete(id).then(() => {
+      ConceptActions.deleted(id);
+      this.setSelected();
+    });
+  }
 
 });
 

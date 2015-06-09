@@ -17,128 +17,129 @@ let {RouteHandler} = Router;
 
 let MapLayout = React.createClass({
 
-	mixins: [
-		Reflux.ListenerMixin,
-		Reflux.connect(userStore, 'user'),
-		Router.State,
-		Router.Navigation
-	],
+  mixins: [
+    Reflux.ListenerMixin,
+    Reflux.connect(userStore, 'user'),
+    Router.State,
+    Router.Navigation
+  ],
 
-	getInitialState() {
-		return {'isLocked': true, 'filter': {}, 'user': {}};
-	},
+  getInitialState() {
+    return {'isLocked': true, 'filter': {}, 'user': {}};
+  },
 
-	componentWillMount() {
-		this.onRoute();
-		Router.HashLocation.addChangeListener(this.onRoute);
-		this.listenTo(conceptStore, concepts => {
-			let selectedConcept = concepts.selected;
-			if (this.getPath() != '/login') {
-				let path = '/';
-				if (selectedConcept) {
-					if (selectedConcept.isNew) path += 'new';
-					else path += selectedConcept.id;
-				}
-				this.transitionTo(path);
-			}
-			this.setState({selectedConcept, 'concepts': concepts.all});
-		});
+  componentWillMount() {
+    this.onRoute();
+    Router.HashLocation.addChangeListener(this.onRoute);
+    this.listenTo(conceptStore, concepts => {
+      let selectedConcept = concepts.selected;
+      if (this.getPath() != '/login') {
+        let path = '/';
+        if (selectedConcept) {
+          if (selectedConcept.isNew) path += 'new';
+          else path += selectedConcept.id;
+        }
+        this.transitionTo(path);
+      }
+      this.setState({selectedConcept, 'concepts': concepts.all});
+    });
 
-		ConceptActions.getAll();
-	},
+    ConceptActions.getAll();
+  },
 
-	render() {
-		let conceptInfo;
-		let {concepts, focusedConceptId, filter,
-			isLocked, selectedConcept, user} = this.state;
+  render() {
+    let conceptInfo;
+    let {concepts, focusedConceptId, filter,
+      isLocked, selectedConcept, user} = this.state;
 
-		if (selectedConcept) {
-			conceptInfo = <ConceptInfo concept={selectedConcept}
-																 editMode={user.admin}/>;
-		}
+    if (selectedConcept) {
+      conceptInfo = <ConceptInfo concept={selectedConcept}
+                                 editMode={user.admin}/>;
+    }
 
-		let actionsHTML;
-		if (user.admin) actionsHTML = [
-			<MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
-							secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
-							onClick={isLocked ? this.onUnlock : this.onLock}/>,
-			<MapFab key="add" title="Add Concept" icon="plus"
-							onClick={this.onNew}/>
-		];
+    let actionsHTML;
+    if (user.admin) actionsHTML = [
+      <MapFab key="lock" title={isLocked ? 'Unlock' : 'Lock'}
+              secondary={true} icon={isLocked ? 'unlocked' : 'lock'}
+              onClick={isLocked ? this.onUnlock : this.onLock}/>,
+      <MapFab key="add" title="Add Concept" icon="plus"
+              onClick={this.onNew}/>
+    ];
 
-		return (
-			<div>
-				<RouteHandler/>
-				<GraphMap concepts={concepts}
-									physical={!isLocked}
-									selectedConceptId={selectedConcept ? selectedConcept.id : ''}
-									focusedConceptId={focusedConceptId}
-									filter={filter}
-									onSelect={this.onSelect}/>
+    return (
+      <div>
+        <RouteHandler/>
+        <GraphMap concepts={concepts}
+                  physical={!isLocked}
+                  selectedConceptId={selectedConcept ? selectedConcept.id : ''}
+                  focusedConceptId={focusedConceptId}
+                  filter={filter}
+                  onSelect={this.onSelect}/>
 
-				<div className="info-container">
-					<Search onSelect={this.onSearchSelect}
-									onFocus={this.onSelect.bind(this, undefined)}/>
-					{conceptInfo}
-				</div>
-				<UserPanel className="uesr" user={user} onLogout={this.onLogout}/>
-				<div className="map-actions">
-					{actionsHTML}
-				</div>
-			</div>);
-	},
+        <div className="info-container">
+          <Search onSelect={this.onSearchSelect}
+                  onFocus={this.onSelect.bind(this, undefined)}/>
+          {conceptInfo}
+        </div>
+        <UserPanel className="uesr" user={user} onLogout={this.onLogout}/>
 
-	onRoute(e) {
-		let id = this.getParams().conceptId;
-		if (id) {
-			if (id == 'new') ConceptActions.new();
-			else ConceptActions.select(id);
+        <div className="map-actions">
+          {actionsHTML}
+        </div>
+      </div>);
+  },
 
-			if (!e || e.type != 'push') this.setState({'focusedConceptId': id});
+  onRoute(e) {
+    let id = this.getParams().conceptId;
+    if (id) {
+      if (id == 'new') ConceptActions.new();
+      else ConceptActions.select(id);
 
-		} else ConceptActions.unselect();
-	},
+      if (!e || e.type != 'push') this.setState({'focusedConceptId': id});
 
-	onSelect(id) {
-		if (id !== undefined) ConceptActions.select(id);
-		else {
-			ConceptActions.unselect();
-			this.setState({'focusedConceptId': null});
-		}
-	},
+    } else ConceptActions.unselect();
+  },
 
-	onSearchSelect(selected) {
-		switch (selected.type) {
-			case 'Concept':
-				let id = selected.value;
-				this.onSelect(id);
-				this.setState({'focusedConceptId': id});
-				break;
-			case 'Tag':
-				let tags = [selected.value];
-				searchAPI({'for': ['Concept'], tags}).then(result => {
-					this.setState({'filter': {'tags': result}});
-				});
-				break
-		}
-	},
+  onSelect(id) {
+    if (id !== undefined) ConceptActions.select(id);
+    else {
+      ConceptActions.unselect();
+      this.setState({'focusedConceptId': null});
+    }
+  },
 
-	onLogout() {
-		userStore.logout();
-	},
+  onSearchSelect(selected) {
+    switch (selected.type) {
+      case 'Concept':
+        let id = selected.value;
+        this.onSelect(id);
+        this.setState({'focusedConceptId': id});
+        break;
+      case 'Tag':
+        let tags = [selected.value];
+        searchAPI({'for': ['Concept'], tags}).then(result => {
+          this.setState({'filter': {'tags': result}});
+        });
+        break
+    }
+  },
 
-	onUnlock() {
-		this.setState({'isLocked': false});
-	},
+  onLogout() {
+    userStore.logout();
+  },
 
-	onLock() {
-		this.setState({'isLocked': true});
-		ConceptActions.reposition();
-	},
+  onUnlock() {
+    this.setState({'isLocked': false});
+  },
 
-	onNew() {
-		ConceptActions.new();
-	}
+  onLock() {
+    this.setState({'isLocked': true});
+    ConceptActions.reposition();
+  },
+
+  onNew() {
+    ConceptActions.new();
+  }
 
 });
 

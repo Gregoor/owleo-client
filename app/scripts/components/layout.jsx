@@ -4,7 +4,7 @@ import Router from 'react-router';
 let {RouteHandler} = Router;
 
 let Layout = React.createClass({
-  render: function() {
+  render() {
     return (
       <div className="App">
         <RouteHandler/>

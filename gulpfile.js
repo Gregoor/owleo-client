@@ -1,53 +1,53 @@
-var gulp       = require('gulp');
-var $          = require('gulp-load-plugins')();
-var sync       = $.sync(gulp).sync;
-var del        = require('del');
+var gulp = require('gulp');
+var $ = require('gulp-load-plugins')();
+var sync = $.sync(gulp).sync;
+var del = require('del');
 var browserify = require('browserify');
-var watchify   = require('watchify');
-var source     = require('vinyl-source-stream');
-var path       = require('path');
-var ga         = require('gulp-ga');
+var watchify = require('watchify');
+var source = require('vinyl-source-stream');
+var path = require('path');
+var ga = require('gulp-ga');
 
 
 var bundler = {
   w: null,
-  init: function() {
+  init: function () {
     this.w = watchify(browserify({
-			cache: {}, packageCache: {},
-	    extensions: ['.jsx'],
+      cache: {}, packageCache: {},
+      extensions: ['.jsx'],
       entries: ['./app/scripts/app.js'],
       insertGlobals: true,
-	    debug: true
+      debug: true
     }));
-	  this.w.on('log', $.util.log.bind($.util));
+    this.w.on('log', $.util.log.bind($.util));
   },
-  bundle: function() {
+  bundle: function () {
     return this.w && this.w.bundle()
-      .on('error', $.util.log.bind($.util, 'Browserify Error'))
-      .pipe(source('app.js'))
-      .pipe(gulp.dest('dist/scripts'));
+        .on('error', $.util.log.bind($.util, 'Browserify Error'))
+        .pipe(source('app.js'))
+        .pipe(gulp.dest('dist/scripts'));
   },
-  watch: function() {
+  watch: function () {
     this.w && this.w.on('update', this.bundle.bind(this));
   },
-  stop: function() {
+  stop: function () {
     this.w && this.w.close();
   }
 };
 
-gulp.task('styles', function() {
-	return gulp.src('app/styles/main.less')
-		.pipe($.plumber())
-		.pipe($.less())
-		.pipe(gulp.dest('dist/styles'));
+gulp.task('styles', function () {
+  return gulp.src('app/styles/main.less')
+    .pipe($.plumber())
+    .pipe($.less())
+    .pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
   bundler.init();
   return bundler.bundle();
 });
 
-gulp.task('html', function() {
+gulp.task('html', function () {
   var assets = $.useref.assets();
   return gulp.src('app/*.html')
     .pipe(assets)
@@ -57,7 +57,7 @@ gulp.task('html', function() {
     .pipe($.size());
 });
 
-gulp.task('images', function() {
+gulp.task('images', function () {
   return gulp.src('app/images/**/*')
     .pipe($.cache($.imagemin({
       optimizationLevel: 3,
@@ -68,7 +68,7 @@ gulp.task('images', function() {
     .pipe($.size());
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
   return gulp.src(['app/fonts/**/*'])
     .pipe(gulp.dest('dist/fonts'))
     .pipe($.size());
@@ -80,7 +80,7 @@ gulp.task('extras', function () {
     .pipe($.size());
 });
 
-gulp.task('serve', function() {
+gulp.task('serve', function () {
   gulp.src('dist')
     .pipe($.webserver({
       livereload: true,
@@ -95,28 +95,28 @@ gulp.task('jest', function () {
       unmockedModulePathPatterns: [nodeModules + '/react']
     }));
 });
-gulp.task('set-production', function() {
+gulp.task('set-production', function () {
   process.env.NODE_ENV = 'production';
 });
 
-gulp.task('minify:js', function() {
+gulp.task('minify:js', function () {
   return gulp.src('dist/scripts/**/*.js')
     .pipe($.uglify())
     .pipe(gulp.dest('dist/scripts/'))
     .pipe($.size());
 });
 
-gulp.task('minify:css', function() {
+gulp.task('minify:css', function () {
   return gulp.src('dist/styles/**/*.css')
     .pipe($.minifyCss())
     .pipe(gulp.dest('dist/styles'))
     .pipe($.size());
 });
 
-gulp.task('ga', function(){
-	gulp.src('dist/index.html')
-		.pipe(ga({url: 'owleo.com', uid: 'UA-63315310-1', tag: 'head'}))
-		.pipe(gulp.dest('dist'));
+gulp.task('ga', function () {
+  gulp.src('dist/index.html')
+    .pipe(ga({url: 'owleo.com', uid: 'UA-63315310-1', tag: 'head'}))
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('minify', ['minify:js', 'minify:css']);
@@ -135,7 +135,7 @@ gulp.task('serve:production', sync(['build:production', 'serve']));
 gulp.task('test', ['jest']);
 gulp.task('default', ['build']);
 
-gulp.task('watch', sync(['clean-bundle', 'serve']), function() {
+gulp.task('watch', sync(['clean-bundle', 'serve']), function () {
   bundler.watch();
   gulp.watch('app/*.html', ['html']);
   gulp.watch('app/styles/**/*.less', ['styles']);

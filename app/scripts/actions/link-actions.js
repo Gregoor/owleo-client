@@ -1,9 +1,9 @@
 import Reflux from 'reflux';
 
 let LinkActions = Reflux.createActions([
-	'create',
+  'create',
   'vote',
-	'unvote'
+  'unvote'
 ]);
 
 export default LinkActions;

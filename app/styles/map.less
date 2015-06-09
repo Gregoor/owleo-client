@@ -1,79 +1,79 @@
 .map {
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	height: 100%;
-	width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
 
-	svg& {
-		&.grabbed {
-			cursor: move;
-		}
+  svg& {
+    &.grabbed {
+      cursor: move;
+    }
 
-		&:not(.grabbed) {
-			.node circle {
-				cursor: pointer;
-			}
-		}
+    &:not(.grabbed) {
+      .node circle {
+        cursor: pointer;
+      }
+    }
 
-		.node {
-			circle {
-				stroke: black;
-				stroke-width: 4px;
+    .node {
+      circle {
+        stroke: black;
+        stroke-width: 4px;
 
-				&.highlighted {
-					fill: hsla(0, 100%, 100%, 0.05) !important;
-				}
-			}
+        &.highlighted {
+          fill: hsla(0, 100%, 100%, 0.05) !important;
+        }
+      }
 
-			text.label {
-				fill: white;
-				stroke: black;
-				font-weight: 800;
-				stroke-width: .2;
-				cursor: pointer;
-				@media(-webkit-min-device-pixel-ratio:2) {
-					font-weight: 400;
-					stroke-width: .4;
-				}
-			}
+      text.label {
+        fill: white;
+        stroke: black;
+        font-weight: 800;
+        stroke-width: .2;
+        cursor: pointer;
+        @media (-webkit-min-device-pixel-ratio: 2) {
+          font-weight: 400;
+          stroke-width: .4;
+        }
+      }
 
-			&.selected {
-				opacity: 1 !important;
+      &.selected {
+        opacity: 1 !important;
 
-				> circle {
-					fill: hsla(0, 100%, 100%, 0.05) !important;
-					stroke-dasharray: 8, 4;
-					opacity: 1 !important;
-				}
+        > circle {
+          fill: hsla(0, 100%, 100%, 0.05) !important;
+          stroke-dasharray: 8, 4;
+          opacity: 1 !important;
+        }
 
-				> .label {
-					font-weight: 900;
-					opacity: 1 !important;
-					font-size: medium;
-				}
-			}
-		}
+        > .label {
+          font-weight: 900;
+          opacity: 1 !important;
+          font-size: medium;
+        }
+      }
+    }
 
-		polygon.link {
-			fill: #bababa;
-			fill-opacity: .2;
-			stroke: white;
-			stroke-opacity: .4;
-			stroke-width: 0.5px;
+    polygon.link {
+      fill: #bababa;
+      fill-opacity: .2;
+      stroke: white;
+      stroke-opacity: .4;
+      stroke-width: 0.5px;
 
-			&.long-distance-relationship {
-				fill-opacity: .05;
-				stroke-opacity: .05;
-			}
+      &.long-distance-relationship {
+        fill-opacity: .05;
+        stroke-opacity: .05;
+      }
 
-			&.selected, &.highlighted {
-				stroke-opacity: 1;
-				fill-opacity: .5;
-				stroke-width: 1px;
-			}
-		}
-	}
+      &.selected, &.highlighted {
+        stroke-opacity: 1;
+        fill-opacity: .5;
+        stroke-width: 1px;
+      }
+    }
+  }
 }

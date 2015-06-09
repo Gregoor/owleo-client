@@ -1,27 +1,26 @@
-let React = require('react');
-
-let _ = require('lodash');
-let {FloatingActionButton} = require('material-ui');
+import React from 'react';
+import _ from 'lodash';
+import {FloatingActionButton} from 'material-ui';
 
 let MapFab = React.createClass({
 
-	getDefaultProps() {
-		return {'secondary': false};
-	},
+  getDefaultProps() {
+    return {'secondary': false};
+  },
 
-	render() {
-		let {secondary, icon} = this.props;
-		let fabProps = _.pick(this.props, 'onClick', 'title');
+  render() {
+    let {secondary, icon} = this.props;
+    let fabProps = _.pick(this.props, 'onClick', 'title');
 
-		let secondaryProps = secondary ? {'secondary': true, 'mini': true} : {};
+    let secondaryProps = secondary ? {'secondary': true, 'mini': true} : {};
 
-		return (
-			<div className="center-xs">
-				<FloatingActionButton {...fabProps} {...secondaryProps}
-				                      iconClassName={`icon icon-${icon}`}/>
-			</div>
-		);
-	}
+    return (
+      <div className="center-xs">
+        <FloatingActionButton {...fabProps} {...secondaryProps}
+          iconClassName={`icon icon-${icon}`}/>
+      </div>
+    );
+  }
 
 });
 

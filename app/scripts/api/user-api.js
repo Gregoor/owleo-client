@@ -6,24 +6,24 @@ let {endpoint} = forResource('users');
 
 export default {
 
-	exists(name) {
-		return http.get(`${endpoint}/exists`, {name});
-	},
+  exists(name) {
+    return http.get(`${endpoint}/exists`, {name});
+  },
 
-	current() {
-		return http.get(`${endpoint}/current`);
-	},
+  current() {
+    return http.get(`${endpoint}/current`);
+  },
 
-	login(user) {
-		return http.post(`${endpoint}/login`, {user});
-	},
+  login(user) {
+    return http.post(`${endpoint}/login`, {user});
+  },
 
-	logout() {
-		return http.post(`${endpoint}/logout`);
-	},
+  logout() {
+    return http.post(`${endpoint}/logout`);
+  },
 
-	register(user) {
-		return http.post(`${endpoint}/register`, {user});
-	}
+  register(user) {
+    return http.post(`${endpoint}/register`, {user});
+  }
 
 };

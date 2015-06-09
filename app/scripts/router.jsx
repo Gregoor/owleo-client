@@ -8,16 +8,16 @@ import AuthDialog from './components/auth-dialog';
 let {Route, DefaultRoute} = Router;
 
 let routes = (
-	<Route handler={Layout}>
-		<Route path="/" handler={MapLayout}>
-			<Route path="login" handler={AuthDialog}/>
-			<Route path=":conceptId"/>
-		</Route>
-	</Route>
+  <Route handler={Layout}>
+    <Route path="/" handler={MapLayout}>
+      <Route path="login" handler={AuthDialog}/>
+      <Route path=":conceptId"/>
+    </Route>
+  </Route>
 );
 
 exports.start = () => {
   Router.run(routes, Handler => {
-		React.render(<Handler/>, document.getElementById('content'));
-	});
+    React.render(<Handler/>, document.getElementById('content'));
+  });
 };
