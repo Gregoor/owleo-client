@@ -9,7 +9,7 @@ let Search = React.createClass({
 
   render() {
     return (
-      <Select placeholder="Search" autoload={false}
+      <Select placeholder="Search for any concept you like" autoload={false}
               asyncOptions={this.onLoadOptions}
               onChange={this.onChange} {...this.props}/>
     );
