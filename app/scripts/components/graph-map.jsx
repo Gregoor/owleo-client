@@ -74,13 +74,21 @@ let GraphMap = React.createClass({
 
 		if (concepts && !this.mapBuilt) {
 			this.mapBuilt = true;
+			let maxX = -Infinity, maxY = -Infinity;
+			let minX = Infinity, minY = Infinity;
 			for (let [,concept] of concepts) {
 				let {container} = concept;
 				if (container) {
 					container = concepts.get(container);
 					if (!container.children) container.children = [concept];
 					else container.children.push(concept);
-				} else this.baseConcepts.push(concept);
+				} else {
+					minX = Math.min(concept.x - concept.r, minX);
+					minY = Math.min(concept.y - concept.r, minY);
+					maxX = Math.min(concept.x + concept.r, maxX);
+					maxY = Math.min(concept.y + concept.r, maxY);
+					this.baseConcepts.push(concept);
+				}
 
 				for (let req of concept.reqs) {
 					req = concepts.get(req);
@@ -90,6 +98,8 @@ let GraphMap = React.createClass({
 						this.links.push(data);
 				}
 			}
+			this.normalWidth = Math.abs(minX - maxX) + 300;
+			this.normalHeight = Math.abs(minY - maxY) + 300;
 		}
 
 		if (this.physicsInited) {
