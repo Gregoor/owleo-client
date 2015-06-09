@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Hammer from 'hammerjs';
 
-const ZOOM_STEPS = 30;
+const ZOOM_STEPS = 5;
 
 export default {
 
