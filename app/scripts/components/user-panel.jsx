@@ -31,6 +31,10 @@ let UserPanel = React.createClass({
     return (
       <Toolbar className="user">
         <ToolbarGroup float="right">
+          <a href="mailto:hello@owleo.com"
+             style={{lineHeight: '57px', marginRight: '20px'}}>
+            Contact us!
+          </a>
           {panelHTML}
         </ToolbarGroup>
       </Toolbar>
