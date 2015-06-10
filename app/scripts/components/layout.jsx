@@ -16,8 +16,7 @@ let Layout = React.createClass({
   render() {
     return (
       <div className="App">
-        <Dialog ref="mobileDialog" title="Not optimized for mobile yet"
-                actions={{text: 'Alright, you fools', onClick: this.onHideDialog}}>
+        <Dialog ref="mobileDialog" title="Not optimized for mobile yet">
 
           <div className="row">
             <div className="col-xs-12">
