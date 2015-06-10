@@ -44,10 +44,10 @@ let ConceptInfo = React.createClass({
 
   render() {
     let {edit, relationType, expandLinkForm} = this.state;
-    let {user} = this.props;
+    let {concept, user} = this.props;
 
     let comp;
-    if (edit || this.props.concept.isNew) {
+    if (edit || concept.isNew) {
       comp = (
         <ConceptForm key="f" onDone={this.onShow} onChange={this.onChange}
           {...this.props}/>
@@ -92,20 +92,24 @@ let ConceptInfo = React.createClass({
     }
 
     let linksHTML = [];
-    _.sortBy(this.props.concept.links || [], link => -link.votes)
+    _.sortBy(concept.links || [], link => -link.votes)
       .forEach(link => {
         linksHTML.push(
           <LinkRow link={link} voteDisabled={!user.loggedIn}/>,
           <hr/>
         );
       });
+
+    let showLinkForm = !concept.isNew &&
+      (linkFormHTML.length || linksHTML.length);
+
     return (
       <div>
         <div className="concept-info card"
-             style={{'border': `8px solid ${this.props.concept.color}`}}>
+             style={{'border': `8px solid ${concept.color}`}}>
           {comp}
         </div>
-        <div className="card" style={{display: linkFormHTML.length || linksHTML.length ? 'block' : 'none'}}>
+        <div className="card" style={{display: showLinkForm ? 'block' : 'none'}}>
           {linkFormHTML}
           {linksHTML}
         </div>

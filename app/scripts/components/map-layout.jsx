@@ -82,7 +82,7 @@ let MapLayout = React.createClass({
                   onFocus={this.onSelect.bind(this, undefined)}/>
           {conceptInfo}
         </div>
-        <UserPanel className="uesr" user={user} onLogout={this.onLogout}/>
+        <UserPanel className="user" user={user} onLogout={this.onLogout}/>
 
         <div className="map-actions">
           {actionsHTML}
