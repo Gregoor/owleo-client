@@ -4,6 +4,7 @@ import {IconButton, TextField, Checkbox, FlatButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
 import nameAndContainer from '../helpers/nameAndContainer';
+import shortenUrl from '../helpers/shorten-url';
 
 let ConceptView = React.createClass({
 
@@ -47,7 +48,7 @@ let ConceptView = React.createClass({
           <div className="col-xs-12" style={{'display': 'inline'}}>
             <h2>Source:</h2>
             <a className="link" target="_blank" href={summarySource}>
-              {summarySource}
+              {shortenUrl(summarySource)}
             </a>
           </div>
         </div>

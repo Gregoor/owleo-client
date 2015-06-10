@@ -2,21 +2,14 @@ import React from 'react';
 import {IconButton} from 'material-ui';
 
 import LinkActions from '../../actions/link-actions';
+import shortenUrl from '../helpers/shorten-url';
 
 let LinkRow = React.createClass({
 
   render() {
     let {link, voteDisabled} = this.props;
-    let parser = document.createElement('a');
-    parser.href = link.url;
-    let path = parser.pathname.split('/');
-
-    let i = 1, part;
-    do {
-      part = path[path.length - i];
-      i++;
-    } while(part.length == 0 && i > path.length);
-    let label = link.name || `${parser.hostname}/../${part}${parser.hash}`;
+    console.log(shortenUrl);
+    let label = link.name || shortenUrl(link.url);
 
     let votedClass = link.hasVoted ? 'voted' : '';
 
