@@ -10,7 +10,12 @@ let LinkRow = React.createClass({
     let parser = document.createElement('a');
     parser.href = link.url;
     let path = parser.pathname.split('/');
-    let label = link.name || `${parser.hostname}/../${path[path.length - 1]}`;
+    let i = 1, part;
+    do {
+      part = path[i];
+      i--;
+    } while(part.length == 0 && i > path.length);
+    let label = link.name || `${parser.hostname}/../${part}`;
 
     let votedClass = link.hasVoted ? 'voted' : '';
 
