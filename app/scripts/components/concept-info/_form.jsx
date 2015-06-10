@@ -14,7 +14,7 @@ let ConceptForm = React.createClass({
   mixins: [FormData],
 
   getInitialState() {
-    return {};
+    return {'similarConcepts': []};
   },
 
   getInitialFormData() {
@@ -38,6 +38,14 @@ let ConceptForm = React.createClass({
       );
     }
 
+    let {similarConcepts} = this.state;
+    let similarConceptsHTML = _(similarConcepts).take(3).map(simConcept => {
+      return (
+        <div className="col-xs-12">
+          {nameAndContainer(simConcept)}
+        </div>);
+    }).value();
+
     return (
       <form onChange={this.onChange} onSubmit={this.onSave}>
         <div className="row">
@@ -45,8 +53,10 @@ let ConceptForm = React.createClass({
             <TextField floatingLabelText="Name"
                        name="name"
                        ref="nameTextField"
-                       defaultValue={concept.name}/>
+                       defaultValue={concept.name}
+                       onInput={this.onInputName}/>
           </div>
+          {similarConceptsHTML}
         </div>
         <div className="scroll">
 
@@ -76,10 +86,8 @@ let ConceptForm = React.createClass({
 												this.nameObjToOption(concept.container) :
 												undefined}
                       autoload={false}
-                      asyncOptions={this.onGetOptionsOf('Concept')}/>
+                      asyncOptions={this.onFetchOptionsOf('Concept')}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <h2>Requirements</h2>
               <Select name="reqs"
@@ -89,10 +97,8 @@ let ConceptForm = React.createClass({
 							        	undefined}
                       multi={true}
                       autoload={false}
-                      asyncOptions={this.onGetOptionsOf('Concept')}/>
+                      asyncOptions={this.onFetchOptionsOf('Concept')}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <h2>Tags</h2>
               <Select name="tags"
@@ -100,19 +106,15 @@ let ConceptForm = React.createClass({
                       defaultValue={concept.tags}
                       multi={true}
                       autoload={false}
-                      asyncOptions={this.onGetOptionsOf('Tag')}
+                      asyncOptions={this.onFetchOptionsOf('Tag')}
                       createable={true}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <TextField floatingLabelText="Summary"
                          multiLine={true}
                          name="summary"
                          defaultValue={concept.summary}/>
             </div>
-          </div>
-          <div className="row">
             <div className="col-xs-12">
               <TextField floatingLabelText="Source of summary"
                          multiline={false}
@@ -132,10 +134,16 @@ let ConceptForm = React.createClass({
     );
   },
 
-  onGetOptionsOf(type) {
+  onFetchOptionsOf(type) {
     return (q, cb) => searchAPI({q, 'for': [type]}).then((result) => {
       let options = result.map(this.nameObjToOption);
       cb(null, {options, 'complete': options.length < 10});
+    });
+  },
+
+  onInputName(event) {
+    searchAPI({'q': event.target.value, 'for': ['Concept']}).then(result => {
+      this.setState({'similarConcepts': result});
     });
   },
 
