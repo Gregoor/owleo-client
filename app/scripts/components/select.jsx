@@ -8,7 +8,8 @@ export default React.createClass({
     return {
       'exclude': [],
       'defaultValue': null,
-      'onChange': _.noop
+      'onChange': _.noop,
+      'clearOnChange': false
     };
   },
 
@@ -33,7 +34,7 @@ export default React.createClass({
   },
 
   onChange(newValue, selected) {
-    this.setState({selected});
+    this.setState({'selected': this.props.clearOnChange ? [] : selected});
     this.props.onChange.apply(this, arguments);
   },
 

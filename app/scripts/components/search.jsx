@@ -11,6 +11,7 @@ let Search = React.createClass({
     return (
       <Select placeholder="Search the concepts in our graph" autoload={false}
               asyncOptions={this.onLoadOptions}
+              clearOnChange={true}
               onChange={this.onChange} {...this.props}/>
     );
   },
