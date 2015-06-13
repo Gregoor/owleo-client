@@ -148,7 +148,6 @@ let GraphMap = React.createClass({
       },
       scale
     });
-    this.renderD3();
   },
 
   createHierarchy(parentEl, concepts) {
