@@ -17,6 +17,10 @@ let conceptStore = Reflux.createStore({
   },
 
   setAll(concepts) {
+    for (let [, concept] of concepts) {
+      concept.x = Math.floor(concept.x);
+      concept.y = Math.floor(concept.y);
+    }
     this.all = new Map(concepts);
     this.triggerAll();
   },
