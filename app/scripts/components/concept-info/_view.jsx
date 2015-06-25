@@ -61,13 +61,14 @@ let ConceptView = React.createClass({
           {editActions} </div>
 
         <div className="scroll">
-          <div className="row">
+          <div className="row center-xs">
             <div className="col-xs-3">
               <IconButton iconClassName="icon icon-arrow-left"
                           style={{paddingBottom: 1}}
                           disabled={fetching || !concept.reqs.length}
                           onClick={this.onSearchFor('leadsTo')}/>
-									<span className="center-xs" style={{fontSize: 9}}>
+              <br/>
+              <span className="center-xs" style={{fontSize: 9}}>
 										REQUIREMENTS
 									</span>
             </div>
@@ -82,7 +83,8 @@ let ConceptView = React.createClass({
                           disabled={!concept.followupCount}
                           style={{paddingBottom: 1}}
                           onClick={this.onSearchFor('reqBy')}/>
-							<span className="center-xs" style={{fontSize: 9}}>
+              <br/>
+              <span className="center-xs" style={{fontSize: 9}}>
 									FOLLOWUPS
 							</span>
             </div>

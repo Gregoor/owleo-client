@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import {http, forResource} from './api-helpers';
 
-let forConcept = (id) => forResource(`concepts/${id}/links`);
+let forConcept = (id) => forResource(`concepts/${id}/explanations`);
 
 let votesPathFor = (conceptId, id) => {
   return `${forConcept(conceptId).endpoint}/${id}/votes`;
@@ -10,8 +10,8 @@ let votesPathFor = (conceptId, id) => {
 
 export default {
 
-  create(conceptId, link) {
-    return http.post(forConcept(conceptId).endpoint, {link});
+  create(conceptId, explanation) {
+    return http.post(forConcept(conceptId).endpoint, {explanation});
   },
 
   vote(conceptId, id) {

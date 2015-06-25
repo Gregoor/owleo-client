@@ -8,6 +8,30 @@
   left: 30px;
   width: 450px - 2 * @card-padding;
 
+  .split-screen {
+    display: flex;
+    flex-direction: column;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 630px;
+    height: 100%;
+    background-color: white;
+
+    .card {
+      width: 97%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 5px;
+    }
+
+    .scrollable {
+      flex: 1;
+      overflow-y: scroll;
+    }
+  }
+
   .card {
     margin-top: 3px;
     width: 100%;
@@ -23,15 +47,6 @@
       }
     }
 
-    .link-form {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 500ms;
-      &.expanded {
-        max-height: 500px;
-      }
-    }
-
     .mui-text-field {
       margin-top: -24px;
       width: 100%;
@@ -40,20 +55,6 @@
     .mui-icon-button[type=submit] {
       color: @accent-1-color;
     }
-  }
-
-  .link {
-    .mui-touch-ripple {
-      display: none;
-    }
-
-    color: black;
-
-    .voted {
-      color: @primary-1-color;
-    }
-
-    transition: color 300ms linear;
   }
 
   .concept-info {

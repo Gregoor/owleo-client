@@ -2,22 +2,21 @@ import React from 'react';
 import Router from 'react-router';
 import Reflux from 'reflux';
 import _ from 'lodash';
-import {IconButton, TextField, Checkbox} from 'material-ui';
+import {FlatButton} from 'material-ui';
 
 import ConceptActions from '../../actions/concept-actions';
-import LinkActions from '../../actions/link-actions';
 import ConceptView from './_view';
 import ConceptForm from './_form';
 import ConceptNeighbors from './_neighbors';
-import LinkRow from './link-row';
+import ExplanationCard from './explanation-card';
+import ExplainFormCard from './explain-form-card';
 
 let ConceptInfo = React.createClass({
 
   getInitialState() {
     return {
       'edit': false,
-      'isDirty': false,
-      'expandLinkForm': false
+      'isDirty': false
     };
   },
 
@@ -43,7 +42,7 @@ let ConceptInfo = React.createClass({
   },
 
   render() {
-    let {edit, relationType, expandLinkForm} = this.state;
+    let {edit, relationType, expanded} = this.state;
     let {concept, user} = this.props;
 
     let comp;
@@ -63,55 +62,37 @@ let ConceptInfo = React.createClass({
       );
     }
 
-    let linkFormHTML = [];
-    if (user && user.loggedIn) {
-      let linkFormClass = expandLinkForm ? 'expanded' : 'collapsed';
-      linkFormHTML = [
-        <form onSubmit={this.onCreateLink}>
-          <div className="row middle-xs">
-            <div className="col-xs-11">
-              <TextField ref="linkUrl" floatingLabelText="Add a link"
-                         onChange={this.onChangeLink}/>
-            </div>
-            <div className="col-xs-1">
-              <IconButton iconClassName="icon icon-plus" tooltip="Add link"
-                          type="submit" className="small"/>
-            </div>
-          </div>
-          <div className={`row middle-xs link-form ${linkFormClass}`}>
-            <div className="col-xs-8">
-              <TextField ref="linkName" floatingLabelText="Link name (optional)"/>
-            </div>
-            <div className="col-xs-4">
-              <Checkbox ref="linkPaywalled" label="paywalled"/>
-            </div>
-          </div>
-        </form>,
-        <hr/>
-      ];
+    let explanationsHTML = [];
+    let explanations = _(concept.explanations || [])
+      .sortBy(explanation => -explanation.votes);
+    let buildExplanationCard = explanation => (
+      <ExplanationCard explanation={explanation} voteDisabled={!user.loggedIn}/>
+    );
+
+    if (expanded) {
+      explanationsHTML = explanations.map(buildExplanationCard).value();
+      if (user && user.loggedIn) {
+        explanationsHTML.unshift(<ExplainFormCard/>)
+      }
+    } else {
+      let bestExplanation = explanations.first();
+      if (bestExplanation) {
+        explanationsHTML = buildExplanationCard(bestExplanation)
+      }
     }
 
-    let linksHTML = [];
-    _.sortBy(concept.links || [], link => -link.votes)
-      .forEach(link => {
-        linksHTML.push(
-          <LinkRow link={link} voteDisabled={!user.loggedIn}/>,
-          <hr/>
-        );
-      });
-
-    let showLinkForm = !concept.isNew &&
-      (linkFormHTML.length || linksHTML.length);
-
     return (
-      <div>
-        <div className="concept-info card"
+      <div className={expanded ? 'split-screen' : ''}>
+        <div className={`concept-info ${!expanded ? 'card' :''}`}
              style={{'border': `8px solid ${concept.color}`}}>
           {comp}
         </div>
-        <div className="card" style={{display: showLinkForm ? 'block' : 'none'}}>
-          {linkFormHTML}
-          {linksHTML}
+        <div className="scrollable">
+          {explanationsHTML}
+          <div className="card center-xs">
+            <FlatButton label={expanded ? 'CONTRACT' : 'EXPAND'}
+                        onClick={() => this.setState({'expanded': !expanded})}/>
+          </div>
         </div>
       </div>
     );
@@ -141,25 +122,8 @@ let ConceptInfo = React.createClass({
 
   onSearch(param) {
     this.setState({'relationType': param});
-  },
-
-  onChangeLink(event) {
-    this.setState({'expandLinkForm': event.target.value.length});
-  },
-
-  onCreateLink(event) {
-    event.preventDefault();
-    let {linkName, linkUrl, linkPaywalled} = this.refs;
-    LinkActions.create({
-      'name': linkName.getValue(),
-      'url': linkUrl.getValue(),
-      'paywalled': linkPaywalled.isChecked()
-    });
-    linkName.setValue('');
-    linkUrl.setValue('');
-    linkPaywalled.setChecked(false);
-    this.setState({'expandLinkForm': false});
   }
+
 
 });
 

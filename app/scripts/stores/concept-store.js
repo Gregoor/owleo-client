@@ -3,15 +3,15 @@ import _ from 'lodash';
 
 import ConceptActions from '../actions/concept-actions';
 import ConceptAPI from '../api/concept-api';
-import linkStore from './link-store';
+import explanationStore from './explanation-store';
 
 let conceptStore = Reflux.createStore({
 
   listenables: ConceptActions,
 
   init() {
-    this.listenTo(linkStore, (links) => {
-      this.selected.links = links;
+    this.listenTo(explanationStore, explanations => {
+      this.selected.explanations = explanations;
       this.triggerAll();
     })
   },
@@ -27,7 +27,9 @@ let conceptStore = Reflux.createStore({
 
   setSelected(concept) {
     this.selected = concept;
-    if (concept) linkStore.setLinks(concept.links, concept.id);
+    if (concept) {
+      explanationStore.setExplanations(concept.explanations, concept.id);
+    }
     this.triggerAll();
   },
 
@@ -60,7 +62,8 @@ let conceptStore = Reflux.createStore({
   },
 
   save(data) {
-    data = _.pick(data, 'name', 'summary', 'color', 'summarySource', 'reqs', 'container', 'tags', 'links');
+    data = _.pick(data, 'name', 'summary', 'color', 'summarySource', 'reqs',
+      'container', 'tags', 'explanations');
 
     (this.selected.isNew ? this.create : this.update)(data);
   },

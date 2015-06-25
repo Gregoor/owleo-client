@@ -55,8 +55,7 @@ let GraphMap = React.createClass({
   },
 
   update(props) {
-    let {concepts, physical, selectedConceptId, focusedConceptId,
-      filter} = props;
+    let {concepts, physical, selectedConceptId, focusedConceptId} = props;
 
     this.buildMap(concepts);
 
@@ -108,14 +107,14 @@ let GraphMap = React.createClass({
     this.concepts = concepts;
 
     let containers = this.containers = new Map();
-    for (let [id, concept] of concepts) {
+    for (let [, concept] of concepts) {
       let {container} = concept;
       if (container && !concept.color) concept.color = container.color;
       initListOrPush(containers, container, concept);
     }
 
     let links = [];
-    for (let [id, c] of concepts) for (let req of c.reqs) {
+    for (let [, c] of concepts) for (let req of c.reqs) {
       links.push({'from': concepts.get(req), 'to': c});
     }
 
@@ -214,7 +213,7 @@ let GraphMap = React.createClass({
       .on('click', onClick)
       .attr({
         'class': 'label',
-        'x': function (d) {
+        'x': function () {
           return -this.getComputedTextLength() / 2
         }
       })
