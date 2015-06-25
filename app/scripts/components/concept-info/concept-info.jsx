@@ -63,6 +63,7 @@ let ConceptInfo = React.createClass({
     }
 
     let explanationsHTML = [];
+    let expandLabel;
     let explanations = _(concept.explanations || [])
       .sortBy(explanation => -explanation.votes);
     let buildExplanationCard = explanation => (
@@ -70,16 +71,22 @@ let ConceptInfo = React.createClass({
     );
 
     if (expanded) {
+      expandLabel = 'Collapse';
       explanationsHTML = explanations.map(buildExplanationCard).value();
       if (user && user.loggedIn) {
         explanationsHTML.unshift(<ExplainFormCard/>)
       }
     } else {
+      expandLabel = 'Create your own explanation';
       let bestExplanation = explanations.first();
       if (bestExplanation) {
-        explanationsHTML = buildExplanationCard(bestExplanation)
+        explanationsHTML = buildExplanationCard(bestExplanation);
+        let restCount = concept.explanations.length - 1;
+        if (restCount > 0) expandLabel = `View ${restCount} more Explanations`
       }
     }
+
+
 
     return (
       <div className={expanded ? 'split-screen' : ''}>
@@ -89,8 +96,8 @@ let ConceptInfo = React.createClass({
         </div>
         <div className="scrollable">
           {explanationsHTML}
-          <div className="card center-xs">
-            <FlatButton label={expanded ? 'CONTRACT' : 'EXPAND'}
+          <div className="card" style={{'padding': 0}}>
+            <FlatButton label={expandLabel} style={{'width': '100%'}}
                         onClick={() => this.setState({'expanded': !expanded})}/>
           </div>
         </div>
