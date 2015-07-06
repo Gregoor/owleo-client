@@ -90,7 +90,8 @@ let ConceptView = React.createClass({
             </div>
           </div>
           <div className="row">
-            <div className="col-xs-12" style={{'display': 'inline'}}>
+            <div className="col-xs-12"
+                 style={{'display': 'inline', 'white-space': 'pre'}}>
               {fetching ? 'Loading...' : concept.summary}
             </div>
           </div>

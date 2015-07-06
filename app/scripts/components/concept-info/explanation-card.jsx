@@ -30,7 +30,7 @@ let ExplanationCard = React.createClass({
           <div className="col-xs-1">
             {explanation.votes}
           </div>
-          <div className="col-xs-10">
+          <div className="col-xs-10" style={{'white-space': 'pre'}}>
             {content}
           </div>
         </div>
