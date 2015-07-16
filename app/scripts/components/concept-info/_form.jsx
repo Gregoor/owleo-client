@@ -126,7 +126,7 @@ let ConceptForm = React.createClass({
         <div className="row end-xs">
           {abortButton}
           <div className="col-xs-3">
-            <FlatButton label={concept.isNew ? 'Create' : 'Save'}
+            <FlatButton label={concept.isNew ? 'Create' : 'Save'} type="submit"
                         primary={true}/>
           </div>
         </div>
@@ -177,7 +177,6 @@ let ConceptForm = React.createClass({
   },
 
   onChangeColor(color) {
-    console.log(color);
     this.setState({'color': color});
     this.formData.color = color;
   }
