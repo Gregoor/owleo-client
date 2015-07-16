@@ -86,8 +86,6 @@ let ConceptInfo = React.createClass({
       }
     }
 
-
-
     return (
       <div className={expanded ? 'split-screen' : ''}>
         <div className={`concept-info ${!expanded ? 'card' :''}`}

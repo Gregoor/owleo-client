@@ -1,10 +1,15 @@
 import React from 'react';
 import Router from 'react-router';
-import {Dialog, FlatButton} from 'material-ui';
+import {Styles, Dialog, FlatButton} from 'material-ui';
 
 let {RouteHandler} = Router;
+let ThemeManager = new Styles.ThemeManager();
 
 let Layout = React.createClass({
+
+  getChildContext() {
+    return {'muiTheme': ThemeManager.getCurrentTheme()};
+  },
 
   componentDidMount() {
     if (window.innerWidth < 500 &&
@@ -43,5 +48,7 @@ let Layout = React.createClass({
   }
 
 });
+
+Layout.childContextTypes = {'muiTheme': React.PropTypes.object};
 
 export default Layout;

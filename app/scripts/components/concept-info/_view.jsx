@@ -56,7 +56,7 @@ let ConceptView = React.createClass({
     }
 
     return (
-      <div>
+      <div style={{padding: '10px'}}>
         <div className="row end-xs">
           {editActions} </div>
 

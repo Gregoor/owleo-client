@@ -26,8 +26,8 @@ let AuthDialog = React.createClass({
     let {exists, mismatch, invalidPw, checking} = this.state;
 
     return (
-      <Dialog ref="dialog" title="Auth" className="auth"
-              onDismiss={this.onDismiss}>
+      <Dialog ref="dialog" title="Auth" onDismiss={this.onDismiss}
+              contentStyle={{maxWidth: '310px'}}>
         <form onSubmit={this.onSubmit}>
           <div className="row">
             <div className="col-xs-12">

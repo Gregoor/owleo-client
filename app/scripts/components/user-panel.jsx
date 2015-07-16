@@ -1,9 +1,15 @@
 import React from 'react';
-import {Toolbar, ToolbarGroup, RaisedButton} from 'material-ui';
+import Radium from 'radium';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, RaisedButton} from 'material-ui';
 
 import userStore from '../stores/user-store';
 
-let UserPanel = React.createClass({
+let styles = {
+  text: {float: 'left', paddingLeft: '15px'},
+  link: {lineHeight: '57px', float: 'left'}
+};
+
+let UserPanel = Radium(React.createClass({
 
   propTypes: {
     'user': React.PropTypes.shape({
@@ -18,29 +24,29 @@ let UserPanel = React.createClass({
     let panelHTML;
     if (user.loggedIn) {
       panelHTML = [
-        <h5 className="name">{user.name}</h5>,
+        <h5 style={[styles.text]}>{user.name}</h5>,
         <RaisedButton label="Logout" primary={true}
                       onClick={this.props.onLogout}/>
       ];
     } else {
       panelHTML = <RaisedButton label="Auth" primary={true}
-                                className="extra-padding"
+                                labelStyle={{paddingLeft: '25px'}}
                                 linkButton={true} href="#/login"/>;
     }
 
     return (
-      <Toolbar className="user">
+      <Toolbar>
         <ToolbarGroup float="right">
-          <a href="mailto:hello@owleo.com"
-             style={{lineHeight: '57px', marginRight: '20px'}}>
+          <a href="mailto:hello@owleo.com" style={[styles.link]}>
             Contact us!
           </a>
+          <ToolbarSeparator />
           {panelHTML}
         </ToolbarGroup>
       </Toolbar>
     );
   }
 
-});
+}));
 
 export default UserPanel;
