@@ -32,7 +32,7 @@ let ExplanationCard = React.createClass({
           <div className="col-xs-1">
             {explanation.votes}
           </div>
-          <div className="col-xs-10" style={{'white-space': 'pre'}}
+          <div className="col-xs-10" style={{'white-space': 'normal'}}
                dangerouslySetInnerHTML={{'__html': content}}/>
         </div>
         <div className="row end-xs">

@@ -18,8 +18,8 @@ let explanationStore = Reflux.createStore({
   },
 
   create(data) {
-    ExplanationAPI.create(this.conceptId, data).then(explanation => {
-      this.explanations.push(explanation);
+    ExplanationAPI.create(this.conceptId, data).then(concept => {
+      this.explanations = concept.explanations;
       this.triggerAll();
     })
   },
