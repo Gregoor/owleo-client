@@ -36,10 +36,12 @@ let UserPanel = Radium(React.createClass({
 
     return (
       <Toolbar>
-        <ToolbarGroup float="right">
+        <ToolbarGroup float="left">
           <a href="mailto:hello@owleo.com" style={[styles.link]}>
             Contact us!
           </a>
+        </ToolbarGroup>
+        <ToolbarGroup float="right">
           <ToolbarSeparator />
           {panelHTML}
         </ToolbarGroup>
