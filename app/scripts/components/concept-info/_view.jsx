@@ -68,7 +68,7 @@ let ConceptView = React.createClass({
                           disabled={fetching || !concept.reqs.length}
                           onClick={this.onSearchFor('leadsTo')}/>
               <br/>
-              <span className="center-xs" style={{fontSize: 9}}>
+              <span style={{fontSize: 9}}>
 										REQUIREMENTS
 									</span>
             </div>
@@ -84,14 +84,16 @@ let ConceptView = React.createClass({
                           style={{paddingBottom: 1}}
                           onClick={this.onSearchFor('reqBy')}/>
               <br/>
-              <span className="center-xs" style={{fontSize: 9}}>
+              <span style={{fontSize: 9}}>
 									FOLLOWUPS
 							</span>
             </div>
           </div>
           <div className="row">
             <div className="col-xs-12 summary"
-                 style={{'display': 'inline', 'white-space': 'pre'}}>
+                 style={{
+                  'display': 'inline', 'whiteSpace': 'normal', 'marginTop': '5px'
+                  }}>
               {fetching ? 'Loading...' : concept.summary}
             </div>
           </div>
