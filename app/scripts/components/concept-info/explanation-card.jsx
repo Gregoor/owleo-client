@@ -12,12 +12,6 @@ let ExplanationCard = React.createClass({
 
     createdAt = new Date(createdAt).toLocaleString();
 
-    if (content && content.trim().startsWith('http')) content = (
-      <a className="and-so-on" target="_blank" href={content.trim()}>
-        {shortenUrl(content)}
-      </a>
-    );
-
     let arrowColor = explanation.hasVoted ? 'red' : 'black';
 
     return (
