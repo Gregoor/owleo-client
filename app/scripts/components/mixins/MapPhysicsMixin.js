@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import Vector from 'wacktor';
 
-const LINK_STRENGTH = .001;
 
 export default {
 
@@ -12,7 +11,16 @@ export default {
     else this.forces.push(force);
 
     force.nodes(concepts).start();
-    force.on('tick', e => {
+
+    let minReq = Infinity, maxReq = 0;
+    el.each(d => {
+      let {reqCount} = d;
+      if (reqCount < minReq) minReq = reqCount;
+      if (reqCount > maxReq) maxReq = reqCount;
+    });
+
+
+    force.on('tick', event => {
 
       force
         .charge(d => -210 + Math.pow(d.r, 2) * -.29)
@@ -21,20 +29,10 @@ export default {
         .start();
 
       el.each(d => {
-        let force = Vector.zero();
-        let absPos = new Vector(d.absX, d.absY);
-
-        let links = this.reqLinks.get(d.id);
-        if (links) for (let link of links) {
-          let {from, to} = d3.select(link).datum();
-          let related = from.id == d.id ? to : from;
-
-          let between = new Vector(related.absX, related.absY).sub(absPos);
-          force = force.add(
-            between.mul(LINK_STRENGTH)
-          );
-        }
-        let pos = force.mul(e.alpha).add(d.x, d.y);
+        let {x, y} = d;
+        let pos = new Vector(x, y);
+        let force = pos.mul((7 * (d.reqCount - minReq) / maxReq) / pos.mag());
+        pos = pos.add(force.mul(event.alpha));
         d.x = pos.x;
         d.y = pos.y;
       });
