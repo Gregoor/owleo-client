@@ -8,6 +8,7 @@ import conceptStore from '../stores/concept-store';
 import userStore from '../stores/user-store';
 
 import GraphMap from './graph-map';
+import OnionMap from './onion-map';
 import Search from './search';
 import ConceptInfo from './concept-info/concept-info';
 import MapFab from './map-fab';
@@ -44,14 +45,17 @@ let MapLayout = React.createClass({
       this.setState({selectedConcept, 'concepts': concepts.all});
     });
 
-    ConceptActions.getAll();
+    if (localStorage.getItem('nested')) ConceptActions.getAllNested();
+    else ConceptActions.getAll();
   },
 
   render() {
-    let conceptInfo;
     let {concepts, focusedConceptId, filter,
       isLocked, selectedConcept, user} = this.state;
 
+    let AMap = concepts instanceof Map ? GraphMap : OnionMap;
+
+    let conceptInfo;
     if (selectedConcept) {
       conceptInfo = <ConceptInfo concept={selectedConcept}
                                  user={user}
@@ -70,7 +74,7 @@ let MapLayout = React.createClass({
     return (
       <div>
         <RouteHandler/>
-        <GraphMap concepts={concepts}
+        <AMap concepts={concepts}
                   physical={!isLocked}
                   selectedConceptId={selectedConcept ? selectedConcept.id : ''}
                   focusedConceptId={focusedConceptId}

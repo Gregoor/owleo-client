@@ -7,8 +7,11 @@ let {endpoint, member} = forResource('concepts');
 export default {
 
   all() {
-    //return http.get(`${endpoint}/nested`);
     return http.get(endpoint);
+  },
+
+  allNested() {
+    return http.get(`${endpoint}/nested`);
   },
 
   find(id) {

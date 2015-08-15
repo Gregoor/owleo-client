@@ -14,8 +14,8 @@ let initListOrPush = (map, key, val) => {
   else map.set(key, [val]);
 };
 
-const INNER_RAD = 100;
-const HEIGHT = 100;
+const INNER_RAD = 0;
+const HEIGHT = 300;
 
 class Onion {
 
@@ -24,7 +24,8 @@ class Onion {
     this.drawLayer(concepts);
   }
 
-  drawLayer(concepts, rad=INNER_RAD, height=HEIGHT, color='white', pos=0, totalWidth=Math.PI * 2) {
+  drawLayer(concepts, rad=INNER_RAD, height=HEIGHT, color='white', pos=0,
+            totalWidth=Math.PI * 2) {
     if (!concepts.length) return;
     let total = concepts.reduce((t, concept) => t + concept.containeeCount, 0);
 
@@ -67,7 +68,8 @@ class Onion {
           })
           .text(concept.name);
 
-      this.drawLayer(concept.containees, outerRad, height * .8, color, pos, width);
+      this.drawLayer(concept.containees, outerRad, height * .8, color, pos,
+        width);
       pos = newPos;
     }
 
@@ -97,7 +99,9 @@ let OnionMap = React.createClass({
   },
 
   componentWillReceiveProps(props) {
-    if (props.concepts) this.g = new Onion(this.refs.map.getDOMNode(), props.concepts).g;
+    if (props.concepts) {
+      this.g = new Onion(this.refs.map.getDOMNode(), props.concepts).g;
+    }
   },
 
   render() {

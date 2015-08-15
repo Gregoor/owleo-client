@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 
 let ConceptActions = Reflux.createActions([
   'getAll',
+  'getAllNested',
   'select',
   'unselect',
   'new',

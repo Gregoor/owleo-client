@@ -22,7 +22,6 @@ let conceptStore = Reflux.createStore({
       concept.y = Math.floor(concept.y);
     }
     this.all = new Map(concepts);
-    //this.all = concepts;
     this.triggerAll();
   },
 
@@ -40,6 +39,13 @@ let conceptStore = Reflux.createStore({
 
   getAll() {
     ConceptAPI.all().then(this.setAll);
+  },
+
+  getAllNested() {
+    ConceptAPI.allNested().then(concepts => {
+      this.all = concepts;
+      this.triggerAll();
+    });
   },
 
   reposition() {
