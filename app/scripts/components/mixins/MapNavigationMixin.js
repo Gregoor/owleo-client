@@ -29,7 +29,7 @@ export default {
   },
 
   onPan(event) {
-    let {pos} = this.navState;
+    let {pos, scale} = this.navState;
     let prevDelta = this.navState.panDelta;
     let x = event.deltaX, y = event.deltaY;
 
@@ -38,7 +38,8 @@ export default {
         'x': pos.x + (x - prevDelta.x),
         'y': pos.y + (y - prevDelta.y)
       },
-      'panDelta': {x, y}
+      'panDelta': {x, y},
+      'prevScale': scale
     });
   },
 
