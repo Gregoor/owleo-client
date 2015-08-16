@@ -77,15 +77,35 @@ let GraphMap = React.createClass({
       this.setState({selectedConceptId});
       this.group.selectAll(`.${SELECTED_CLASS}`)
         .classed(SELECTED_CLASS, false);
+      if (this.hidden) this.hidden.style('opacity', '1');
       if (selectedConceptId) {
-        let conceptNode = this.conceptNodes.get(selectedConceptId);
+        let {id, reqs} = this.concepts.get(selectedConceptId);
+
+        let conceptNode = this.conceptNodes.get(id);
         if (conceptNode) {
           conceptNode.classList.add(SELECTED_CLASS);
-          let linkNodes = this.reqLinks.get(selectedConceptId);
+          let linkNodes = this.reqLinks.get(id);
           if (linkNodes) linkNodes.forEach(el => {
             el.classList.add(SELECTED_CLASS);
           });
         }
+
+        let all = [];
+        let related = [];
+        for (let [id2, g] of this.conceptNodes) {
+          if (id != id2) {
+            g = d3.select(g);
+            let els = [g.select('circle').node(), g.select('text').node()];
+            if (_.includes(reqs, id2) || _.includes(this.concepts.get(id2).reqs, id)) {
+              related = related.concat(els);
+            } else {
+              all = all.concat(els);
+            }
+          }
+        }
+        d3.selectAll(all).style('opacity', '.2');
+        d3.selectAll(related).style('opacity', '.7');
+        this.hidden = d3.selectAll(all.concat(related));
       }
     }
 
@@ -179,37 +199,41 @@ let GraphMap = React.createClass({
         self.conceptNodes.set(d.id, this);
       });
 
-    let onClick = function (d) {
+    let onClick = function(d) {
       if (!self.state.wasPanning) {
         self.props.onSelect(d.id);
         self.selectedAt = Date.now();
       }
+    };
+    let onMouseMove = function(d) {
+      let linkNodes = self.reqLinks.get(d.id);
+      if (linkNodes) linkNodes.forEach(el => {
+        d3.select(el).classed(HIGHLIGHT_CLASS, true);
+      });
+      d3.select(this).classed(HIGHLIGHT_CLASS, true);
+    };
+    let onMouseOut = function (d) {
+      let linkNodes = self.reqLinks.get(d.id);
+      if (linkNodes) linkNodes.forEach(el => {
+        d3.select(el).classed(HIGHLIGHT_CLASS, false);
+      });
+      d3.select(this).classed(HIGHLIGHT_CLASS, false);
     };
     let circle = el.append('circle')
       .style({
         'stroke': d => d.color || (d.color = container.color) || 'white',
         'fill': 'rgba(0, 0, 0, .05)'
       })
-      .on('mouseover', function (d) {
-        let linkNodes = self.reqLinks.get(d.id);
-        if (linkNodes) linkNodes.forEach(el => {
-          d3.select(el).classed(HIGHLIGHT_CLASS, true);
-        });
-        d3.select(this).classed(HIGHLIGHT_CLASS, true);
-      })
-      .on('mouseout', function (d) {
-        let linkNodes = self.reqLinks.get(d.id);
-        if (linkNodes) linkNodes.forEach(el => {
-          d3.select(el).classed(HIGHLIGHT_CLASS, false);
-        });
-        d3.select(this).classed(HIGHLIGHT_CLASS, false);
-      })
+      .on('mouseover', onMouseMove)
+      .on('mouseout', onMouseOut)
       .on('click', onClick);
 
     circle.append('title').text(d => d.name);
 
     let label = el.append('text')
       .text(d => d.name)
+      .on('mouseover', onMouseMove)
+      .on('mouseout', onMouseOut)
       .on('click', onClick)
       .attr({
         'class': 'label',
