@@ -8,8 +8,8 @@ export default {
     this.navState = {
       'pos': {x: window.innerWidth / 2, y: window.innerHeight / 2},
       'panDelta': {x, y},
-      'prevScale': .19,
-      'scale': .2
+      'prevScale': .29,
+      'scale': .3
     };
     return {'panning': false};
   },
@@ -59,7 +59,7 @@ export default {
     let prevScale = this.navState.scale;
     let multiply = event.deltaMode == 1 ? 10 : 1;
     let scale = prevScale - (prevScale * (event.deltaY * multiply) / steps);
-    if (scale == prevScale || scale > 1.5 || scale < .1) return;
+    if (scale == prevScale || scale > 2 || scale < .1) return;
 
     let {pos} = this.navState;
     let eventX = event.pageX;

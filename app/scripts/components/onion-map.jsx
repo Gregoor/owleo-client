@@ -14,8 +14,8 @@ let initListOrPush = (map, key, val) => {
   else map.set(key, [val]);
 };
 
-const INNER_RAD = 0;
-const HEIGHT = 300;
+const INNER_RAD = 100;
+const HEIGHT = 100;
 
 class Onion {
 
@@ -36,43 +36,69 @@ class Onion {
       let width = relWidth * totalWidth;
       let newPos = pos + width;
 
+      if (concept.color) color = concept.color;
+
       let arc = d3.svg.arc()
         .innerRadius(rad)
         .outerRadius(outerRad)
         .startAngle(pos)
         .endAngle(newPos);
 
-      if (concept.color) color = concept.color;
-
       this.g.append('path')
         .attr('d', arc)
         .style({'fill': color, 'stroke': 'black'})
         .append('svg:title').text(concept.name);
 
-      let innerArc = d3.svg.arc()
-        .innerRadius(rad)
-        .outerRadius(rad + height / 2)
-        .startAngle(pos)
-        .endAngle(newPos);
+      let circum = (newPos - pos) * (rad + height / 2);
+      let middleRad =  rad + height / 2;
+      let text = concept.name;
+      if (circum > height) {
+        let fontSize = Math.min(1.5 * circum / text.length, 90);
 
-      this.g.append('path')
-        .attr({'d': innerArc, 'id': concept.id})
-        .style('fill', 'transparent');
+        let innerArc = d3.svg.arc()
+          .innerRadius(middleRad)
+          .outerRadius(middleRad)
+          .startAngle(pos)
+          .endAngle(newPos);
 
-      if (rad * width > 100) this.g.append('text')
-        .style('font-size', 20)
-        .append('textPath')
+        let pathLength = this.g.append('path')
+          .attr({'d': innerArc, 'id': concept.id})
+          .style('fill', 'transparent')
+          .node().getTotalLength();
+
+        let textEl = this.g.append('text')
+          .style('font-size', fontSize)
+          .append('textPath')
           .attr({
-            'xlink:href': `#${concept.id}`,
-            'textLength': rad * width, 'startOffset': '10%'
+            'dominant-baseline': 'central',
+            'xlink:href': `#${concept.id}`
           })
-          .text(concept.name);
+          .text(text);
+console.log(pathLength / 2, textEl.node().getComputedTextLength() / 2);
+        textEl.attr('startOffset', pathLength / 4 - textEl.node().getComputedTextLength() / 2);
+      } else {
+        let center = pos + width / 2;
+        let fontSize = Math.min(circum / 1.2, 150 / text.length);
+        let invCenter = Math.PI - center;
+        let x = Math.sin(invCenter) * middleRad;
+        let y = Math.cos(invCenter) * middleRad;
+        let rotation = (center - Math.PI/2) * 57;
+        if (center > Math.PI) rotation += 180;
+        this.g.append('text')
+          .attr({
+            x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+            'transform': `rotate(${rotation} ${x},${y})`
+          })
+          .style({
+            'font-size': fontSize, 'fill': 'black'
+          })
+          .text(text)
+      }
 
-      this.drawLayer(concept.containees, outerRad, height * .8, color, pos,
+      this.drawLayer(concept.containees, outerRad, height, color, pos,
         width);
       pos = newPos;
     }
-
   }
 
 }
