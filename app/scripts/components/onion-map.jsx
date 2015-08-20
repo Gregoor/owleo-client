@@ -19,8 +19,11 @@ const HEIGHT = 100;
 
 class Onion {
 
-  constructor(svg, concepts) {
+  constructor(svg, concepts, opts) {
     this.g = d3.select(svg).append('g').attr('transform', 'translate(400, 400)');
+    _.assign(this, {
+      'onClick': _.noop
+    }, opts);
     this.drawLayer(concepts);
   }
 
@@ -46,7 +49,8 @@ class Onion {
 
       this.g.append('path')
         .attr('d', arc)
-        .style({'fill': color, 'stroke': 'black'})
+        .style({'fill': color, 'stroke': 'black', 'cursor': 'pointer'})
+        .on('click', this.onClick.bind(null, concept))
         .append('svg:title').text(concept.name);
 
       let circum = (newPos - pos) * (rad + height / 2);
@@ -67,14 +71,16 @@ class Onion {
           .node().getTotalLength();
 
         let textEl = this.g.append('text')
-          .style('font-size', fontSize)
+          .style({
+            'font-size': fontSize, 'cursor': 'pointer', 'pointer-events': 'none'
+          })
           .append('textPath')
           .attr({
             'dominant-baseline': 'central',
             'xlink:href': `#${concept.id}`
           })
           .text(text);
-console.log(pathLength / 2, textEl.node().getComputedTextLength() / 2);
+
         textEl.attr('startOffset', pathLength / 4 - textEl.node().getComputedTextLength() / 2);
       } else {
         let center = pos + width / 2;
@@ -90,7 +96,8 @@ console.log(pathLength / 2, textEl.node().getComputedTextLength() / 2);
             'transform': `rotate(${rotation} ${x},${y})`
           })
           .style({
-            'font-size': fontSize, 'fill': 'black'
+            'font-size': fontSize, 'fill': 'black',
+            'cursor': 'pointer', 'pointer-events': 'none'
           })
           .text(text)
       }
@@ -125,8 +132,14 @@ let OnionMap = React.createClass({
   },
 
   componentWillReceiveProps(props) {
+    let self = this;
     if (props.concepts) {
-      this.g = new Onion(this.refs.map.getDOMNode(), props.concepts).g;
+      let svgNode = this.refs.map.getDOMNode();
+      this.g = new Onion(svgNode, props.concepts, {
+        onClick(concept) {
+          self.props.onSelect(concept.id);
+        }
+      }).g;
     }
   },
 

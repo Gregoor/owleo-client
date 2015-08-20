@@ -54,7 +54,7 @@ let conceptStore = Reflux.createStore({
 
   select(id) {
     if (this.selected && id == this.selected.id) return;
-    if (this.all && this.all.has(id)) {
+    if (this.all && this.all instanceof Map && this.all.has(id)) {
       this.setSelected(_.assign({'fetching': true}, this.all.get(id)));
     }
     ConceptAPI.find(id).then(this.setSelected);
