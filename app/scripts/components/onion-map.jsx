@@ -21,9 +21,11 @@ class Onion {
 
   constructor(svg, concepts, opts) {
     this.g = d3.select(svg).append('g').attr('transform', 'translate(400, 400)');
-    _.assign(this, {
+    this.opts = _.assign({
       'onClick': _.noop
     }, opts);
+    this.groups = new Map();
+    this.hiddenGroups = [];
     this.drawLayer(concepts);
   }
 
@@ -47,15 +49,20 @@ class Onion {
         .startAngle(pos)
         .endAngle(newPos);
 
-      this.g.append('path')
+      let text = concept.name;
+      let group = this.g.append('g');
+
+      this.groups.set(concept.id, group);
+
+      group.append('path')
         .attr('d', arc)
         .style({'fill': color, 'stroke': 'black', 'cursor': 'pointer'})
-        .on('click', this.onClick.bind(null, concept))
-        .append('svg:title').text(concept.name);
+        .on('click', () => this.onClick(concept))
+        .append('svg:title').text(text);
 
       let circum = (newPos - pos) * (rad + height / 2);
       let middleRad =  rad + height / 2;
-      let text = concept.name;
+
       if (circum > height) {
         let fontSize = Math.min(1.5 * circum / text.length, 90);
 
@@ -65,12 +72,12 @@ class Onion {
           .startAngle(pos)
           .endAngle(newPos);
 
-        let pathLength = this.g.append('path')
+        let pathLength = group.append('path')
           .attr({'d': innerArc, 'id': concept.id})
           .style('fill', 'transparent')
           .node().getTotalLength();
 
-        let textEl = this.g.append('text')
+        let textEl = group.append('text')
           .style({
             'font-size': fontSize, 'cursor': 'pointer', 'pointer-events': 'none'
           })
@@ -90,7 +97,7 @@ class Onion {
         let y = Math.cos(invCenter) * middleRad;
         let rotation = (center - Math.PI/2) * 57;
         if (center > Math.PI) rotation += 180;
-        this.g.append('text')
+        group.append('text')
           .attr({
             x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central',
             'transform': `rotate(${rotation} ${x},${y})`
@@ -105,6 +112,22 @@ class Onion {
       this.drawLayer(concept.containees, outerRad, height, color, pos,
         width);
       pos = newPos;
+    }
+  }
+
+  onClick(concept) {
+    this.opts.onClick(concept);
+  }
+
+  highlight(conceptId) {
+    if (conceptId) for (let [id, group] of this.groups) {
+      if (id != conceptId) {
+        this.hiddenGroups.push(group.style('opacity', .3));
+      } else {
+        group.style('opacity', 1);
+      }
+    } else {
+      this.hiddenGroups.forEach(group => group.style('opacity', 1));
     }
   }
 
@@ -133,13 +156,21 @@ let OnionMap = React.createClass({
 
   componentWillReceiveProps(props) {
     let self = this;
-    if (props.concepts) {
+    let {concepts, selectedConceptId} = props;
+
+    if (!this.onion && concepts) {
       let svgNode = this.refs.map.getDOMNode();
-      this.g = new Onion(svgNode, props.concepts, {
+      this.onion = new Onion(svgNode, concepts, {
         onClick(concept) {
           self.props.onSelect(concept.id);
         }
-      }).g;
+      });
+      this.onion.highlight(selectedConceptId);
+      this.g = this.onion.g;
+    }
+
+    if (this.onion && selectedConceptId != this.props.selectedConceptId) {
+      this.onion.highlight(selectedConceptId);
     }
   },
 
