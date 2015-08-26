@@ -167,6 +167,7 @@ let OnionMap = React.createClass({
       });
       this.onion.highlight(selectedConceptId);
       this.g = this.onion.g;
+      this.setNavState({'prevScale': .49, 'scale': .5});
     }
 
     if (this.onion && selectedConceptId != this.props.selectedConceptId) {

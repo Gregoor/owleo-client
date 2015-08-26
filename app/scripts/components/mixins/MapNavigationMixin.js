@@ -59,7 +59,7 @@ export default {
     let prevScale = this.navState.scale;
     let multiply = event.deltaMode == 1 ? 10 : 1;
     let scale = prevScale - (prevScale * (event.deltaY * multiply) / steps);
-    if (scale == prevScale || scale > 2 || scale < .1) return;
+    if (scale == prevScale || scale > 4 || scale < .1) return;
 
     let {pos} = this.navState;
     let eventX = event.pageX;
